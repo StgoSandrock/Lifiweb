@@ -1,0 +1,1973 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIFI - Liga Infantil de Fútbol Interestadios</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html { scroll-behavior: smooth; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        @keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+        .animate-pulse {
+            animation: slideInRight 0.3s ease-out;
+        }
+        .toast-exit {
+            animation: slideOutRight 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 font-sans text-slate-900 antialiased overflow-x-hidden">
+
+    <div id="app-root"></div>
+
+    <!-- Modal de Login para Staff -->
+    <div id="login-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center">
+        <div class="bg-slate-800 rounded-[2rem] border border-slate-700 p-8 shadow-2xl max-w-md w-full mx-4">
+            <h2 class="text-2xl font-black text-white uppercase mb-6 tracking-tighter">Acceso Staff</h2>
+            <form onsubmit="verifyAdminLogin(event)" class="space-y-4">
+                <input type="password" name="password" placeholder="Ingresa la contraseña" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold outline-none focus:ring-2 focus:ring-yellow-500" required />
+                <div id="login-error-msg" class="hidden bg-red-500/20 border border-red-500 text-red-300 text-sm p-3 rounded-lg text-center font-bold"></div>
+                <button type="submit" class="w-full bg-yellow-500 text-black font-black py-4 rounded-xl uppercase tracking-widest hover:bg-yellow-400 transition-colors">Entrar</button>
+            </form>
+            <button onclick="toggleLoginModal(false)" class="w-full mt-4 bg-slate-700 text-white font-black py-3 rounded-xl uppercase tracking-widest hover:bg-slate-600 transition-colors">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal para registrar goles y tarjetas -->
+    <div id="goal-modal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-[2rem] border border-slate-700 p-8 shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <div id="goal-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Ascenso de Categoria (fin de temporada) -->
+    <div id="ascenso-modal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4">
+        <div class="bg-slate-800 rounded-[2rem] border border-slate-700 p-6 md:p-8 shadow-2xl max-w-2xl w-full max-h-[88vh] overflow-y-auto">
+            <div id="ascenso-modal-content"></div>
+        </div>
+    </div>
+
+    <!-- Contenedor para notificaciones Toast -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 space-y-3"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            onSnapshot, 
+            setDoc, 
+            updateDoc, 
+            deleteDoc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // ==========================================
+        // 1. CONFIGURACIÓN DE FIREBASE
+        // ==========================================
+        const firebaseConfig = {
+            apiKey: "AIzaSyBLGMtJ6QJSNwakmD_PdgtstARICyu1sEI",
+            authDomain: "lifiwebapp.firebaseapp.com",
+            projectId: "lifiwebapp",
+            storageBucket: "lifiwebapp.firebasestorage.app",
+            messagingSenderId: "798436972351",
+            appId: "1:798436972351:web:7242cbd43e3fb46c99a58a",
+            measurementId: "G-4CJH9M87YL"
+        };
+
+        const isFirebaseConfigured = firebaseConfig.apiKey !== "";
+        let app, auth, db;
+        const appId = 'lifi-2026-prod';
+
+        if (isFirebaseConfigured) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } else {
+            console.warn("MODO DEMO: Firebase no está configurado.");
+        }
+        
+// ==========================================
+// 2. CONSTANTES GLOBALES Y ESTRUCTURA DE DATOS
+// ==========================================
+const LIGA_CLUBS = [
+    { id: 'manquehue', name: 'Club Manquehue', logo: 'logo_manquehue.png' },
+    { id: 'espanol', name: 'Estadio Español', logo: 'estadio español logo.png' },
+    { id: 'israelita', name: 'Estadio Israelita', logo: 'logo-club-israelita.png' },
+    { id: 'palestino', name: 'Club Palestino', logo: 'logo palestino.jpeg' },
+    { id: 'italiano', name: 'Stadio Italiano', logo: 'stadio italiano logo.png' },
+    { id: 'croata', name: 'Estadio Croata', logo: 'estadio_croatalogo-AoPv7zjrKEHMW543.avif' },
+    { id: 'bianconero', name: 'Bianconero', logo: 'bianconero logo.png' },
+    { id: 'ultimate', name: 'Ultimate S.A.', logo: 'ultimate_logo.png' },
+    { id: 'chicureo', name: 'U.C. Chicureo', logo: 'uc_chicureo.png' },
+    { id: 'lif', name: 'Club LIF', logo: 'lif.png' }
+];
+
+        // ==========================================
+        // TEMPORADA Y CATEGORIAS DINAMICAS
+        // Los anios de cada categoria se calculan a partir de la temporada actual
+        // (seasonYear). Con seasonYear = 2025 se reproducen exactamente los anios
+        // originales: Pre-Peque 2019-20, Peque 2017-18, ... Intermedia 2011-12.
+        // Cada vez que se ejecuta el "Ascenso de Categoria" la temporada avanza 1,
+        // de modo que el boton siempre sabe quien es "el anio mayor" de cada categoria.
+        // ==========================================
+        const CATEGORY_DEFS = [
+            { id: 'pre-peque',  name: 'Pre-Peque',  offset: 9 },
+            { id: 'peque',      name: 'Peque',      offset: 11 },
+            { id: 'mini',       name: 'Mini',       offset: 13 },
+            { id: 'infantil',   name: 'Infantil',   offset: 15 },
+            { id: 'intermedia', name: 'Intermedia', offset: 17 }
+        ];
+
+        let seasonYear = (function () {
+            const stored = parseInt(localStorage.getItem('lifi_seasonYear_v2'), 10);
+            return Number.isFinite(stored) ? stored : 2026;
+        })();
+
+        function buildCategories() {
+            return CATEGORY_DEFS.map(d => {
+                const older = seasonYear - d.offset;   // anio mayor (el que asciende)
+                const younger = older + 1;             // anio menor (se queda)
+                return {
+                    id: d.id,
+                    name: d.name,
+                    offset: d.offset,
+                    older,
+                    younger,
+                    years: `${older}-${String(younger).slice(2)}`
+                };
+            });
+        }
+
+        let CATEGORIES = buildCategories();
+
+        // Persistir la temporada (localStorage siempre, Firestore si esta configurado)
+        async function setSeasonYear(y) {
+            seasonYear = y;
+            CATEGORIES = buildCategories();
+            try { localStorage.setItem('lifi_seasonYear_v2', String(y)); } catch (e) {}
+            if (isFirebaseConfigured && state.currentUser) {
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'temporada-v2'), { year: y });
+                } catch (e) { console.error('Error guardando temporada:', e); }
+            }
+            window.setState({});
+        }
+
+        // Es momento de ascender? (al finalizar el anio / 31 de diciembre)
+        function isAscensoTime() {
+            const now = new Date();
+            const y = now.getFullYear();
+            if (y > seasonYear) return true;
+            if (y === seasonYear && now.getMonth() === 11 && now.getDate() === 31) return true;
+            return false;
+        }
+
+        const CUP_CATEGORIES = ['pre-peque', 'peque', 'mini'];
+
+        const CUP_CLUBS_BY_CATEGORY = {
+            'pre-peque': [
+                'Club Manquehue',
+                'D Rojos',
+                'Barnechea',
+                'Estadio Israelita',
+                'Country Club',
+                'Alumni',
+                'Club Sirio',
+                'Club Palestino'
+            ],
+            'peque': [
+                'Universidad San Sebastián',
+                'Club Manquehue',
+                'D Rojos',
+                'Barnechea',
+                'Estadio Israelita',
+                'Country Club',
+                'Alumni',
+                'Club Sirio',
+                'Club Palestino',
+                'Stadio Italiano',
+                'F Albo',
+                'Estadio Español'
+            ],
+            'mini': [
+                'Universidad San Sebastián',
+                'Club Manquehue',
+                'Ultimate',
+                'Barnechea',
+                'P Gales',
+                'Country Club',
+                'Alumni',
+                'Club Sirio',
+                'Club Palestino',
+                'F Albo'
+            ]
+        };
+
+        const INITIAL_MOCK_PLAYERS = [];
+        const INITIAL_MOCK_FIXTURES = [];
+
+// ==========================================
+        // 3. ESTADO GLOBAL (LOCAL STATE)
+        // ==========================================
+        let state = {
+            view: 'lobby',          
+            activeMode: 'liga',      
+            tournament: 'apertura', 
+            subView: 'tabla',       
+            selectedClub: null,     
+            category: 'infantil',   
+            players: [],
+            fixtures: [],
+            currentUser: null,
+            isAdmin: false,
+            lastSelectedClub: 'Club Manquehue',
+            editingFixtureId: null,
+            editingFixture: null,
+            fixtureGoals: null,
+            teamDashboardMode: false,
+            selectedTeamDashboard: null,
+            unsavedChanges: false
+        };
+
+        window.setState = function(updatedState) {
+            state = { ...state, ...updatedState };
+            render();
+        };
+
+        window.selectClubView = function(clubName) {
+            window.setState({ selectedClub: clubName });
+            window.scrollTo(0, 0);
+        };
+
+        // ==========================================
+        // 4. LÓGICA DE FIREBASE Y PANELES
+        // ==========================================
+        const initAuthAndSync = async () => {
+            if (!isFirebaseConfigured) return;
+
+            try {
+                await signInAnonymously(auth);
+            } catch (error) {
+                console.error("Error al autenticar en Firebase:", error);
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    state.currentUser = user;
+                    onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'jugadores'), (snapshot) => {
+                        let fetchedPlayers = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        window.setState({ players: fetchedPlayers });
+                    });
+
+                    onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'partidos'), (snapshot) => {
+                        let fetchedFixtures = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                        window.setState({ fixtures: fetchedFixtures });
+                    });
+
+                    // Temporada actual (define los anios de cada categoria)
+                    onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'config', 'temporada-v2'), (snap) => {
+                        if (snap.exists() && Number.isFinite(snap.data().year)) {
+                            seasonYear = snap.data().year;
+                            CATEGORIES = buildCategories();
+                            try { localStorage.setItem('lifi_seasonYear_v2', String(seasonYear)); } catch (e) {}
+                            window.setState({});
+                        }
+                    });
+                }
+            });
+        };
+
+        // ==========================================
+        // 5. CÁLCULOS EN TIEMPO REAL
+        // ==========================================
+        
+        // ---> NUEVA FUNCIÓN PARA ORDENAR POR APELLIDO <---
+        function getApellido(nombreCompleto) {
+            if (!nombreCompleto) return '';
+            const partes = nombreCompleto.trim().split(' ');
+            return partes.length > 1 ? partes[partes.length - 1].toLowerCase() : nombreCompleto.toLowerCase();
+        }
+
+        function getRealTopScorers(isCup) {
+            const targetCats = isCup ? CATEGORIES.filter(c => CUP_CATEGORIES.includes(c.id)) : CATEGORIES;
+            return targetCats.map(cat => {
+                const catPlayers = state.players.filter(p => p.categoria === cat.id && p.cupPlayer === isCup);
+                if (catPlayers.length === 0) return { category: cat.name, nombre: 'Pendiente', club: '---', goles: 0 };
+                const sorted = [...catPlayers].sort((a, b) => b.goles - a.goles);
+                const maxGoles = sorted[0]?.goles || 0;
+                
+                const leaders = sorted.filter(p => p.goles === maxGoles && maxGoles > 0);
+                if (leaders.length === 0) {
+                    return { category: cat.name, nombre: 'Pendiente', club: '---', goles: 0 };
+                } else if (leaders.length === 1) {
+                    return { category: cat.name, nombre: leaders[0].nombre, club: leaders[0].club, goles: leaders[0].goles };
+                } else {
+                    return { category: cat.name, nombre: leaders.map(l => l.nombre).join(' / '), club: 'Empate', goles: maxGoles };
+                }
+            });
+        }
+
+        function getStandings() {
+            const isCup = state.activeMode === 'cup';
+            const clubs = isCup 
+                ? (CUP_CLUBS_BY_CATEGORY[state.category] || []).map(name => {
+                    const mapped = LIGA_CLUBS.find(c => c.name === name);
+                    return mapped ? mapped : { id: name.toLowerCase().replace(/\s+/g, ''), name, logo: '' };
+                })
+                : LIGA_CLUBS;
+
+            const stats = {};
+            clubs.forEach(club => { stats[club.name] = { id: club.id, name: club.name, logo: club.logo, pj: 0, pg: 0, pe: 0, pp: 0, gf: 0, gc: 0, dg: 0, pts: 0 }; });
+
+            const filteredFixtures = state.fixtures.filter(f => f.tournament === state.tournament && f.isCup === isCup && f.category === state.category && f.status === 'played');
+
+            filteredFixtures.forEach(m => {
+                if (!stats[m.local] || !stats[m.visita]) return;
+                stats[m.local].pj++; stats[m.visita].pj++;
+                stats[m.local].gf += m.golesL; stats[m.local].gc += m.golesV;
+                stats[m.visita].gf += m.golesV; stats[m.visita].gc += m.golesL;
+
+                if (m.golesL > m.golesV) { stats[m.local].pg++; stats[m.local].pts += 3; stats[m.visita].pp++; } 
+                else if (m.golesL < m.golesV) { stats[m.visita].pg++; stats[m.visita].pts += 3; stats[m.local].pp++; } 
+                else { stats[m.local].pe++; stats[m.local].pts += 1; stats[m.visita].pe++; stats[m.visita].pts += 1; }
+                
+                stats[m.local].dg = stats[m.local].gf - stats[m.local].gc;
+                stats[m.visita].dg = stats[m.visita].gf - stats[m.visita].gc;
+            });
+
+            return Object.values(stats).sort((a, b) => {
+                if (b.pts !== a.pts) return b.pts - a.pts;
+                return b.dg - a.dg;
+            });
+        }
+
+        // ==========================================
+        // NUEVA FUNCIÓN: GENERAR CRUCES AUTOMÁTICOS (ROUND ROBIN)
+        // ==========================================
+        function generateAllFixtures() {
+            const isCup = state.activeMode === 'cup';
+            const clubs = isCup 
+                ? CUP_CLUBS_BY_CATEGORY[state.category] || []
+                : LIGA_CLUBS.map(c => c.name);
+
+            const tournaments = ['apertura', 'clausura'];
+            const newFixtures = [];
+
+            tournaments.forEach(tournament => {
+                // Generar round-robin para todos los equipos
+                for (let i = 0; i < clubs.length; i++) {
+                    for (let j = i + 1; j < clubs.length; j++) {
+                        // Partido 1: clubs[i] local, clubs[j] visita
+                        const id1 = 'f_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        newFixtures.push({
+                            id: id1,
+                            tournament: tournament,
+                            isCup: isCup,
+                            category: state.category,
+                            fecha: 'Pendiente',
+                            local: clubs[i],
+                            visita: clubs[j],
+                            golesL: 0,
+                            golesV: 0,
+                            status: 'pending',
+                            fechaCompleta: '',
+                            cancha: 'Por definir',
+                            hora: '12:00',
+                            fechaNumero: 0
+                        });
+
+                        // Partido 2: clubs[j] local, clubs[i] visita
+                        const id2 = 'f_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                        newFixtures.push({
+                            id: id2,
+                            tournament: tournament,
+                            isCup: isCup,
+                            category: state.category,
+                            fecha: 'Pendiente',
+                            local: clubs[j],
+                            visita: clubs[i],
+                            golesL: 0,
+                            golesV: 0,
+                            status: 'pending',
+                            fechaCompleta: '',
+                            cancha: 'Por definir',
+                            hora: '12:00',
+                            fechaNumero: 0
+                        });
+                    }
+                }
+            });
+
+            return newFixtures;
+        }
+
+        window.generateAllFixtures = async function() {
+            const newFixtures = generateAllFixtures();
+            
+            for (let fixture of newFixtures) {
+                if (isFirebaseConfigured && state.currentUser) {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'partidos', fixture.id), fixture);
+                } else {
+                    state.fixtures.push(fixture);
+                }
+            }
+            
+            if (!isFirebaseConfigured) {
+                window.setState({});
+            }
+            
+            alert(`Se generaron ${newFixtures.length} cruces automáticamente para ${state.activeMode === 'cup' ? 'LIFI Cup' : 'LIGA LIFI'} - ${CATEGORIES.find(c => c.id === state.category)?.name}`);
+        };
+
+        initAuthAndSync();
+
+        // ---------------- Funciones del Staff ----------------
+        window.verifyAdminLogin = function(event) {
+            event.preventDefault();
+            const pass = event.target.password.value;
+            if (pass === "133233") {
+                window.setState({ view: 'admin', isAdmin: true });
+                toggleLoginModal(false);
+            } else {
+                const errMessage = document.getElementById('login-error-msg');
+                if (errMessage) {
+                    errMessage.innerText = 'Contraseña incorrecta. Inténtelo de nuevo.';
+                    errMessage.classList.remove('hidden');
+                }
+            }
+        };
+
+        window.toggleLoginModal = function(show) {
+            const modal = document.getElementById('login-modal');
+            if (modal) {
+                if (show) {
+                    modal.classList.remove('hidden');
+                } else {
+                    modal.classList.add('hidden');
+                    const errMessage = document.getElementById('login-error-msg');
+                    if (errMessage) errMessage.classList.add('hidden');
+                }
+            }
+        };
+
+window.savePlayer = async function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const id = 'p_' + Date.now();
+            const isCup = state.activeMode === 'cup';
+
+            // Guardamos el club seleccionado en el estado antes de limpiar el formulario
+            state.lastSelectedClub = form.club.value;
+
+            const player = {
+                id,
+                nombre: form.nombre.value.trim(),
+                posicion: form.posicion.value || '', 
+                club: form.club.value,
+                categoria: state.category,
+                anio: parseInt(form.anio.value, 10) || null,
+                goles: parseInt(form.goles.value) || 0,
+                pj: parseInt(form.pj.value) || 0,
+                ta: parseInt(form.ta.value) || 0,
+                tr: parseInt(form.tr.value) || 0,
+                cupPlayer: isCup
+            };
+
+            if (isFirebaseConfigured && state.currentUser) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jugadores', id), player);
+            } else {
+                state.players.push(player);
+                window.setState({});
+            }
+            markUnsavedChanges();
+            showToast('✓ Jugador agregado exitosamente', 'success');
+            form.reset();
+        };
+
+        window.updatePlayerStatInDb = async function(playerId, field, value) {
+            let finalValue = value;
+            if (field === 'anio') {
+                finalValue = parseInt(value, 10);
+                if (!Number.isFinite(finalValue)) finalValue = null;
+            } else if (field !== 'nombre' && field !== 'posicion') {
+                finalValue = isNaN(value) ? value : parseInt(value);
+            }
+            
+            if (isFirebaseConfigured && state.currentUser) {
+                const playerRef = doc(db, 'artifacts', appId, 'public', 'data', 'jugadores', playerId);
+                try {
+                    const docSnap = await getDoc(playerRef);
+                    if (docSnap.exists()) {
+                        await updateDoc(playerRef, { [field]: finalValue });
+                    }
+                } catch (e) { console.error("Error:", e); }
+            } else {
+                const p = state.players.find(x => x.id === playerId);
+                if (p) p[field] = finalValue;
+                window.setState({});
+            }
+            markUnsavedChanges();
+            showToast('✓ Estadísticas actualizadas', 'success');
+        };
+
+        window.deletePlayerFromDb = async function(playerId) {
+            const confirmation = document.getElementById(`confirm-del-${playerId}`);
+            if (confirmation) confirmation.classList.remove('hidden');
+        };
+
+        window.confirmDeletePlayer = async function(playerId) {
+            if (isFirebaseConfigured && state.currentUser) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jugadores', playerId));
+            } else {
+                state.players = state.players.filter(x => x.id !== playerId);
+                window.setState({});
+            }
+            markUnsavedChanges();
+            showToast('✓ Jugador eliminado', 'success');
+            window.cancelDeletePlayer(playerId);
+        };
+
+        window.cancelDeletePlayer = function(playerId) {
+            const confirmation = document.getElementById(`confirm-del-${playerId}`);
+            if (confirmation) confirmation.classList.add('hidden');
+        };
+
+        window.saveFixture = async function(event) {
+            event.preventDefault();
+            const form = event.target;
+            const id = 'f_' + Date.now();
+
+            const isCupVal = form.isCup.value === 'true';
+            let tournamentVal = form.tournament.value;
+            const fechaInput = form.fecha.value;
+
+            // Si la fecha del partido es posterior a julio (agosto en adelante),
+            // se registra automaticamente como Torneo de Clausura.
+            const fechaCompletaVal = form.fechaCompleta.value;
+            if (fechaCompletaVal) {
+                const mes = parseInt(fechaCompletaVal.split('-')[1], 10); // 1-12
+                if (Number.isFinite(mes)) {
+                    tournamentVal = mes > 7 ? 'clausura' : 'apertura';
+                }
+            }
+            
+            // Extraer número de fecha si es "Fecha X"
+            let fechaNumero = 0;
+            const match = fechaInput.match(/\d+/);
+            if (match) {
+                fechaNumero = parseInt(match[0]);
+            }
+
+            const fixture = {
+                id,
+                tournament: tournamentVal,
+                isCup: isCupVal,
+                category: state.category,
+                fecha: fechaInput,
+                fechaNumero: fechaNumero,
+                local: form.local.value,
+                visita: form.visita.value,
+                golesL: parseInt(form.golesL.value) || 0,
+                golesV: parseInt(form.golesV.value) || 0,
+                status: form.status.value,
+                fechaCompleta: form.fechaCompleta.value || '2026-05-24',
+                cancha: form.cancha.value || 'Por definir',
+                hora: form.hora.value || '12:00'
+            };
+
+            if (isFirebaseConfigured && state.currentUser) {
+                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'partidos', id), fixture);
+            } else {
+                state.fixtures.push(fixture);
+                window.setState({});
+            }
+            markUnsavedChanges();
+            showToast('✓ Partido agregado exitosamente', 'success');
+            form.reset();
+        };
+
+        window.updateFixtureStatInDb = async function(fixtureId, field, value) {
+            let parsedValue = isNaN(value) ? value : parseInt(value);
+            
+            // Si es el campo 'fecha', extraer también el fechaNumero
+            const updateObj = { [field]: parsedValue };
+            if (field === 'fecha') {
+                const match = value.match(/\d+/);
+                updateObj.fechaNumero = match ? parseInt(match[0]) : 0;
+            }
+            
+            if (isFirebaseConfigured && state.currentUser) {
+                const fixtureRef = doc(db, 'artifacts', appId, 'public', 'data', 'partidos', fixtureId);
+                await updateDoc(fixtureRef, updateObj);
+            } else {
+                const f = state.fixtures.find(x => x.id === fixtureId);
+                if (f) {
+                    f[field] = parsedValue;
+                    if (field === 'fecha') {
+                        const match = value.match(/\d+/);
+                        f.fechaNumero = match ? parseInt(match[0]) : 0;
+                    }
+                }
+                window.setState({});
+            }
+            markUnsavedChanges();
+            showToast('✓ Datos del partido actualizados', 'success');
+        };
+
+        window.deleteFixtureFromDb = async function(fixtureId) {
+            if (isFirebaseConfigured && state.currentUser) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'partidos', fixtureId));
+            } else {
+                state.fixtures = state.fixtures.filter(x => x.id !== fixtureId);
+                window.setState({});
+            }
+            markUnsavedChanges();
+            showToast('✓ Partido eliminado', 'success');
+        };
+
+        // ==========================================
+        // NUEVO: REGISTRO DE GOLES Y TARJETAS
+        // ==========================================
+        window.openGoalModal = function(fixtureId) {
+            const fixture = state.fixtures.find(f => f.id === fixtureId);
+            if (!fixture) return;
+            
+            state.editingFixtureId = fixtureId;
+            state.editingFixture = JSON.parse(JSON.stringify(fixture));
+            state.fixtureGoals = JSON.parse(fixture.goalDetails || '{"local": [], "visita": []}');
+            
+            const modal = document.getElementById('goal-modal');
+            const modalContent = document.getElementById('goal-modal-content');
+            
+            const localTeamPlayers = state.players.filter(p => p.club === fixture.local && p.categoria === fixture.category && p.cupPlayer === fixture.isCup);
+            const visitTeamPlayers = state.players.filter(p => p.club === fixture.visita && p.categoria === fixture.category && p.cupPlayer === fixture.isCup);
+            
+            modalContent.innerHTML = `
+                <h2 class="text-2xl font-black text-white uppercase mb-8 tracking-tighter">${fixture.local} vs ${fixture.visita}</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- LOCAL -->
+                    <div class="bg-slate-900 rounded-2xl p-6 border border-slate-700">
+                        <h3 class="text-xl font-black text-white mb-4 uppercase">${fixture.local}</h3>
+                        
+                        <div class="mb-6">
+                            <label class="text-white text-sm font-bold mb-2 block">Selecciona Jugador:</label>
+                            <select id="player-select-local" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white font-bold outline-none focus:ring-2 focus:ring-yellow-500">
+                                <option value="">-- Seleccionar --</option>
+                                ${localTeamPlayers.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="text-white text-sm font-bold mb-2 block">Tipo de Evento:</label>
+                            <select id="goal-type-local" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white font-bold outline-none focus:ring-2 focus:ring-yellow-500">
+                                <option value="gol">⚽ Gol</option>
+                                <option value="ta">🟨 Tarjeta Amarilla</option>
+                                <option value="tr">🔴 Tarjeta Roja</option>
+                            </select>
+                        </div>
+
+                        <button onclick="addGoalToFixture('local')" class="w-full bg-emerald-500 text-black font-black py-3 rounded-lg uppercase text-sm hover:bg-emerald-400 transition-colors mb-6">
+                            Agregar Evento
+                        </button>
+
+                        <div class="bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto">
+                            <h4 class="text-white font-bold mb-3 text-sm uppercase">Eventos Registrados:</h4>
+                            ${(state.fixtureGoals.local || []).length === 0 ? 
+                                `<p class="text-slate-400 text-sm italic">Sin eventos registrados</p>` :
+                                `<div class="space-y-2">
+                                    ${(state.fixtureGoals.local || []).map((goal, idx) => `
+                                        <div class="bg-slate-700 p-3 rounded flex justify-between items-center">
+                                            <div>
+                                                <span class="text-white font-bold text-sm">${goal.playerName}</span>
+                                                <span class="text-yellow-400 text-xs font-bold ml-2">
+                                                    ${goal.type === 'gol' ? '⚽' : goal.type === 'ta' ? '🟨' : '🔴'}
+                                                </span>
+                                            </div>
+                                            <button onclick="removeGoalFromFixture('local', ${idx})" class="text-red-400 hover:text-red-300 font-bold">✕</button>
+                                        </div>
+                                    `).join('')}
+                                </div>`
+                            }
+                        </div>
+                    </div>
+
+                    <!-- VISITA -->
+                    <div class="bg-slate-900 rounded-2xl p-6 border border-slate-700">
+                        <h3 class="text-xl font-black text-white mb-4 uppercase">${fixture.visita}</h3>
+                        
+                        <div class="mb-6">
+                            <label class="text-white text-sm font-bold mb-2 block">Selecciona Jugador:</label>
+                            <select id="player-select-visita" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white font-bold outline-none focus:ring-2 focus:ring-yellow-500">
+                                <option value="">-- Seleccionar --</option>
+                                ${visitTeamPlayers.map(p => `<option value="${p.id}">${p.nombre}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="text-white text-sm font-bold mb-2 block">Tipo de Evento:</label>
+                            <select id="goal-type-visita" class="w-full p-3 bg-slate-800 border border-slate-600 rounded-lg text-white font-bold outline-none focus:ring-2 focus:ring-yellow-500">
+                                <option value="gol">⚽ Gol</option>
+                                <option value="ta">🟨 Tarjeta Amarilla</option>
+                                <option value="tr">🔴 Tarjeta Roja</option>
+                            </select>
+                        </div>
+
+                        <button onclick="addGoalToFixture('visita')" class="w-full bg-emerald-500 text-black font-black py-3 rounded-lg uppercase text-sm hover:bg-emerald-400 transition-colors mb-6">
+                            Agregar Evento
+                        </button>
+
+                        <div class="bg-slate-800 rounded-lg p-4 max-h-64 overflow-y-auto">
+                            <h4 class="text-white font-bold mb-3 text-sm uppercase">Eventos Registrados:</h4>
+                            ${(state.fixtureGoals.visita || []).length === 0 ? 
+                                `<p class="text-slate-400 text-sm italic">Sin eventos registrados</p>` :
+                                `<div class="space-y-2">
+                                    ${(state.fixtureGoals.visita || []).map((goal, idx) => `
+                                        <div class="bg-slate-700 p-3 rounded flex justify-between items-center">
+                                            <div>
+                                                <span class="text-white font-bold text-sm">${goal.playerName}</span>
+                                                <span class="text-yellow-400 text-xs font-bold ml-2">
+                                                    ${goal.type === 'gol' ? '⚽' : goal.type === 'ta' ? '🟨' : '🔴'}
+                                                </span>
+                                            </div>
+                                            <button onclick="removeGoalFromFixture('visita', ${idx})" class="text-red-400 hover:text-red-300 font-bold">✕</button>
+                                        </div>
+                                    `).join('')}
+                                </div>`
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mt-8">
+                    <button onclick="saveFixtureGoals()" class="flex-1 bg-yellow-500 text-black font-black py-4 rounded-xl uppercase hover:bg-yellow-400 transition-colors">
+                        ✓ Guardar y Cerrar
+                    </button>
+                    <button onclick="closeGoalModal()" class="flex-1 bg-slate-700 text-white font-black py-4 rounded-xl uppercase hover:bg-slate-600 transition-colors">
+                        Cancelar
+                    </button>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        };
+
+        window.closeGoalModal = function() {
+            const modal = document.getElementById('goal-modal');
+            if (modal) modal.classList.add('hidden');
+            state.editingFixtureId = null;
+            state.editingFixture = null;
+            state.fixtureGoals = null;
+        };
+
+        // ==========================================
+        // NUEVAS FUNCIONES: LOGOUT, GUARDADO Y NOTIFICACIONES
+        // ==========================================
+        window.logoutStaff = function() {
+            if (state.unsavedChanges) {
+                const confirmed = confirm('⚠️ Tienes cambios sin guardar. ¿Deseas cerrar sesión de todas formas?');
+                if (!confirmed) return;
+            }
+            state.view = 'lobby';
+            state.isAdmin = false;
+            state.teamDashboardMode = false;
+            state.selectedTeamDashboard = null;
+            state.unsavedChanges = false;
+            window.setState({});
+            showToast('✓ Sesión cerrada correctamente', 'info');
+        };
+
+        window.saveChanges = async function() {
+            try {
+                // Aquí va la lógica para guardar todos los cambios en Firebase
+                if (isFirebaseConfigured && state.currentUser) {
+                    // Los cambios ya se guardan automáticamente, pero aquí puedes hacer un guardado explícito
+                    showToast('✓ Cambios guardados exitosamente', 'success');
+                } else {
+                    showToast('✓ Cambios guardados en modo local', 'success');
+                }
+                state.unsavedChanges = false;
+                window.setState({});
+            } catch (error) {
+                console.error('Error al guardar:', error);
+                showToast('✗ Error al guardar los cambios', 'error');
+            }
+        };
+
+        window.markUnsavedChanges = function() {
+            state.unsavedChanges = true;
+            window.setState({});
+        };
+
+        window.showToast = function(message, type = 'success') {
+            const toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                // Crear contenedor si no existe
+                const container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-6 right-6 z-50 space-y-3';
+                document.body.appendChild(container);
+            }
+
+            const toast = document.createElement('div');
+            const colors = {
+                'success': 'bg-emerald-500',
+                'error': 'bg-red-500',
+                'info': 'bg-blue-500',
+                'warning': 'bg-yellow-500'
+            };
+            
+            toast.className = `${colors[type] || 'bg-slate-500'} text-white font-bold px-6 py-4 rounded-lg shadow-xl animate-pulse`;
+            toast.textContent = message;
+            
+            const container = document.getElementById('toast-container');
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        };
+
+        // ==========================================
+        // FEATURE 1: TORNEO SEGUN FECHA (auto Clausura tras julio)
+        // ==========================================
+        window.autoSetTournamentByDate = function(input) {
+            const fc = input.value;
+            const form = input.closest('form');
+            if (!fc || !form || !form.tournament) return;
+            const mes = parseInt(fc.split('-')[1], 10);
+            if (!Number.isFinite(mes)) return;
+            form.tournament.value = mes > 7 ? 'clausura' : 'apertura';
+        };
+
+        // ==========================================
+        // FEATURE 2: ASCENSO DE CATEGORIA (FIN DE TEMPORADA)
+        // ==========================================
+        function computeAscensoMoves() {
+            const cats = CATEGORIES;
+            const ascend = [], graduate = [], review = [];
+            state.players.forEach(p => {
+                const idx = cats.findIndex(c => c.id === p.categoria);
+                if (idx === -1) return;
+                const cat = cats[idx];
+                const anio = parseInt(p.anio, 10);
+                if (!Number.isFinite(anio)) { review.push({ player: p, cat }); return; }
+                if (anio === cat.older) {
+                    if (idx === cats.length - 1) {
+                        graduate.push({ player: p, from: cat });           // Intermedia (anio mayor) -> desaparecen
+                    } else {
+                        const dest = cats[idx + 1];
+                        const cupFlag = !!p.cupPlayer && CUP_CATEGORIES.includes(dest.id);
+                        ascend.push({ player: p, from: cat, to: dest, cupFlag });
+                    }
+                } else if (anio === cat.younger) {
+                    // anio menor -> se queda
+                } else {
+                    review.push({ player: p, cat, fueraDeRango: true });
+                }
+            });
+            const byCat = cats.map(c => {
+                const idx = cats.findIndex(x => x.id === c.id);
+                return {
+                    cat: c,
+                    next: cats[idx + 1] || null,
+                    ascienden: ascend.filter(m => m.from.id === c.id).length,
+                    seQuedan: state.players.filter(p => p.categoria === c.id && parseInt(p.anio, 10) === c.younger).length,
+                    graduan: graduate.filter(m => m.from.id === c.id).length,
+                    revisar: review.filter(m => m.cat.id === c.id).length
+                };
+            });
+            return { ascend, graduate, review, byCat };
+        }
+
+        window.openAscensoModal = function() {
+            const { ascend, graduate, review, byCat } = computeAscensoMoves();
+            const nuevaTemporada = seasonYear + 1;
+            const nuevoAnioPrePeque = nuevaTemporada - (CATEGORY_DEFS[0].offset - 1); // anio menor de la nueva Pre-Peque (los que se agregan a mano)
+
+            const rows = byCat.map(b => {
+                const detalle = b.cat.id === 'intermedia'
+                    ? `<span class="text-red-400 font-black">${b.graduan}</span> se graduan (salen de la liga)`
+                    : `<span class="text-emerald-400 font-black">${b.ascienden}</span> ascienden a ${b.next ? b.next.name : ''}`;
+                return `<tr class="border-b border-slate-700/40">
+                    <td class="py-2.5 pr-3 font-bold text-white whitespace-nowrap">${b.cat.name} <span class="text-slate-500 text-[10px] font-normal">(${b.cat.years})</span></td>
+                    <td class="py-2.5 px-3">${detalle}</td>
+                    <td class="py-2.5 px-3 text-slate-400 whitespace-nowrap">${b.seQuedan} se quedan</td>
+                    <td class="py-2.5 pl-3 text-right whitespace-nowrap">${b.revisar ? `<span class="text-yellow-400 font-bold">! ${b.revisar}</span>` : '<span class="text-slate-600">-</span>'}</td>
+                </tr>`;
+            }).join('');
+
+            const totalAsc = ascend.length, totalGrad = graduate.length, totalRev = review.length;
+            const content = `
+                <div class="flex items-start justify-between mb-2">
+                    <h3 class="text-2xl font-black text-white uppercase italic tracking-tight">Ascenso de Categoria</h3>
+                    <button onclick="closeAscensoModal()" class="text-slate-500 hover:text-white text-2xl leading-none">&times;</button>
+                </div>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-1">Fin de temporada ${seasonYear} -> ${nuevaTemporada}</p>
+                <p class="text-slate-400 text-sm mb-5">Todos los jugadores del <b class="text-white">anio mayor</b> de su categoria suben una categoria. Los del anio menor se quedan. La temporada avanza a <b class="text-white">${nuevaTemporada}</b> y las categorias pasan a mostrar sus nuevos anios.</p>
+
+                <div class="overflow-x-auto bg-slate-900/60 rounded-2xl p-4 mb-4">
+                    <table class="w-full text-left text-sm">
+                        <thead class="text-[9px] font-black uppercase text-slate-500 border-b border-slate-700">
+                            <tr><th class="py-2 pr-3">Categoria</th><th class="py-2 px-3">Movimiento</th><th class="py-2 px-3">Quedan</th><th class="py-2 pl-3 text-right">Revisar</th></tr>
+                        </thead>
+                        <tbody>${rows}</tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 mb-4">
+                    <div class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 text-center"><p class="text-2xl font-black text-emerald-400">${totalAsc}</p><p class="text-[9px] font-bold uppercase text-slate-400 tracking-widest">Ascienden</p></div>
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center"><p class="text-2xl font-black text-red-400">${totalGrad}</p><p class="text-[9px] font-bold uppercase text-slate-400 tracking-widest">Se graduan</p></div>
+                    <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-xl p-3 text-center"><p class="text-2xl font-black text-yellow-400">${totalRev}</p><p class="text-[9px] font-bold uppercase text-slate-400 tracking-widest">Sin anio</p></div>
+                </div>
+
+                ${totalRev > 0 ? `<div class="bg-yellow-500/15 border border-yellow-500/40 text-yellow-200 p-3 rounded-xl text-xs font-bold mb-3">! Hay ${totalRev} jugador(es) sin anio de nacimiento asignado. No se moveran. Asignales el anio en la tabla "Jugadores por Club" (campo ANIO) antes de continuar si quieres incluirlos.</div>` : ''}
+
+                <div class="bg-blue-500/10 border border-blue-500/30 text-blue-200 p-3 rounded-xl text-xs font-bold mb-5">i Despues del ascenso, agrega manualmente los nuevos jugadores de Pre-Peque (anio ${nuevoAnioPrePeque}), como siempre.</div>
+
+                <div class="flex gap-3">
+                    <button onclick="closeAscensoModal()" class="flex-1 bg-slate-700 text-white font-black py-4 rounded-xl uppercase text-xs tracking-widest hover:bg-slate-600 transition-colors">Cancelar</button>
+                    <button onclick="executeAscenso()" class="flex-1 bg-yellow-500 text-black font-black py-4 rounded-xl uppercase text-xs tracking-widest hover:bg-yellow-400 transition-colors shadow-lg">Confirmar Ascenso</button>
+                </div>`;
+
+            const modal = document.getElementById('ascenso-modal');
+            const modalContent = document.getElementById('ascenso-modal-content');
+            if (modalContent) modalContent.innerHTML = content;
+            if (modal) modal.classList.remove('hidden');
+        };
+
+        window.closeAscensoModal = function() {
+            const modal = document.getElementById('ascenso-modal');
+            if (modal) modal.classList.add('hidden');
+        };
+
+        window.executeAscenso = async function() {
+            const { ascend, graduate } = computeAscensoMoves();
+            try {
+                for (const m of ascend) {
+                    if (isFirebaseConfigured && state.currentUser) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jugadores', m.player.id), { categoria: m.to.id, cupPlayer: m.cupFlag });
+                    } else {
+                        const p = state.players.find(x => x.id === m.player.id);
+                        if (p) { p.categoria = m.to.id; p.cupPlayer = m.cupFlag; }
+                    }
+                }
+                for (const m of graduate) {
+                    if (isFirebaseConfigured && state.currentUser) {
+                        await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jugadores', m.player.id));
+                    } else {
+                        state.players = state.players.filter(x => x.id !== m.player.id);
+                    }
+                }
+                await setSeasonYear(seasonYear + 1);
+                closeAscensoModal();
+                markUnsavedChanges();
+                showToast(`Ascenso aplicado. Temporada ${seasonYear} - ${ascend.length} ascendidos, ${graduate.length} graduados`, 'success');
+            } catch (e) {
+                console.error('Error en ascenso:', e);
+                showToast('Error al ejecutar el ascenso', 'error');
+            }
+        };
+
+        window.toggleTeamDashboard = function() {
+            state.teamDashboardMode = !state.teamDashboardMode;
+            state.selectedTeamDashboard = null;
+            window.setState({});
+        };
+
+        window.selectTeamDashboard = function(teamId) {
+            state.selectedTeamDashboard = teamId;
+            window.setState({});
+        };
+
+        window.addGoalToFixture = function(team) {
+            const fixture = state.editingFixture;
+            const playerSelect = document.getElementById(`player-select-${team}`);
+            const typeSelect = document.getElementById(`goal-type-${team}`);
+            
+            if (!playerSelect.value) {
+                alert('Por favor selecciona un jugador');
+                return;
+            }
+
+            const player = state.players.find(p => p.id === playerSelect.value);
+            const type = typeSelect.value; // 'gol', 'ta', 'tr'
+
+            if (!state.fixtureGoals[team]) {
+                state.fixtureGoals[team] = [];
+            }
+
+            state.fixtureGoals[team].push({
+                playerId: player.id,
+                playerName: player.nombre,
+                type: type
+            });
+
+            playerSelect.value = '';
+            typeSelect.value = 'gol';
+            window.setState({});
+        };
+
+        window.removeGoalFromFixture = function(team, index) {
+            state.fixtureGoals[team].splice(index, 1);
+            window.setState({});
+        };
+
+        window.saveFixtureGoals = async function() {
+            const fixture = state.editingFixture;
+            const goalsLocal = state.fixtureGoals.local || [];
+            const goalsVisita = state.fixtureGoals.visita || [];
+
+            // Actualizar los goles en el fixture
+            const golesL = goalsLocal.filter(g => g.type === 'gol').length;
+            const golesV = goalsVisita.filter(g => g.type === 'gol').length;
+
+            const updatedFixture = {
+                ...fixture,
+                golesL: golesL,
+                golesV: golesV,
+                goalDetails: JSON.stringify(state.fixtureGoals),
+                status: 'played'
+            };
+
+            // Actualizar todos los jugadores afectados
+            for (let goal of goalsLocal) {
+                const player = state.players.find(p => p.id === goal.playerId);
+                if (player) {
+                    const updateObj = {};
+                    if (goal.type === 'gol') updateObj.goles = (player.goles || 0) + 1;
+                    if (goal.type === 'ta') updateObj.ta = (player.ta || 0) + 1;
+                    if (goal.type === 'tr') updateObj.tr = (player.tr || 0) + 1;
+
+                    if (isFirebaseConfigured && state.currentUser) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jugadores', goal.playerId), updateObj);
+                    } else {
+                        Object.assign(player, updateObj);
+                    }
+                }
+            }
+
+            for (let goal of goalsVisita) {
+                const player = state.players.find(p => p.id === goal.playerId);
+                if (player) {
+                    const updateObj = {};
+                    if (goal.type === 'gol') updateObj.goles = (player.goles || 0) + 1;
+                    if (goal.type === 'ta') updateObj.ta = (player.ta || 0) + 1;
+                    if (goal.type === 'tr') updateObj.tr = (player.tr || 0) + 1;
+
+                    if (isFirebaseConfigured && state.currentUser) {
+                        await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'jugadores', goal.playerId), updateObj);
+                    } else {
+                        Object.assign(player, updateObj);
+                    }
+                }
+            }
+
+            // Actualizar el fixture
+            if (isFirebaseConfigured && state.currentUser) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'partidos', fixture.id), updatedFixture);
+            } else {
+                const f = state.fixtures.find(x => x.id === fixture.id);
+                if (f) Object.assign(f, updatedFixture);
+            }
+
+            markUnsavedChanges();
+            window.closeGoalModal();
+            showToast('✓ Partido actualizado exitosamente con goles y tarjetas', 'success');
+        };
+
+        // ==========================================
+        // 6. RENDERIZADO HTML (COMPONENTS)
+        // ==========================================
+function renderFooter() {
+            return `
+            <footer class="bg-slate-950 border-t border-white/5 pt-16 pb-8 relative z-20 mt-auto">
+                <div class="container mx-auto px-8 max-w-6xl">
+                    
+                    <div class="border-b border-white/5 pb-10 mb-12 text-center">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-6">Auspiciadores Oficiales</h3>
+                        <div class="flex flex-wrap justify-center items-center gap-12">
+                            <img src="auspicio 1.png" alt="Auspiciador 1" class="h-10 object-contain opacity-40 hover:opacity-100 transition-all duration-300 filter grayscale hover:grayscale-0" onerror="this.style.display='none'">
+                            <img src="auspicio 2.png" alt="Auspiciador 2" class="h-10 object-contain opacity-40 hover:opacity-100 transition-all duration-300 filter grayscale hover:grayscale-0" onerror="this.style.display='none'">
+                            <img src="auspicio 3.png" alt="Auspiciador 3" class="h-10 object-contain opacity-40 hover:opacity-100 transition-all duration-300 filter grayscale hover:grayscale-0" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+                        <div class="space-y-4 text-center md:text-left">
+                            <h2 class="text-4xl font-black italic tracking-tighter text-white">LIFI<span class="text-yellow-500">.</span></h2>
+                            <p class="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] leading-loose">Liga Infantil de Fútbol Interestadios.</p>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white mb-6">Categorías Oficiales</h3>
+                            <div class="grid grid-cols-2 gap-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                <span class="hover:text-yellow-500 cursor-pointer transition-colors">Pre-Peque</span>
+                                <span class="hover:text-yellow-500 cursor-pointer transition-colors">Peque</span>
+                                <span class="hover:text-yellow-500 cursor-pointer transition-colors">Mini</span>
+                                <span class="hover:text-yellow-500 cursor-pointer transition-colors">Infantil</span>
+                                <span class="hover:text-yellow-500 cursor-pointer transition-colors">Intermedia</span>
+                            </div>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-white mb-6">Contacto y Redes</h3>
+                            <div class="space-y-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                                <a href="https://www.instagram.com/lifi_futbol_infantil/" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors cursor-pointer flex items-center justify-center md:justify-start gap-2">
+                                    <span>📸</span> Instagram: @lifi_futbol_infantil
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="border-t border-white/5 pt-8 flex flex-col md:flex-row justify-between items-center gap-6">
+                        <p class="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em]">© 2026 LIFI Web. Todos los derechos reservados.</p>
+                        <button onclick="toggleLoginModal(true)" class="text-[9px] font-black uppercase text-slate-700 hover:text-yellow-500 tracking-[0.5em] transition-colors duration-300">Staff Access</button>
+                    </div>
+                </div>
+            </footer>
+            `;
+        }
+
+        function NavbarHeader(isDark = false) {
+            const bgClass = isDark ? "bg-slate-950/80 border-white/5" : "bg-white/90 border-slate-100";
+            const textClass = isDark ? "text-white" : "text-blue-950";
+            const iconBg = isDark ? "bg-white/10 text-white" : "bg-blue-950 text-white";
+            const btnActive = isDark ? "bg-white text-blue-950" : "bg-blue-950 text-white";
+            const btnInactive = isDark ? "text-slate-400 hover:text-white" : "text-slate-400 hover:text-blue-950";
+
+            return `
+            <nav class="backdrop-blur-md ${bgClass} border-b sticky top-0 z-50 px-4 md:px-8 py-4 shadow-sm transition-all duration-300">
+                <div class="container mx-auto flex justify-between items-center">
+                    <div class="flex items-center space-x-3 cursor-pointer group" onclick="setState({ view: 'lobby', selectedClub: null })">
+                        <div class="w-10 h-10 ${iconBg} rounded-xl flex items-center justify-center font-black italic text-xl group-hover:scale-105 transition-transform">L</div>
+                        <span class="font-black uppercase tracking-tighter ${textClass} text-xl hidden md:block tracking-widest">LIFI Web</span>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        ${state.isAdmin ? `<button onclick="setState({ view: 'admin', selectedClub: null })" class="text-[10px] font-black uppercase text-red-500 border border-red-500/30 px-4 py-2 rounded-xl hover:bg-red-500/10 transition-colors">Admin Panel</button>` : ''}
+                        <div class="flex ${isDark ? 'bg-white/5' : 'bg-slate-100'} p-1 rounded-xl">
+                            <button onclick="setState({ activeMode: 'liga', view: 'liga', selectedClub: null })" class="px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${state.activeMode === 'liga' && state.view !== 'lobby' && state.view !== 'admin' ? btnActive + ' shadow-sm' : btnInactive}">Liga</button>
+                            <button onclick="setState({ activeMode: 'cup', category: 'pre-peque', view: 'liga', selectedClub: null })" class="px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${state.activeMode === 'cup' && state.view !== 'lobby' && state.view !== 'admin' ? 'bg-yellow-400 text-black shadow-sm' : btnInactive}">LIFI Cup</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>`;
+        }
+
+        function renderLobby() {
+            const scorersLiga = getRealTopScorers(false);
+            const scorersCup = getRealTopScorers(true);
+
+            return `
+            <div class="min-h-screen bg-slate-950 text-white flex flex-col justify-between relative overflow-hidden">
+                <div class="absolute inset-0 z-0 h-[120vh]">
+                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518605368461-1ee7c532066d?q=80&w=2000')] bg-cover bg-center bg-fixed opacity-40"></div>
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/90 to-slate-950"></div>
+                </div>
+
+                ${NavbarHeader(true)}
+
+                <main class="container mx-auto px-4 pt-20 pb-16 relative z-10 flex flex-col items-center animate-fade-in">
+                    <div class="glass-panel p-10 md:p-16 rounded-[3rem] shadow-2xl text-center max-w-4xl w-full mb-12 transform transition-all hover:scale-[1.02] duration-500">
+                        <div class="inline-block bg-yellow-500 text-black px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 shadow-lg shadow-yellow-500/20">Temporada 2026</div>
+                        <h1 class="text-7xl md:text-[11rem] font-black italic tracking-tighter leading-none uppercase select-none text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-300 drop-shadow-2xl">LIFI<span class="text-yellow-500">.</span></h1>
+                        <p class="text-white text-2xl font-black italic tracking-widest mt-6 mb-12 leading-tight">Liga Infantil de Fútbol Interestadios</p>
+                        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+                            <button onclick="setState({ view: 'liga', activeMode: 'liga', category: 'infantil', selectedClub: null })" class="px-8 md:px-10 py-4 bg-white text-blue-950 font-black text-sm md:text-base uppercase rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all tracking-widest">
+                                Ver Liga LIFI
+                            </button>
+                            <button onclick="setState({ view: 'liga', activeMode: 'cup', category: 'pre-peque', selectedClub: null })" class="px-8 md:px-10 py-4 bg-yellow-400 text-black font-black text-sm md:text-base uppercase rounded-2xl shadow-xl hover:shadow-2xl hover:scale-105 transition-all tracking-widest">
+                                Ver LIFI Cup
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 w-full max-w-5xl">
+                        <div class="glass-panel p-8 rounded-[2rem] shadow-xl">
+                            <h3 class="text-xl font-black text-yellow-400 uppercase tracking-widest mb-8 italic">Goleadores Liga LIFI</h3>
+                            <div class="space-y-6">
+                                ${scorersLiga.map((scorer, idx) => `
+                                    <div class="flex items-center justify-between pb-4 border-b border-white/5 last:border-0">
+                                        <div>
+                                            <p class="text-white font-black italic uppercase tracking-tight">${scorer.nombre}</p>
+                                            <p class="text-[9px] text-slate-400 uppercase tracking-widest mt-1">${scorer.club}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-4xl font-black italic text-yellow-400">${scorer.goles}</p>
+                                            <p class="text-[9px] text-slate-400 uppercase tracking-widest">${scorer.category}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <div class="glass-panel p-8 rounded-[2rem] shadow-xl">
+                            <h3 class="text-xl font-black text-yellow-400 uppercase tracking-widest mb-8 italic">Goleadores LIFI Cup</h3>
+                            <div class="space-y-6">
+                                ${scorersCup.map((scorer, idx) => `
+                                    <div class="flex items-center justify-between pb-4 border-b border-white/5 last:border-0">
+                                        <div>
+                                            <p class="text-white font-black italic uppercase tracking-tight">${scorer.nombre}</p>
+                                            <p class="text-[9px] text-slate-400 uppercase tracking-widest mt-1">${scorer.club}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-4xl font-black italic text-yellow-400">${scorer.goles}</p>
+                                            <p class="text-[9px] text-slate-400 uppercase tracking-widest">${scorer.category}</p>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                ${renderFooter()}
+            </div>`;
+        }
+
+        // ==========================================
+        // NUEVA FUNCIÓN: RENDER TEAM DASHBOARD
+        // ==========================================
+        function renderTeamDashboard() {
+            if (!state.selectedTeamDashboard) {
+                // Mostrar selector de equipos
+                return `
+                <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950">
+                    ${NavbarHeader(true)}
+                    <main class="container mx-auto px-4 md:px-8 py-12">
+                        <div class="mb-12">
+                            <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+                                <div>
+                                    <h2 class="text-4xl font-black text-white uppercase italic tracking-tighter">Dashboard por Equipo</h2>
+                                    <p class="text-slate-400 text-sm mt-2 uppercase tracking-widest font-bold">Categoría: ${CATEGORIES.find(c => c.id === state.category)?.name}</p>
+                                </div>
+                                <button onclick="toggleTeamDashboard()" class="px-6 py-3 rounded-lg font-bold text-sm uppercase transition-all bg-slate-700 text-white hover:bg-slate-600">
+                                    ← Volver al Admin
+                                </button>
+                            </div>
+
+                            <!-- Filtro de Categorías -->
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="setState({ category: 'pre-peque' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'pre-peque' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Pre-Peque</button>
+                                <button onclick="setState({ category: 'peque' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'peque' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Peque</button>
+                                <button onclick="setState({ category: 'mini' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'mini' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Mini</button>
+                                <button onclick="setState({ category: 'infantil' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'infantil' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Infantil</button>
+                                <button onclick="setState({ category: 'intermedia' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'intermedia' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Intermedia</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                            ${LIGA_CLUBS.map(club => `
+                                <div onclick="selectTeamDashboard('${club.id}')" class="group cursor-pointer bg-gradient-to-br from-slate-700 to-slate-800 rounded-2xl p-6 border border-slate-600 hover:border-yellow-500 hover:shadow-2xl transition-all hover:-translate-y-2">
+                                    <div class="w-20 h-20 mx-auto mb-4 bg-white rounded-xl p-2 flex items-center justify-center group-hover:scale-110 transition-transform overflow-hidden">
+                                        <img src="${club.logo}" alt="${club.name}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span class="text-blue-950 font-black italic text-sm uppercase hidden">${club.name.substring(0,3)}</span>
+                                    </div>
+                                    <h3 class="text-center font-black text-white uppercase text-sm tracking-tight group-hover:text-yellow-400 transition-colors">${club.name}</h3>
+                                    <p class="text-center text-slate-400 text-xs mt-2 group-hover:text-slate-300 transition-colors">Gestionar →</p>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="mt-12 flex gap-3 justify-center">
+                            <button onclick="saveChanges()" class="px-8 py-3 rounded-lg font-bold text-sm uppercase transition-all bg-emerald-600 text-white hover:bg-emerald-700">
+                                💾 Guardar Cambios
+                            </button>
+                            <button onclick="logoutStaff()" class="px-8 py-3 rounded-lg font-bold text-sm uppercase transition-all bg-red-600 text-white hover:bg-red-700">
+                                🚪 Salir Sesión
+                            </button>
+                        </div>
+                    </main>
+                </div>
+                `;
+            } else {
+                // Mostrar detalles del equipo
+                const club = LIGA_CLUBS.find(c => c.id === state.selectedTeamDashboard);
+                const teamPlayers = state.players.filter(p => p.club === club.name && p.categoria === state.category);
+                const teamFixtures = state.fixtures.filter(f => f.local === club.name && f.category === state.category);
+
+                return `
+                <div class="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-950">
+                    ${NavbarHeader(true)}
+                    <main class="container mx-auto px-4 md:px-8 py-12">
+                        <!-- Header del Equipo -->
+                        <div class="mb-12 bg-slate-800/50 rounded-2xl p-8 border border-slate-700">
+                            <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+                                <div class="flex items-center gap-6">
+                                    <div class="w-24 h-24 bg-white rounded-xl p-2 flex items-center justify-center overflow-hidden">
+                                        <img src="${club.logo}" alt="${club.name}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                        <span class="text-blue-950 font-black italic text-2xl uppercase hidden">${club.name.substring(0,3)}</span>
+                                    </div>
+                                    <div>
+                                        <h2 class="text-4xl font-black text-white uppercase tracking-tight">${club.name}</h2>
+                                        <p class="text-slate-400 text-sm mt-2">Jugadores: ${teamPlayers.length} | Partidos: ${teamFixtures.length}</p>
+                                    </div>
+                                </div>
+                                <button onclick="selectTeamDashboard(null)" class="px-6 py-3 rounded-lg font-bold text-sm uppercase transition-all bg-slate-700 text-white hover:bg-slate-600">
+                                    ← Elegir Otro Equipo
+                                </button>
+                            </div>
+
+                            ${state.unsavedChanges ? `
+                                <div class="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 p-3 rounded-lg text-sm font-bold">
+                                    ⚠️ Tienes cambios sin guardar
+                                </div>
+                            ` : ''}
+
+                            <!-- Filtro de Categorías -->
+                            <div class="flex gap-2 flex-wrap mt-6 pt-6 border-t border-slate-700">
+                                <span class="text-slate-400 text-xs font-bold uppercase self-center mr-2">Filtrar por Categoría:</span>
+                                <button onclick="setState({ category: 'pre-peque' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'pre-peque' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Pre-Peque</button>
+                                <button onclick="setState({ category: 'peque' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'peque' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Peque</button>
+                                <button onclick="setState({ category: 'mini' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'mini' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Mini</button>
+                                <button onclick="setState({ category: 'infantil' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'infantil' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Infantil</button>
+                                <button onclick="setState({ category: 'intermedia' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'intermedia' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Intermedia</button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <!-- Panel de Jugadores -->
+                            <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700">
+                                <h3 class="text-2xl font-black text-white uppercase mb-6">Plantilla (${teamPlayers.length})</h3>
+                                <div class="space-y-3 max-h-96 overflow-y-auto">
+                                    ${teamPlayers.length === 0 ? `
+                                        <p class="text-slate-400 text-center py-8">Sin jugadores registrados</p>
+                                    ` : teamPlayers.map(p => `
+                                        <div class="bg-slate-700/50 rounded-lg p-4 flex items-center justify-between group hover:bg-slate-700">
+                                            <div>
+                                                <p class="font-black text-white">${p.nombre}</p>
+                                                <p class="text-slate-400 text-xs">${p.posicion || 'Sin posición'}</p>
+                                            </div>
+                                            <div class="flex items-center gap-3">
+                                                <span class="bg-yellow-500/20 text-yellow-400 text-xs font-bold px-3 py-1 rounded">${p.goles || 0} goles</span>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Panel de Partidos (Editable) -->
+                            <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700">
+                                <h3 class="text-2xl font-black text-white uppercase mb-6">Partidos (${teamFixtures.length})</h3>
+                                <div class="space-y-4 max-h-96 overflow-y-auto pr-1">
+                                    ${teamFixtures.length === 0 ? `
+                                        <p class="text-slate-400 text-center py-8">Sin partidos registrados</p>
+                                    ` : teamFixtures
+                                        .sort((a, b) => (a.fechaNumero || 0) - (b.fechaNumero || 0))
+                                        .map(f => `
+                                        <div class="bg-slate-900 rounded-2xl p-4 border border-slate-700/30 flex flex-col gap-3 group">
+                                            <div class="flex justify-between items-start">
+                                                <div class="flex flex-col flex-1">
+                                                    <input type="text" onblur="updateFixtureStatInDb('${f.id}', 'fecha', this.value)" class="bg-transparent text-[8px] font-black text-slate-500 uppercase outline-none focus:text-yellow-500 w-full" value="${f.fecha}" title="Editar fecha" />
+                                                    <span class="text-[10px] font-bold text-white uppercase mt-2">${f.local} <span class="text-slate-400">vs</span> ${f.visita}</span>
+                                                </div>
+                                                <div class="flex gap-2 items-center">
+                                                    <select onchange="updateFixtureStatInDb('${f.id}', 'status', this.value)" class="bg-transparent text-xs font-bold outline-none px-2 py-1 rounded ${f.status === 'played' ? 'text-emerald-400' : 'text-yellow-500'}">
+                                                        <option value="pending" ${f.status === 'pending' ? 'selected' : ''}>⏳ Pendiente</option>
+                                                        <option value="played" ${f.status === 'played' ? 'selected' : ''}>✓ Jugado</option>
+                                                    </select>
+                                                    <button onclick="deleteFixtureFromDb('${f.id}')" class="text-slate-500 hover:text-red-500 transition-colors" title="Eliminar partido">🗑️</button>
+                                                </div>
+                                            </div>
+                                            <div class="flex gap-2 items-center">
+                                                <input type="number" onblur="updateFixtureStatInDb('${f.id}', 'golesL', this.value)" class="w-10 bg-slate-800 border border-slate-600 rounded p-1 text-center font-black text-white text-xs" value="${f.golesL}" title="Goles Local" />
+                                                <span class="text-xs font-bold text-slate-500">-</span>
+                                                <input type="number" onblur="updateFixtureStatInDb('${f.id}', 'golesV', this.value)" class="w-10 bg-slate-800 border border-slate-600 rounded p-1 text-center font-black text-white text-xs" value="${f.golesV}" title="Goles Visita" />
+                                                <input type="text" onblur="updateFixtureStatInDb('${f.id}', 'hora', this.value)" class="flex-1 bg-slate-800 border border-slate-600 rounded p-1 text-center font-bold text-white text-xs" value="${f.hora}" title="Hora" placeholder="HH:MM" />
+                                                <input type="text" onblur="updateFixtureStatInDb('${f.id}', 'cancha', this.value)" class="flex-1 bg-slate-800 border border-slate-600 rounded p-1 text-center font-bold text-white text-xs" value="${f.cancha}" title="Cancha" placeholder="Cancha" />
+                                                <button onclick="openGoalModal('${f.id}')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1 rounded text-xs uppercase transition-colors">⚽</button>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-12 flex gap-3 justify-center">
+                            <button onclick="saveChanges()" class="px-8 py-3 rounded-lg font-bold text-sm uppercase transition-all bg-emerald-600 text-white hover:bg-emerald-700">
+                                💾 Guardar Cambios
+                            </button>
+                            <button onclick="logoutStaff()" class="px-8 py-3 rounded-lg font-bold text-sm uppercase transition-all bg-red-600 text-white hover:bg-red-700">
+                                🚪 Salir Sesión
+                            </button>
+                        </div>
+                    </main>
+                </div>
+                `;
+            }
+        }
+
+        function renderAdmin() {
+            const isCup = state.activeMode === 'cup';
+            const clubOptions = isCup ? CUP_CLUBS_BY_CATEGORY[state.category] || [] : LIGA_CLUBS.map(c => c.name);
+            const fixturesInCategory = state.fixtures.filter(f => f.tournament === state.tournament && f.isCup === isCup && f.category === state.category);
+            const clubsToDisplay = isCup 
+                ? (CUP_CLUBS_BY_CATEGORY[state.category] || [])
+                : LIGA_CLUBS.map(c => c.name);
+
+            // Si está en modo team dashboard, renderizar ese en su lugar
+            if (state.teamDashboardMode) {
+                return renderTeamDashboard();
+            }
+
+            return `
+            <div class="min-h-screen bg-slate-900 text-slate-50 flex flex-col">
+                ${NavbarHeader(true)}
+                
+                <main class="container mx-auto px-4 md:px-8 py-12 flex-grow">
+                    <!-- Header con controles mejorados -->
+                    <div class="mb-8">
+                        <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+                            <div>
+                                <h2 class="text-3xl font-black text-white uppercase italic tracking-tighter">Panel de Administración</h2>
+                                <p class="text-slate-400 text-sm mt-2 uppercase tracking-widest font-bold">${state.activeMode === 'cup' ? 'LIFI Cup' : 'LIGA LIFI'} • ${CATEGORIES.find(c => c.id === state.category)?.name} • Temporada ${seasonYear}</p>
+                            </div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="toggleTeamDashboard()" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all bg-purple-600 text-white hover:bg-purple-700 shadow-lg flex items-center gap-2">
+                                    📊 Dashboard por Equipo
+                                </button>
+                                <button onclick="openAscensoModal()" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all bg-blue-600 text-white hover:bg-blue-700 shadow-lg flex items-center gap-2">
+                                    ⬆️ Ascenso de Categoría
+                                </button>
+                                <button onclick="saveChanges()" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg flex items-center gap-2">
+                                    💾 Guardar Cambios
+                                </button>
+                                <button onclick="logoutStaff()" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all bg-red-600 text-white hover:bg-red-700 shadow-lg flex items-center gap-2">
+                                    🚪 Salir Sesión
+                                </button>
+                            </div>
+                        </div>
+                        ${isAscensoTime() ? `
+                            <div class="bg-blue-500/15 border border-blue-500/50 text-blue-200 p-4 rounded-xl text-sm font-bold flex items-center justify-between flex-wrap gap-3 mb-3">
+                                <span>📅 Terminó la temporada ${seasonYear}. Es momento de ascender las categorías.</span>
+                                <button onclick="openAscensoModal()" class="bg-blue-500 text-white font-black px-4 py-2 rounded-lg uppercase text-xs tracking-widest hover:bg-blue-400 transition-colors whitespace-nowrap">Ejecutar Ascenso</button>
+                            </div>
+                        ` : ''}
+                        ${state.unsavedChanges ? `
+                            <div class="bg-yellow-500/20 border border-yellow-500/50 text-yellow-300 p-3 rounded-lg text-sm font-bold">
+                                ⚠️ Tienes cambios sin guardar
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
+                        <div></div>
+                        <div class="flex gap-3">
+                            <button onclick="setState({ category: 'pre-peque' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'pre-peque' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Pre-Peque</button>
+                            <button onclick="setState({ category: 'peque' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'peque' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Peque</button>
+                            <button onclick="setState({ category: 'mini' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'mini' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Mini</button>
+                            <button onclick="setState({ category: 'infantil' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'infantil' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Infantil</button>
+                            <button onclick="setState({ category: 'intermedia' })" class="px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${state.category === 'intermedia' ? 'bg-yellow-500 text-black shadow-lg' : 'bg-slate-700 text-white hover:bg-slate-600'}">Intermedia</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-8 gap-8">
+                        <div class="lg:col-span-3 space-y-6">
+                            <div class="bg-slate-800 rounded-[2.5rem] border border-slate-700/50 p-6 md:p-8 shadow-2xl">
+                                <h3 class="font-black text-white uppercase text-xs tracking-widest italic mb-6">Agregar Jugador</h3>
+                                <form onsubmit="savePlayer(event)" class="space-y-4">
+                                    <select name="club" required class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500">
+                                        <option value="">Seleccionar Club</option>
+                                        ${clubsToDisplay.map(club => `<option value="${club}" ${state.lastSelectedClub === club ? 'selected' : ''}>${club}</option>`).join('')}
+                                    </select>
+                                    <input name="nombre" placeholder="Nombre Completo" required class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500" />
+                                    <select name="posicion" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500">
+                                        <option value="">Posición</option>
+                                        <option value="Arquero">Arquero</option>
+                                        <option value="Defensa">Defensa</option>
+                                        <option value="Mediocampista">Mediocampista</option>
+                                        <option value="Delantero">Delantero</option>
+                                    </select>
+                                    ${(() => { const cSel = CATEGORIES.find(c => c.id === state.category) || {}; return `
+                                    <select name="anio" required class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500">
+                                        <option value="">Año de Nacimiento</option>
+                                        <option value="${cSel.older}">${cSel.older} (año mayor)</option>
+                                        <option value="${cSel.younger}" selected>${cSel.younger} (año menor)</option>
+                                    </select>`; })()}
+                                    <div class="grid grid-cols-3 gap-3">
+                                        <input name="goles" type="number" placeholder="Goles" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500" />
+                                        <input name="pj" type="number" placeholder="PJ" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500" />
+                                        <input name="ta" type="number" placeholder="TA" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500" />
+                                    </div>
+                                    <input name="tr" type="number" placeholder="TR" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500" />
+                                    <button type="submit" class="w-full bg-yellow-500 text-black font-black py-5 rounded-xl uppercase text-xs tracking-widest hover:bg-yellow-400 transition-colors shadow-lg">Guardar Jugador</button>
+                                </form>
+                            </div>
+
+                            <div class="bg-slate-800 rounded-[2.5rem] border border-slate-700/50 p-6 md:p-8 shadow-2xl">
+                                <h3 class="font-black text-white uppercase text-xs tracking-widest italic mb-6">Jugadores por Club</h3>
+                                <div class="space-y-4 max-h-[600px] overflow-y-auto pr-2">
+                                ${clubsToDisplay.map(club => {
+                                    const clubPlayers = state.players.filter(p => p.club === club && p.categoria === state.category && p.cupPlayer === isCup);
+                                    return `
+                                    <details class="group">
+                                        <summary class="cursor-pointer select-none bg-slate-900 p-4 rounded-xl font-bold text-white uppercase text-xs tracking-widest hover:bg-slate-800 transition-colors flex justify-between items-center">
+                                            <span>${club}</span>
+                                            <span class="text-yellow-500">${clubPlayers.length}</span>
+                                        </summary>
+                                        
+                                        <div class="overflow-x-auto bg-slate-900/50 mt-2 rounded-lg">
+                                            <table class="w-full text-left text-xs min-w-[600px]">
+                                                <thead class="bg-slate-900/80 text-[9px] font-black uppercase text-slate-500 border-b border-slate-700">
+                                                    <tr>
+                                                        <th class="p-4 md:p-6">Jugador</th>
+                                                        <th class="p-4 md:p-6 text-center">G</th>
+                                                        <th class="p-4 md:p-6 text-center">PJ</th>
+                                                        <th class="p-4 md:p-6 text-center">TA</th>
+                                                        <th class="p-4 md:p-6 text-center">TR</th>
+                                                        <th class="p-4 md:p-6 text-right"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-slate-700/50">
+                                                    ${clubPlayers.map(p => `
+                                                        <tr class="hover:bg-slate-700/20 group transition-all">
+                                                            <td class="p-4 md:p-6">
+                                                                <input onblur="updatePlayerStatInDb('${p.id}', 'nombre', this.value)" class="bg-transparent font-bold text-white uppercase w-full outline-none focus:border-b border-yellow-500" value="${p.nombre}" />
+                                                                <div class="text-[8px] font-bold text-slate-500 uppercase mt-1 flex items-center gap-1">
+                                                                    <select onchange="updatePlayerStatInDb('${p.id}', 'posicion', this.value)" class="bg-transparent outline-none hover:text-white focus:text-white transition-colors cursor-pointer w-auto ${!p.posicion ? 'italic text-slate-400' : ''}">
+                                                                        <option value="" ${!p.posicion ? 'selected' : ''}>Posición Pendiente</option>
+                                                                        <option value="Arquero" class="text-slate-800" ${p.posicion === 'Arquero' ? 'selected' : ''}>Arquero</option>
+                                                                        <option value="Defensa" class="text-slate-800" ${p.posicion === 'Defensa' ? 'selected' : ''}>Defensa</option>
+                                                                        <option value="Mediocampista" class="text-slate-800" ${p.posicion === 'Mediocampista' ? 'selected' : ''}>Mediocampista</option>
+                                                                        <option value="Delantero" class="text-slate-800" ${p.posicion === 'Delantero' ? 'selected' : ''}>Delantero</option>
+                                                                    </select>
+                                                                    ${(() => { const cSel = CATEGORIES.find(c => c.id === state.category) || {}; const a = parseInt(p.anio,10); return `
+                                                                    <span class="text-slate-600">·</span>
+                                                                    <select onchange="updatePlayerStatInDb('${p.id}', 'anio', this.value)" class="bg-transparent outline-none cursor-pointer w-auto ${!Number.isFinite(a) ? 'italic text-yellow-500' : 'text-slate-400 hover:text-white'}" title="Año de nacimiento">
+                                                                        <option value="" ${!Number.isFinite(a) ? 'selected' : ''}>Año?</option>
+                                                                        <option value="${cSel.older}" class="text-slate-800" ${a === cSel.older ? 'selected' : ''}>${cSel.older}</option>
+                                                                        <option value="${cSel.younger}" class="text-slate-800" ${a === cSel.younger ? 'selected' : ''}>${cSel.younger}</option>
+                                                                    </select>`; })()}
+                                                                </div>
+                                                            </td>
+                                                            <td class="p-4 md:p-6 text-center"><input type="number" onblur="updatePlayerStatInDb('${p.id}', 'goles', this.value)" class="w-10 bg-slate-900 border border-slate-700 rounded p-1.5 text-center font-black text-white" value="${p.goles}" /></td>
+                                                            <td class="p-4 md:p-6 text-center"><input type="number" onblur="updatePlayerStatInDb('${p.id}', 'pj', this.value)" class="w-10 bg-slate-900 border border-slate-700 rounded p-1.5 text-center font-black text-white" value="${p.pj || 0}" /></td>
+                                                            <td class="p-4 md:p-6 text-center"><input type="number" onblur="updatePlayerStatInDb('${p.id}', 'ta', this.value)" class="w-10 bg-slate-900 border border-slate-700 rounded p-1.5 text-center font-black text-white" value="${p.ta || 0}" /></td>
+                                                            <td class="p-4 md:p-6 text-center"><input type="number" onblur="updatePlayerStatInDb('${p.id}', 'tr', this.value)" class="w-10 bg-slate-900 border border-slate-700 rounded p-1.5 text-center font-black text-white" value="${p.tr || 0}" /></td>
+                                                            <td class="p-4 md:p-6 text-right relative">
+                                                                <button onclick="deletePlayerFromDb('${p.id}')" class="text-slate-500 hover:text-red-500">🗑️</button>
+                                                                <div id="confirm-del-${p.id}" class="hidden absolute right-0 top-0 bg-slate-950 border border-red-500 p-4 rounded-xl shadow-2xl flex flex-col items-center gap-2 z-50">
+                                                                    <p class="text-[9px] font-black text-white uppercase">¿Eliminar?</p>
+                                                                    <div class="flex gap-2">
+                                                                        <button onclick="confirmDeletePlayer('${p.id}')" class="bg-red-500 text-white font-bold px-3 py-1 rounded text-[10px]">Sí</button>
+                                                                        <button onclick="cancelDeletePlayer('${p.id}')" class="bg-slate-700 text-white font-bold px-3 py-1 rounded text-[10px]">No</button>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    `).join('')}
+                                                    ${clubPlayers.length === 0 ? `<tr><td colspan="6" class="p-8 text-center text-slate-500 italic text-[10px] uppercase font-bold tracking-widest">Sin jugadores registrados</td></tr>` : ''}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </details>
+                                    `;
+                                }).join('')}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-5 space-y-6">
+                            <div class="bg-slate-800 rounded-[2.5rem] border border-slate-700/50 p-6 md:p-8 shadow-2xl">
+                                <h3 class="font-black text-white uppercase text-xs tracking-widest italic mb-6">Generar Cruces Automáticos</h3>
+                                <button onclick="generateAllFixtures()" class="w-full bg-emerald-500 text-black font-black py-5 rounded-xl uppercase text-xs tracking-widest hover:bg-emerald-400 transition-colors shadow-lg mb-4">
+                                    🎯 Generar Todos los Cruces
+                                </button>
+                                <p class="text-slate-400 text-[10px] italic text-center">Genera automáticamente todos los partidos (round-robin) para esta categoría y torneo. Se crearán en estado pendiente.</p>
+                            </div>
+
+                            <div class="bg-slate-800 rounded-[2.5rem] border border-slate-700/50 p-6 md:p-8 shadow-2xl">
+                                <h3 class="font-black text-white uppercase text-xs tracking-widest italic mb-6">Programar Partido Manual</h3>
+                                <form onsubmit="saveFixture(event)" class="space-y-4">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <select name="isCup" required class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500">
+                                            <option value="false" ${!isCup ? 'selected' : ''}>LIGA LIFI</option>
+                                            <option value="true" ${isCup ? 'selected' : ''}>LIFI CUP</option>
+                                        </select>
+                                        <select name="tournament" required class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500">
+                                            <option value="apertura" ${state.tournament === 'apertura' ? 'selected' : ''}>Torneo Apertura</option>
+                                            <option value="clausura" ${state.tournament === 'clausura' ? 'selected' : ''}>Torneo Clausura</option>
+                                        </select>
+                                    </div>
+                                    <input name="fecha" placeholder="Número de Fecha (Ej: Fecha 1)" required class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none focus:ring-2 focus:ring-yellow-500" />
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <select name="local" required class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none">
+                                            <option value="">Local</option>
+                                            ${clubOptions.map(club => `<option value="${club}">${club}</option>`).join('')}
+                                        </select>
+                                        <select name="visita" required class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none">
+                                            <option value="">Visita</option>
+                                            ${clubOptions.map(club => `<option value="${club}">${club}</option>`).join('')}
+                                        </select>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <input name="golesL" type="number" placeholder="Goles Local" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none" />
+                                        <input name="golesV" type="number" placeholder="Goles Visita" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none" />
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <input name="hora" placeholder="10:30" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none" />
+                                        <input name="cancha" placeholder="Cancha" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none" />
+                                        <select name="status" class="p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none">
+                                            <option value="pending">Pendiente</option>
+                                            <option value="played">Jugado</option>
+                                        </select>
+                                    </div>
+                                    <input name="fechaCompleta" type="date" onchange="autoSetTournamentByDate(this)" class="w-full p-4 bg-slate-900 border border-slate-700 rounded-xl text-xs font-bold text-white outline-none" />
+                                    <p class="text-slate-500 text-[10px] italic">📅 Si la fecha es posterior a julio (agosto en adelante), el partido se registra automáticamente en el Torneo de Clausura.</p>
+                                    <button type="submit" class="w-full bg-yellow-500 text-black font-black py-5 rounded-xl uppercase text-xs tracking-widest hover:bg-yellow-400 transition-colors shadow-lg">Cargar Encuentro</button>
+                                </form>
+                            </div>
+
+                            <div class="bg-slate-800 rounded-[2.5rem] border border-slate-700/50 p-6 md:p-8 shadow-2xl">
+                                <h3 class="font-black text-white uppercase text-xs tracking-widest italic mb-6">Fixture Editable (Ordenado por Fecha)</h3>
+                                <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2">
+                                ${fixturesInCategory
+                                    .sort((a, b) => {
+                                        if (a.fechaNumero !== b.fechaNumero) {
+                                            return a.fechaNumero - b.fechaNumero;
+                                        }
+                                        return 0;
+                                    })
+                                    .map(f => `
+                                    <div class="p-4 bg-slate-900 rounded-2xl flex flex-col gap-3 border border-slate-700/30 group">
+                                        <div class="flex justify-between items-start">
+                                            <div class="flex flex-col flex-1">
+                                                <input type="text" onblur="updateFixtureStatInDb('${f.id}', 'fecha', this.value)" class="bg-transparent text-[8px] font-black text-slate-500 uppercase outline-none focus:text-yellow-500 w-full" value="${f.fecha}" />
+                                                <span class="text-[10px] font-bold text-white uppercase mt-2">${f.local} <span class="text-slate-400">vs</span> ${f.visita}</span>
+                                            </div>
+                                            <div class="flex gap-2 items-center">
+                                                <select onchange="updateFixtureStatInDb('${f.id}', 'status', this.value)" class="bg-transparent text-xs font-bold outline-none px-2 py-1 rounded ${f.status === 'played' ? 'text-emerald-400' : 'text-yellow-500'}">
+                                                    <option value="pending" ${f.status==='pending'?'selected':''}>Pendiente</option>
+                                                    <option value="played" ${f.status==='played'?'selected':''}>Jugado</option>
+                                                </select>
+                                                <button onclick="deleteFixtureFromDb('${f.id}')" class="text-slate-500 hover:text-red-500 transition-opacity">🗑️</button>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2 items-center">
+                                            <input type="number" onblur="updateFixtureStatInDb('${f.id}', 'golesL', this.value)" class="w-10 bg-slate-800 border border-slate-600 rounded p-1 text-center font-black text-white text-xs" value="${f.golesL}" title="Goles Local" />
+                                            <span class="text-xs font-bold text-slate-500">-</span>
+                                            <input type="number" onblur="updateFixtureStatInDb('${f.id}', 'golesV', this.value)" class="w-10 bg-slate-800 border border-slate-600 rounded p-1 text-center font-black text-white text-xs" value="${f.golesV}" title="Goles Visita" />
+                                            <input type="text" onblur="updateFixtureStatInDb('${f.id}', 'hora', this.value)" class="flex-1 bg-slate-800 border border-slate-600 rounded p-1 text-center font-bold text-white text-xs" value="${f.hora}" title="Hora" placeholder="HH:MM" />
+                                            <input type="text" onblur="updateFixtureStatInDb('${f.id}', 'cancha', this.value)" class="flex-1 bg-slate-800 border border-slate-600 rounded p-1 text-center font-bold text-white text-xs" value="${f.cancha}" title="Cancha" placeholder="Cancha" />
+                                            <button onclick="openGoalModal('${f.id}')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold px-3 py-1 rounded text-xs uppercase transition-colors">⚽ Goles</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                ${fixturesInCategory.length === 0 ? `<p class="text-center py-10 text-[10px] font-bold text-slate-500 uppercase italic">Sin partidos programados</p>` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>`;
+        }
+
+        function renderLiga() {
+            const isCup = state.activeMode === 'cup';
+            const categoriesToDisplay = isCup ? CATEGORIES.filter(c => CUP_CATEGORIES.includes(c.id)) : CATEGORIES;
+            const standings = getStandings();
+            const activeFixture = state.fixtures.filter(f => f.tournament === state.tournament && f.isCup === isCup && f.category === state.category);
+
+            if (state.selectedClub) {
+                const clubPlayers = state.players.filter(p => p.club === state.selectedClub && p.categoria === state.category && p.cupPlayer === isCup);
+                
+                return `
+                <div class="min-h-screen bg-slate-50 font-sans antialiased text-slate-950 flex flex-col">
+                    ${NavbarHeader()}
+                    
+                    <div class="bg-blue-950 py-16 px-4 md:px-8 text-white relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1551952237-954a0e68786c?q=80&w=2000')] bg-cover bg-center opacity-10"></div>
+                        <div class="container mx-auto relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                            <div class="flex flex-col md:flex-row items-center gap-8 text-center md:text-left w-full md:w-auto">
+                                <button onclick="setState({ selectedClub: null })" class="group flex items-center gap-3 px-6 py-4 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all">
+                                    <svg class="w-5 h-5 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"></path></svg>
+                                    <span class="text-[10px] font-black uppercase tracking-widest">Volver a Posiciones</span>
+                                </button>
+                                
+                                <div class="w-28 h-28 bg-white rounded-[2rem] p-5 shadow-2xl flex items-center justify-center shrink-0 overflow-hidden">
+                                    <img src="${LIGA_CLUBS.find(c => c.name === state.selectedClub)?.logo || ''}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                    <span class="text-blue-950 font-black italic text-2xl uppercase hidden">${state.selectedClub.substring(0,3)}</span>
+                                </div>
+                                <div>
+                                    <h2 class="text-5xl md:text-6xl font-black italic uppercase tracking-tighter leading-none">${state.selectedClub}</h2>
+                                    <p class="text-blue-100 text-sm mt-4 opacity-90">Plantilla Detallada</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <main class="container mx-auto px-4 py-12 flex-grow animate-fade-in">
+                        <div class="bg-white rounded-[4rem] shadow-2xl border border-slate-200/60 overflow-hidden">
+                            <div class="hidden md:overflow-x-auto">
+                                <table class="w-full text-left min-w-[700px]">
+                                    <thead class="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
+                                        <tr>
+                                            <th class="p-8">Jugador</th>
+                                            <th class="p-8 text-center">Pos</th>
+                                            <th class="p-8 text-center">G</th>
+                                            <th class="p-8 text-center">PJ</th>
+                                            <th class="p-8 text-center">TA</th>
+                                            <th class="p-8 text-center">TR</th>
+                                            <th class="p-8 text-right">Tarjetas</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-slate-100 text-sm">
+                                        ${clubPlayers.map(p => `
+                                            <tr class="hover:bg-slate-50 transition-colors group cursor-pointer">
+                                                <td class="p-8">
+                                                    <div class="font-black text-blue-950 uppercase italic">${p.nombre}</div>
+                                                    <div class="text-[9px] font-bold text-slate-500 uppercase mt-1 tracking-widest">${p.posicion || 'Pendiente'}</div>
+                                                </td>
+                                                <td class="p-8 text-center font-black text-slate-400 text-lg">${p.posicion || '-'}</td>
+                                                <td class="p-8 text-center"><span class="bg-blue-50 text-blue-950 font-black px-4 py-2 rounded-lg">${p.goles || 0}</span></td>
+                                                <td class="p-8 text-center font-bold text-slate-500">${p.pj || 0}</td>
+                                                <td class="p-8 text-center text-xl">${p.ta || 0}</td>
+                                                <td class="p-8 text-center text-xl">${p.tr || 0}</td>
+                                                <td class="p-8 text-right">
+                                                    <div class="flex gap-1.5 justify-end">
+                                                        ${Array(p.ta || 0).fill(0).map(() => `<div class="w-4 h-6 bg-yellow-400 rounded-sm shadow-md"></div>`).join('')}
+                                                        ${Array(p.tr || 0).fill(0).map(() => `<div class="w-4 h-6 bg-red-500 rounded-sm shadow-md"></div>`).join('')}
+                                                        ${(p.ta || 0) === 0 && (p.tr || 0) === 0 ? `<span class="text-slate-200">-</span>` : ''}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        `).join('')}
+                                        ${clubPlayers.length === 0 ? `<tr><td colspan="7" class="p-20 text-center text-slate-400 font-bold uppercase tracking-widest italic">No hay jugadores registrados en esta categoría</td></tr>` : ''}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="md:hidden p-6 space-y-4">
+                                ${clubPlayers.map(p => `
+                                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200/50 space-y-4 shadow-sm">
+                                        <div class="flex justify-between items-start border-b pb-4">
+                                            <div>
+                                                <h4 class="font-black text-blue-950 uppercase italic text-lg leading-none">${p.nombre}</h4>
+                                                <p class="text-[9px] font-black text-slate-400 uppercase mt-2 tracking-widest">${p.posicion || '<span class="italic text-slate-300 normal-case">Pendiente</span>'}</p>
+                                            </div>
+                                            <div class="flex gap-1.5">
+                                                ${Array(p.ta || 0).fill(0).map(() => `<div class="w-3 h-5 bg-yellow-400 rounded-sm"></div>`).join('')}
+                                                ${Array(p.tr || 0).fill(0).map(() => `<div class="w-3 h-5 bg-red-500 rounded-sm"></div>`).join('')}
+                                            </div>
+                                        </div>
+                                        <div class="grid grid-cols-3 gap-3 text-center">
+                                            <div class="bg-white p-3 rounded-2xl border"><span class="block text-[8px] font-black text-slate-400 uppercase">PJ</span><span class="font-black text-xl italic text-slate-700">${p.pj || 0}</span></div>
+                                            <div class="bg-blue-50 p-3 rounded-2xl border border-blue-100"><span class="block text-[8px] font-black text-blue-400 uppercase">Goles</span><span class="font-black text-xl italic text-blue-700">${p.goles || 0}</span></div>
+                                            <div class="bg-slate-50 p-3 rounded-2xl border border-slate-100"><span class="block text-[8px] font-black text-slate-400 uppercase">Tarjetas</span><span class="font-black text-xl italic text-slate-700">${(p.ta || 0) + (p.tr || 0)}</span></div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                ${clubPlayers.length === 0 ? `<p class="p-12 text-center text-slate-400 font-bold uppercase italic text-xs">No hay jugadores registrados</p>` : ''}
+                            </div>
+                        </div>
+                    </main>
+                    ${renderFooter()}
+                </div>`;
+            }
+
+            return `
+            <div class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased flex flex-col">
+                ${NavbarHeader()}
+                
+                <div class="bg-blue-950 text-white overflow-x-auto hide-scrollbar scroll-smooth">
+                    <div class="container mx-auto px-4 md:px-8 flex justify-between items-center">
+                        <div class="flex space-x-8 shrink-0">
+                            ${categoriesToDisplay.map(cat => `
+                                <button onclick="setState({ category: '${cat.id}', selectedClub: null })" class="py-6 text-[10px] font-black uppercase tracking-[0.2em] border-b-2 transition-all ${state.category === cat.id ? 'border-yellow-500 text-yellow-500' : 'border-transparent text-white/40 hover:text-white'}">
+                                    ${cat.name}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div class="flex bg-white/15 p-1 rounded-xl shrink-0 my-3 ml-4">
+                            <button onclick="setState({ tournament: 'apertura', selectedClub: null })" class="px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${state.tournament === 'apertura' ? 'bg-white text-blue-950 shadow-sm' : 'text-white/40'}">Apertura</button>
+                            <button onclick="setState({ tournament: 'clausura', selectedClub: null })" class="px-4 py-2 rounded-lg text-[9px] font-black uppercase transition-all ${state.tournament === 'clausura' ? 'bg-white text-blue-950 shadow-sm' : 'text-white/40'}">Clausura</button>
+                        </div>
+                    </div>
+                </div>
+
+                <main class="container mx-auto px-4 py-12 flex-grow animate-fade-in">
+                    <div class="space-y-12">
+                        <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                            <div>
+                                <h2 class="text-5xl md:text-6xl font-black text-blue-950 uppercase italic tracking-tighter leading-none">
+                                    ${isCup ? 'LIFI CUP' : 'LIGA LIFI'}
+                                </h2>
+                                <p class="text-slate-400 font-bold uppercase text-[10px] tracking-[0.4em] mt-3">
+                                    Competición Juvenil 2026 • Torneo ${state.tournament.toUpperCase()} • Serie ${CATEGORIES.find(c => c.id === state.category)?.name}
+                                </p>
+                            </div>
+                            <div class="flex bg-white p-1.5 rounded-2xl shadow-xl border border-slate-200">
+                                <button onclick="setState({ subView: 'tabla' })" class="px-8 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all ${state.subView === 'tabla' ? 'bg-blue-950 text-white shadow-lg' : 'text-slate-400 hover:text-blue-950'}">Clasificación</button>
+                                <button onclick="setState({ subView: 'fixture' })" class="px-8 py-3.5 rounded-xl text-[10px] font-black uppercase transition-all ${state.subView === 'fixture' ? 'bg-blue-950 text-white shadow-lg' : 'text-slate-400 hover:text-blue-950'}">Fixture</button>
+                            </div>
+                        </div>
+
+                        ${state.subView === 'tabla' ? `
+                            <div class="bg-white rounded-[4rem] shadow-2xl border border-slate-200/60 overflow-hidden">
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left min-w-[700px]">
+                                        <thead class="bg-slate-50 border-b border-slate-100 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">
+                                            <tr>
+                                                <th class="p-8 w-24 text-center">Pos</th>
+                                                <th class="p-8">Club</th>
+                                                <th class="p-8 text-center">PJ</th>
+                                                <th class="p-8 text-center">PG</th>
+                                                <th class="p-8 text-center">PE</th>
+                                                <th class="p-8 text-center">PP</th>
+                                                <th class="p-8 text-center">GF</th>
+                                                <th class="p-8 text-center">GC</th>
+                                                <th class="p-8 text-center">DG</th>
+                                                <th class="p-8 text-center bg-yellow-500/10 text-yellow-600">PTS</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-slate-100 text-sm">
+                                            ${standings.map((club, i) => `
+                                                <tr onclick="selectClubView('${club.name}')" class="cursor-pointer group hover:bg-slate-50 transition-colors">
+                                                    <td class="p-8 text-center text-slate-300 font-black italic text-2xl group-hover:text-blue-950 transition-colors">${(i + 1).toString().padStart(2, '0')}</td>
+                                                    <td class="p-8 flex items-center space-x-6">
+                                                        <div class="w-14 h-14 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-center p-2 shrink-0 group-hover:scale-110 transition-transform overflow-hidden">
+                                                            <img src="${club.logo}" alt="${club.name}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                            <span class="text-blue-950 font-black italic text-lg uppercase hidden">${club.name.substring(0,3)}</span>
+                                                        </div>
+                                                        <div class="flex flex-col">
+                                                            <span class="text-blue-950 font-black italic uppercase text-2xl tracking-tighter leading-none">${club.name}</span>
+                                                            <span class="text-[9px] font-bold text-blue-500 uppercase mt-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all">Ver Plantilla Detallada →</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="p-8 text-center font-bold text-slate-400 text-lg">${club.pj}</td>
+                                                    <td class="p-8 text-center font-bold text-slate-500">${club.pg}</td>
+                                                    <td class="p-8 text-center font-bold text-slate-500">${club.pe}</td>
+                                                    <td class="p-8 text-center font-bold text-slate-500">${club.pp}</td>
+                                                    <td class="p-8 text-center font-bold text-slate-500">${club.gf}</td>
+                                                    <td class="p-8 text-center font-bold text-slate-500">${club.gc}</td>
+                                                    <td class="p-8 text-center font-black ${club.dg >= 0 ? 'text-emerald-600' : 'text-rose-500'} text-lg">${club.dg > 0 ? '+' : ''}${club.dg}</td>
+                                                    <td class="p-8 text-center bg-yellow-50/50 text-blue-950 font-black text-4xl italic">${club.pts}</td>
+                                                </tr>
+                                            `).join('')}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        ` : `
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                ${activeFixture
+                                    .sort((a, b) => {
+                                        if (a.fechaNumero !== b.fechaNumero) {
+                                            return a.fechaNumero - b.fechaNumero;
+                                        }
+                                        return 0;
+                                    })
+                                    .map((match, idx) => {
+                                        const logoLocal = LIGA_CLUBS.find(c => c.name === match.local)?.logo || '';
+                                        const logoVisita = LIGA_CLUBS.find(c => c.name === match.visita)?.logo || '';
+                                        return `
+                                        <div class="bg-white rounded-[3rem] p-8 shadow-xl border border-slate-100 relative overflow-hidden group hover:-translate-y-1 transition-transform">
+                                            <div class="absolute top-0 right-0 p-6">
+                                                <span class="bg-slate-100 text-slate-400 text-[8px] font-black uppercase px-3 py-1.5 rounded-full">${match.fecha}</span>
+                                            </div>
+                                            <div class="flex items-center justify-between mb-8 mt-4">
+                                                <div class="text-center flex-1">
+                                                    <div class="w-16 h-16 mx-auto mb-4 bg-slate-50 rounded-2xl p-3 flex items-center justify-center border overflow-hidden">
+                                                        <img src="${logoLocal}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                        <span class="text-blue-950 font-black italic text-lg uppercase hidden">${match.local.substring(0,3)}</span>
+                                                    </div>
+                                                    <span class="text-blue-950 font-black uppercase italic text-sm block tracking-tighter leading-none">${match.local}</span>
+                                                </div>
+                                                <div class="px-4 text-center">
+                                                    ${match.status === 'played' ? `
+                                                        <div class="bg-blue-950 text-white font-black text-3xl italic px-5 py-2.5 rounded-2xl shadow-lg leading-none">
+                                                            ${match.golesL} - ${match.golesV}
+                                                        </div>
+                                                    ` : `
+                                                        <span class="text-slate-200 font-black text-2xl italic">VS</span>
+                                                    `}
+                                                </div>
+                                                <div class="text-center flex-1">
+                                                    <div class="w-16 h-16 mx-auto mb-4 bg-slate-50 rounded-2xl p-3 flex items-center justify-center border overflow-hidden">
+                                                        <img src="${logoVisita}" class="w-full h-full object-contain" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                        <span class="text-blue-950 font-black italic text-lg uppercase hidden">${match.visita.substring(0,3)}</span>
+                                                    </div>
+                                                    <span class="text-blue-950 font-black uppercase italic text-sm block tracking-tighter leading-none">${match.visita}</span>
+                                                </div>
+                                            </div>
+                                            <div class="pt-6 border-t border-slate-50 flex justify-between items-center text-slate-400 font-semibold">
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4 text-yellow-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd"></path></svg>
+                                                    <span class="text-[9px] font-black uppercase tracking-widest">${match.hora} HRS</span>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"></path></svg>
+                                                    <span class="text-[9px] font-black uppercase tracking-widest">${match.cancha}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        `;
+                                    }).join('')}
+                                ${activeFixture.length === 0 ? `
+                                    <div class="col-span-full py-20 bg-white rounded-[3rem] shadow-xl border border-slate-100 text-center">
+                                        <p class="text-xl font-black italic text-slate-300 uppercase tracking-widest">No hay partidos programados para esta categoría</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `}
+                    </div>
+                </main>
+                ${renderFooter()}
+            </div>`;
+        }
+
+        function render() {
+            const root = document.getElementById('app-root');
+            if (state.view === 'lobby') {
+                document.body.className = "bg-slate-950 font-sans text-slate-900 antialiased overflow-x-hidden";
+                root.innerHTML = renderLobby();
+            } else if (state.view === 'liga') {
+                document.body.className = "bg-slate-50 font-sans text-slate-900 antialiased overflow-x-hidden";
+                root.innerHTML = renderLiga();
+            } else if (state.view === 'admin') {
+                document.body.className = "bg-slate-900 font-sans text-slate-300 antialiased overflow-x-hidden";
+                root.innerHTML = renderAdmin();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', render);
+    </script>
+</body>
+</html>
