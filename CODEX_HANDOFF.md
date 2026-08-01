@@ -12,13 +12,14 @@ Abre este repositorio o adjunta el ZIP exportado y usa este mensaje:
 
 - Repositorio: `StgoSandrock/Lifiweb`.
 - Rama de trabajo: `codex/modernizacion-lifi-2026`.
-- Último commit funcional: `20b246b` (`style: remove scroll fade effect`).
+- Último commit funcional: `02d70a0` (`feat: build LIFI mobile experience`).
 - La rama está limpia y contiene todos los cambios locales de modernización y traspaso.
 - La integración disponible de GitHub tenía acceso de lectura, por lo que la rama aún no fue subida y no existe Pull Request.
 
 ## Arquitectura implementada
 
 - Next.js 16, React 19 y TypeScript.
+- Expo SDK 54 y React Native 0.81 para la app Android/iOS en `apps/mobile`.
 - Firebase modular para Authentication y Firestore.
 - `/`: lobby con selección de competencia.
 - `/liga`: Clausura 2026, posiciones, fixture y planteles.
@@ -27,6 +28,9 @@ Abre este repositorio o adjunta el ZIP exportado y usa este mensaje:
 - Fuente única de clubes y categorías en `src/config/league.ts`.
 - Reglas nuevas en `firestore.rules`.
 - Respaldo local en `src/data`, sin escritura o migración automática.
+- La app comparte configuración, modelos, fixture, clasificación, validaciones y adaptadores con la web mediante el alias `@shared`.
+- Pantallas móviles implementadas: lobby, Liga, LIFI Cup, categorías, posiciones, fixture, clubes, planteles y Staff.
+- Staff móvil permite autenticación, edición de partidos, creación/edición/eliminación de jugadores, búsqueda y validación de duplicados.
 
 ## Estado deportivo auditado
 
@@ -47,6 +51,9 @@ Abre este repositorio o adjunta el ZIP exportado y usa este mensaje:
 - Build de producción: aprobado.
 - Rutas estáticas: `/`, `/liga`, `/lifi-cup`, `/staff`, 404, manifest, robots y sitemap.
 - Verificación visual: escritorio y 390 px, sin overflow horizontal.
+- App móvil: ESLint y TypeScript aprobados.
+- Expo export: bundles Android, iOS y web generados correctamente.
+- Verificación visual móvil a 390 px: lobby, Liga, Cup, fixture, clubes, ficha de Inter y login Staff sin errores de consola.
 
 ## Preview actual
 
@@ -76,6 +83,9 @@ La auditoría comprobó que las reglas actualmente desplegadas aún permiten esc
 npx firebase-tools login
 npx firebase-tools deploy --only firestore:rules --project lifiwebapp
 pnpm qa:security
+pnpm mobile:lint
+pnpm mobile:typecheck
+pnpm mobile:export
 ```
 
 La última prueba debe rechazar tanto escritura pública como anónima.

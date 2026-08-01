@@ -11,6 +11,24 @@ pnpm install
 pnpm dev
 ```
 
+## App móvil
+
+La app para Android e iOS vive en `apps/mobile` y reutiliza clubes, categorías, fixture, clasificación, validaciones y adaptadores de la web. No mantiene una segunda copia de los datos deportivos.
+
+```bash
+# Inicia Expo y muestra el QR para Expo Go
+pnpm mobile:start
+
+# Validación y exportación de bundles
+pnpm mobile:lint
+pnpm mobile:typecheck
+pnpm mobile:export
+```
+
+Instala Expo Go en el teléfono, conecta computador y teléfono a la misma red y escanea el QR. Si la red local lo bloquea, ejecuta `pnpm --filter @lifi/mobile start --tunnel`.
+
+Consulta [`apps/mobile/README.md`](apps/mobile/README.md) para conocer las pantallas implementadas y el flujo de builds de prueba y tiendas.
+
 Variables opcionales: copia `.env.example` a `.env.local`. La configuración Firebase del cliente es pública; la seguridad real depende de Authentication y `firestore.rules`.
 
 ## Validación
@@ -44,6 +62,7 @@ Los roles no pueden crearse desde el cliente. Las reglas mantienen lectura públ
 - `src/lib`: clasificación, ordenamiento, normalización y validación.
 - `src/components`: interfaz pública y panel Staff.
 - `src/data`: respaldo extraído de la última versión válida del HTML.
+- `apps/mobile`: app Expo/React Native para Android e iOS.
 - `firestore.rules`: autorización y validación de escrituras.
 - `scripts`: auditoría de solo lectura y prueba efímera de seguridad.
 
