@@ -8,7 +8,6 @@ import { FixtureList } from "@/components/fixture-list";
 import { ClubMark } from "@/components/club-mark";
 import { StandingsTable } from "@/components/standings-table";
 import { SiteHeader } from "@/components/site-header";
-import { ScrollFade } from "@/components/scroll-fade";
 import { calculateStandings } from "@/lib/standings";
 import { foldText } from "@/lib/text";
 import { useLeagueData } from "@/hooks/use-league-data";
@@ -41,9 +40,8 @@ export function LeagueApp({ competition }: { competition: Competition }) {
   return (
     <>
       <SiteHeader competition={competition} onNavigate={(nextView) => { setView(nextView); setSelectedClub(null); }} />
-      <ScrollFade />
       <main className="competition-page">
-        <section className="hero route-enter" data-scroll-fade>
+        <section className="hero route-enter">
           <div className="hero-copy">
             <p className="eyebrow"><span /> {competition === "league" ? `Temporada ${SEASON} · Torneo Clausura` : "Competencia LIFI"}</p>
             <h1>LIFI <em>{competition === "league" ? "Liga" : "Cup"}</em></h1>
@@ -63,7 +61,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
         {error && <div className="connection-alert" role="status"><WifiOff /><span><strong>Modo respaldo</strong>{error}</span></div>}
         {status === "loading" && <div className="loading-line" role="status"><LoaderCircle /> Cargando información oficial…</div>}
 
-        <section className="league-controls" aria-label="Filtros de competencia" data-scroll-fade>
+        <section className="league-controls" aria-label="Filtros de competencia">
           <div className="competition-switch" aria-label="Competencia">
             <Link className={competition === "league" ? "active" : ""} href="/liga"><Trophy /> Liga · Clausura</Link>
             <Link className={competition === "cup" ? "active" : ""} href="/lifi-cup"><Trophy /> LIFI Cup</Link>
@@ -73,7 +71,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
           </div>
         </section>
 
-        <section className="content-section" data-scroll-fade id={view === "fixture" ? "fixture" : view === "clubs" ? "clubes" : "posiciones"}>
+        <section className="content-section" id={view === "fixture" ? "fixture" : view === "clubs" ? "clubes" : "posiciones"}>
           <div className="section-heading">
             <div><p className="eyebrow"><span /> {competition === "league" ? "Liga LIFI" : "LIFI Cup"} · {CATEGORIES.find((item) => item.id === category)?.name}</p><h2>{view === "standings" ? "Tabla de posiciones" : view === "fixture" ? "Fixture oficial" : "Clubes y planteles"}</h2></div>
             <div className="view-tabs" role="tablist" aria-label="Sección deportiva">

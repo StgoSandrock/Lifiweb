@@ -212,17 +212,8 @@ button { color: inherit; }
 .last-visit { position: absolute; top: 17px; right: 18px; padding: 6px 9px; color: #dbe9f8; background: rgba(5,19,38,.55); border-radius: 8px; font-size: 8px; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
 .lobby-hint { margin: 25px 0 0; color: #8298b2; text-align: center; font-size: 11px; }
 
-/* Scroll transitions */
 .competition-page { overflow: clip; }
 .route-enter { animation: route-enter .55s cubic-bezier(.22,1,.36,1) both; }
-[data-scroll-fade].scroll-fade-ready { opacity: .22; filter: blur(3px); transform: translateY(18px); transition: opacity .55s ease, filter .55s ease, transform .55s cubic-bezier(.22,1,.36,1); }
-[data-scroll-fade].scroll-fade-visible { opacity: 1; filter: blur(0); transform: translateY(0); }
-.scroll-fade-veil { position: fixed; inset: 80px 0 0; z-index: 45; pointer-events: none; }
-.scroll-fade-veil span { position: absolute; left: 0; right: 0; height: 54px; transition: opacity .25s ease; }
-.scroll-fade-veil span:first-child { top: 0; background: linear-gradient(to bottom, var(--canvas), rgba(244,247,251,0)); }
-.scroll-fade-veil span:first-child { opacity: 0; }
-.scroll-fade-veil.is-scrolled span:first-child { opacity: 1; }
-.scroll-fade-veil span:last-child { bottom: 0; opacity: 1; background: linear-gradient(to top, rgba(244,247,251,.96), rgba(244,247,251,0)); }
 @keyframes lobby-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes route-enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -343,7 +334,6 @@ button { color: inherit; }
   .lobby-brand p { max-width: 290px; margin-top: 12px; font-size: 12px; line-height: 1.45; }
   .competition-cards { grid-template-columns: 1fr; }
   .competition-card { min-height: 172px; }
-  .scroll-fade-veil { inset-block-start: 68px; }
   .hero { min-height: auto; grid-template-columns: 1fr; padding: 60px 24px; }
   .hero h1 { font-size: clamp(46px, 13vw, 68px); }
   .hero-scoreboard { display: none; }
@@ -421,6 +411,4 @@ button { color: inherit; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  [data-scroll-fade].scroll-fade-ready { opacity: 1; filter: none; transform: none; }
-  .scroll-fade-veil { display: none; }
 }
