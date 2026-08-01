@@ -1,5 +1,5 @@
-import { LeagueApp } from "@/components/league-app";
+import { CompetitionLobby } from "@/components/competition-lobby";
 
 export default function HomePage() {
-  return <LeagueApp />;
+  return <CompetitionLobby />;
 }

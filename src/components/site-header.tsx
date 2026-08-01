@@ -2,11 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Menu, ShieldCheck, X } from "lucide-react";
+import { Home, Menu, ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
+import type { Competition } from "@/types/domain";
 
-export function SiteHeader() {
+type View = "standings" | "fixture" | "clubs";
+
+export function SiteHeader({ competition, onNavigate }: { competition?: Competition; onNavigate?: (view: View) => void }) {
   const [open, setOpen] = useState(false);
+  const basePath = competition === "cup" ? "/lifi-cup" : "/liga";
+  const navigate = (view: View) => { onNavigate?.(view); setOpen(false); };
   return (
     <header className="site-header">
       <Link className="brand" href="/" aria-label="LIFI, página principal">
@@ -17,9 +22,11 @@ export function SiteHeader() {
         {open ? <X /> : <Menu />}
       </button>
       <nav id="main-nav" className={open ? "main-nav is-open" : "main-nav"} aria-label="Navegación principal">
-        <a href="#posiciones" onClick={() => setOpen(false)}>Posiciones</a>
-        <a href="#fixture" onClick={() => setOpen(false)}>Fixture</a>
-        <a href="#clubes" onClick={() => setOpen(false)}>Clubes</a>
+        <Link className="home-link" href="/" onClick={() => setOpen(false)}><Home size={16} /> Competencias</Link>
+        {competition && <div className="header-competition-switch" aria-label="Cambiar competencia"><Link className={competition === "league" ? "active" : ""} href="/liga">Liga</Link><Link className={competition === "cup" ? "active" : ""} href="/lifi-cup">Cup</Link></div>}
+        <a href={`${basePath}#posiciones`} onClick={() => navigate("standings")}>Posiciones</a>
+        <a href={`${basePath}#fixture`} onClick={() => navigate("fixture")}>Fixture</a>
+        <a href={`${basePath}#clubes`} onClick={() => navigate("clubs")}>Clubes</a>
         <Link className="staff-link" href="/staff"><ShieldCheck size={17} /> Staff</Link>
       </nav>
     </header>

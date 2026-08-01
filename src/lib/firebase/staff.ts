@@ -48,7 +48,7 @@ export async function saveMatch(input: Match, user: User) {
     tournament: "clausura",
     isCup: input.competition === "cup",
     category: parsed.category,
-    fecha: `Fecha ${parsed.round}`,
+    fecha: input.roundLabel ?? `Fecha ${parsed.round}`,
     local: parsed.home,
     visita: parsed.away,
     status: parsed.status === "played" ? "played" : parsed.status === "scheduled" ? "pending" : parsed.status,

@@ -7,7 +7,7 @@ export function FixtureList({ matches, editable }: { matches: Match[]; editable?
   if (!matches.length) return <div className="empty-state"><CalendarDays /><h3>Aún no hay partidos</h3><p>La información se publicará cuando esté confirmada.</p></div>;
   return <div className="rounds">{groupMatchesByRound(matches).map(([round, roundMatches]) => (
     <section className="round" key={round} aria-labelledby={`fecha-${round}`}>
-      <div className="round-title"><span /><h3 id={`fecha-${round}`}>Fecha {round}</h3><span /></div>
+      <div className="round-title"><span /><h3 id={`fecha-${round}`}>{roundMatches[0]?.roundLabel ?? `Fecha ${round}`}</h3><span /></div>
       <div className="match-grid">{roundMatches.map((match) => editable ? editable(match) : <MatchCard match={match} key={match.id} />)}</div>
     </section>
   ))}</div>;

@@ -35,6 +35,7 @@ export interface Match {
   competition: Competition;
   category: CategoryId;
   round: number;
+  roundLabel?: string;
   order: number;
   home: string;
   away: string;

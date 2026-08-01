@@ -7,7 +7,7 @@ const optionalText = z.string().trim().max(120).nullable();
 export const matchInputSchema = z.object({
   id: z.string().min(1),
   category,
-  round: z.number().int().min(1).max(9),
+  round: z.number().int().min(1).max(99),
   home: z.string().trim().min(1).max(80),
   away: z.string().trim().min(1).max(80),
   status: z.enum(["scheduled", "played", "postponed", "cancelled"]),

@@ -26,9 +26,13 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
   const away = normalizeClubName(text(raw.visita ?? raw.away));
   if (!matchCategory || !home || !away) return null;
   const played = raw.status === "played";
-  const roundMatch = text(raw.fecha).match(/\d+/);
-  const round = Number(raw.round ?? roundMatch?.[0]);
-  if (!Number.isInteger(round) || round < 1) return null;
+  const isCup = raw.isCup === true;
+  const roundText = text(raw.fecha);
+  const roundMatch = roundText.match(/\d+/);
+  const parsedRound = Number(raw.round ?? roundMatch?.[0]);
+  const hasNumberedRound = Number.isInteger(parsedRound) && parsedRound >= 1;
+  if (!hasNumberedRound && !isCup) return null;
+  const round = hasNumberedRound ? parsedRound : 99;
   const mappedStatus: MatchStatus = played
     ? "played"
     : raw.status === "postponed" || raw.status === "cancelled"
@@ -37,9 +41,10 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
   return {
     id,
     tournament: "clausura",
-    competition: raw.isCup === true ? "cup" : "league",
+    competition: isCup ? "cup" : "league",
     category: matchCategory,
     round,
+    roundLabel: hasNumberedRound ? undefined : roundText || "Por definir",
     order: nonNegative(raw.orden ?? raw.order) || 99,
     home,
     away,
