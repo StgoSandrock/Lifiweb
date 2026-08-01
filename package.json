@@ -1,0 +1,38 @@
+{
+  "name": "lifiweb",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "audit:firestore": "node scripts/audit-firestore.mjs",
+    "qa:security": "node scripts/test-public-write.mjs"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "packageManager": "pnpm@11.9.0",
+  "dependencies": {
+    "firebase": "^12.17.0",
+    "lucide-react": "^1.28.0",
+    "next": "^16.2.12",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitest/coverage-v8": "^4.1.10",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.2.12",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.10"
+  }
+}
