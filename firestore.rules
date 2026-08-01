@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isStaff() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && (
+          request.auth.token.staff == true
+          || request.auth.token.admin == true
+          || get(/databases/$(database)/documents/staffRoles/$(request.auth.uid)).data.active == true
+        );
+    }
+
+    function isNonNegativeInt(value) {
+      return value is int && value >= 0;
+    }
+
+    function validCategory(value) {
+      return value in ['pre-peque', 'peque', 'mini', 'infantil', 'intermedia'];
+    }
+
+    function validPlayer(data) {
+      return data.nombre is string
+        && data.nombre.size() >= 2
+        && data.nombre.size() <= 100
+        && data.club is string
+        && data.club.size() > 0
+        && data.posicion is string
+        && validCategory(data.categoria)
+        && data.tournament == 'clausura'
+        && data.cupPlayer is bool
+        && isNonNegativeInt(data.goles)
+        && isNonNegativeInt(data.asistencias)
+        && isNonNegativeInt(data.pj)
+        && isNonNegativeInt(data.ta)
+        && isNonNegativeInt(data.tr)
+        && data.updatedBy == request.auth.uid;
+    }
+
+    function validMatch(data) {
+      return data.tournament == 'clausura'
+        && data.isCup is bool
+        && validCategory(data.category)
+        && data.fecha is string
+        && data.local is string
+        && data.visita is string
+        && data.local != data.visita
+        && data.status in ['pending', 'played', 'postponed', 'cancelled']
+        && (data.golesL == null || isNonNegativeInt(data.golesL))
+        && (data.golesV == null || isNonNegativeInt(data.golesV))
+        && (data.status != 'played' || (isNonNegativeInt(data.golesL) && isNonNegativeInt(data.golesV)))
+        && (data.status == 'played' || (data.golesL == null && data.golesV == null))
+        && data.updatedBy == request.auth.uid;
+    }
+
+    match /artifacts/{artifactId}/public/data/jugadores/{playerId} {
+      allow read: if true;
+      allow create, update: if isStaff() && validPlayer(request.resource.data);
+      allow delete: if isStaff();
+    }
+
+    match /artifacts/{artifactId}/public/data/partidos/{matchId} {
+      allow read: if true;
+      allow create, update: if isStaff() && validMatch(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /artifacts/{artifactId}/public/data/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /staffRoles/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
