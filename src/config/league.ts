@@ -12,15 +12,15 @@ export const CATEGORIES: readonly Category[] = [
 ] as const;
 
 export const CLUBS: readonly Club[] = [
-  { id: "israelita", name: "Estadio Israelita", aliases: ["Israelita"], logo: "/clubs/israelita.png" },
-  { id: "espanol", name: "Estadio Español", aliases: ["Estadio Espanol", "Español"], logo: "/clubs/espanol.png" },
-  { id: "manquehue", name: "Club Manquehue", aliases: ["Manquehue"], logo: "/clubs/manquehue.png" },
-  { id: "palestino", name: "Club Palestino", aliases: ["Palestino"], logo: "/clubs/palestino.jpeg" },
-  { id: "bianconero", name: "Bianconero", aliases: [], logo: "/clubs/bianconero.png" },
-  { id: "italiano", name: "Stadio Italiano", aliases: ["Stadio", "Italiano"], logo: "/clubs/italiano.png" },
-  { id: "lif", name: "LIF", aliases: ["L.I.F."], logo: "/clubs/lif.png" },
-  { id: "ultimate", name: "Ultimate S.A.", aliases: ["Ultimate S.A", "Ultimate"], logo: "/clubs/ultimate.png" },
-  { id: "croata", name: "Estadio Croata", aliases: ["Croata"], logo: "/clubs/croata.avif" },
+  { id: "israelita", name: "Estadio Israelita", aliases: ["Israelita"], logo: "/clubs/israelita.svg" },
+  { id: "espanol", name: "Estadio Español", aliases: ["Estadio Espanol", "Español"], logo: "/clubs/espanol.svg" },
+  { id: "manquehue", name: "Club Manquehue", aliases: ["Manquehue"], logo: "/clubs/manquehue.svg" },
+  { id: "palestino", name: "Club Palestino", aliases: ["Palestino"], logo: "/clubs/palestino.svg" },
+  { id: "bianconero", name: "Bianconero", aliases: [], logo: "/clubs/bianconero.svg" },
+  { id: "italiano", name: "Stadio Italiano", aliases: ["Stadio", "Italiano"], logo: "/clubs/italiano.svg" },
+  { id: "lif", name: "LIF", aliases: ["L.I.F."], logo: "/clubs/lif.svg" },
+  { id: "ultimate", name: "Ultimate S.A.", aliases: ["Ultimate S.A", "Ultimate"], logo: "/clubs/ultimate.svg" },
+  { id: "croata", name: "Estadio Croata", aliases: ["Croata"], logo: "/clubs/croata.svg" },
   { id: "inter", name: "Inter", aliases: [], logo: "/clubs/inter.png" },
 ] as const;
 

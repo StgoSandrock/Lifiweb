@@ -15,9 +15,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_CL",
     siteName: "LIFI",
-    images: [{ url: "/lifi-logo.png", width: 512, height: 512, alt: "Logo de LIFI" }],
+    images: [{ url: "/lifi-logo.svg", width: 512, height: 512, alt: "Logo de LIFI" }],
   },
-  icons: { icon: "/lifi-logo.png", apple: "/lifi-logo.png" },
+  icons: { icon: "/lifi-logo.svg", apple: "/lifi-logo.svg" },
 };
 
 export const viewport: Viewport = { themeColor: "#071a35", width: "device-width", initialScale: 1 };

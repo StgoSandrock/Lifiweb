@@ -10,7 +10,7 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <Link className="brand" href="/" aria-label="LIFI, página principal">
-        <Image src="/lifi-logo.png" alt="Logo de LIFI" width={52} height={52} priority />
+        <Image src="/lifi-logo.svg" alt="Logo de LIFI" width={52} height={52} priority />
         <span><strong>LIFI</strong><small>Liga Infantil de Fútbol Interestadios</small></span>
       </Link>
       <button className="menu-button" type="button" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-controls="main-nav" aria-label={open ? "Cerrar menú" : "Abrir menú"}>
