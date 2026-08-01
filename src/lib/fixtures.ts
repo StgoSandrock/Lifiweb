@@ -1,4 +1,4 @@
-import type { Match } from "@/types/domain";
+import type { Match } from "../types/domain";
 
 function valueOrLast(value: string | null) {
   return value && value !== "Por definir" ? value : "9999-99-99";

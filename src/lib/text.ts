@@ -1,4 +1,4 @@
-import { CLUBS } from "@/config/league";
+import { CLUBS } from "../config/league";
 
 export function foldText(value = "") {
   return String(value)

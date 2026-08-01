@@ -1,6 +1,6 @@
-import type { CategoryId, Match, MatchStatus, Player } from "@/types/domain";
-import { CATEGORY_IDS } from "@/config/league";
-import { normalizeClubName } from "@/lib/text";
+import type { CategoryId, Match, MatchStatus, Player } from "../../types/domain";
+import { CATEGORY_IDS } from "../../config/league";
+import { normalizeClubName } from "../text";
 
 type Raw = Record<string, unknown>;
 

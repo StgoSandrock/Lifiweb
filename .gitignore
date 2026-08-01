@@ -8,3 +8,6 @@ coverage/
 !.env.example
 next-env.d.ts
 tsconfig.tsbuildinfo
+.expo/
+apps/mobile/dist/
+apps/mobile/.expo/

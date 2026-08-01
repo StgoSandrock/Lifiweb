@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { CATEGORY_IDS } from "@/config/league";
+import { CATEGORY_IDS } from "../config/league";
 
 const category = z.enum(CATEGORY_IDS as [typeof CATEGORY_IDS[number], ...typeof CATEGORY_IDS]);
 const optionalText = z.string().trim().max(120).nullable();

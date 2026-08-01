@@ -1,4 +1,4 @@
-import type { Category, CategoryId, Club } from "@/types/domain";
+import type { Category, CategoryId, Club } from "../types/domain";
 
 export const SEASON = 2026;
 export const ACTIVE_TOURNAMENT = "clausura" as const;

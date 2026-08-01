@@ -1,6 +1,6 @@
-import { CLUBS } from "@/config/league";
-import type { Club, Match, Standing } from "@/types/domain";
-import { normalizeClubName } from "@/lib/text";
+import { CLUBS } from "../config/league";
+import type { Club, Match, Standing } from "../types/domain";
+import { normalizeClubName } from "./text";
 
 function validPlayedMatch(match: Match) {
   return match.status === "played"

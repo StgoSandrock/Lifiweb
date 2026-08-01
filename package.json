@@ -11,7 +11,14 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "audit:firestore": "node scripts/audit-firestore.mjs",
-    "qa:security": "node scripts/test-public-write.mjs"
+    "qa:security": "node scripts/test-public-write.mjs",
+    "mobile:assets": "node scripts/generate-mobile-assets.mjs",
+    "mobile:start": "pnpm --filter @lifi/mobile start",
+    "mobile:android": "pnpm --filter @lifi/mobile android",
+    "mobile:ios": "pnpm --filter @lifi/mobile ios",
+    "mobile:lint": "pnpm --filter @lifi/mobile lint",
+    "mobile:typecheck": "pnpm --filter @lifi/mobile typecheck",
+    "mobile:export": "pnpm --filter @lifi/mobile export"
   },
   "engines": {
     "node": ">=20.9.0"
@@ -32,6 +39,7 @@
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.12",
+    "sharp": "^0.34.5",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"
   }
