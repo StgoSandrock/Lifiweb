@@ -67,3 +67,4 @@ Los roles no pueden crearse desde el cliente. Las reglas mantienen lectura públ
 - `scripts`: auditoría de solo lectura y prueba efímera de seguridad.
 
 Consulta [docs/AUDIT.md](docs/AUDIT.md) para los conteos y riesgos encontrados.
+Actualización del logo oficial.
