@@ -32,7 +32,7 @@ export const playerInputSchema = z.object({
   position: z.string().trim().min(2).max(50),
   club: z.string().trim().min(1).max(80),
   category,
-  competition: z.enum(["league", "cup"]),
+  competition: z.enum(["league", "cup", "lff"]),
   goals: z.number().int().min(0).max(999).default(0),
   assists: z.number().int().min(0).max(999).default(0),
   appearances: z.number().int().min(0).max(99).default(0),

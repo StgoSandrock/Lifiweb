@@ -1,0 +1,28 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isStaff() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && (
+          request.auth.token.staff == true
+          || request.auth.token.admin == true
+          || firestore.get(/databases/(default)/documents/staffRoles/$(request.auth.uid)).data.active == true
+        );
+    }
+
+    match /team-galleries/{competition}/{category}/{club}/{fileName} {
+      allow read: if true;
+      allow create, update: if isStaff()
+        && competition in ['league', 'cup', 'lff']
+        && category in ['pre-peque', 'peque', 'mini', 'infantil', 'intermedia']
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+      allow delete: if isStaff();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

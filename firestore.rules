@@ -29,6 +29,7 @@ service cloud.firestore {
         && validCategory(data.categoria)
         && data.tournament == 'clausura'
         && data.cupPlayer is bool
+        && data.competition in ['league', 'cup', 'lff']
         && isNonNegativeInt(data.goles)
         && isNonNegativeInt(data.asistencias)
         && isNonNegativeInt(data.pj)
@@ -40,6 +41,7 @@ service cloud.firestore {
     function validMatch(data) {
       return data.tournament == 'clausura'
         && data.isCup is bool
+        && data.competition in ['league', 'cup', 'lff']
         && validCategory(data.category)
         && data.fecha is string
         && data.local is string
@@ -63,6 +65,20 @@ service cloud.firestore {
       allow read: if true;
       allow create, update: if isStaff() && validMatch(request.resource.data);
       allow delete: if false;
+    }
+
+    match /artifacts/{artifactId}/public/data/teamPhotos/{photoId} {
+      allow read: if true;
+      allow create: if isStaff()
+        && request.resource.data.competition in ['league', 'cup', 'lff']
+        && validCategory(request.resource.data.category)
+        && request.resource.data.club is string
+        && request.resource.data.club.size() > 0
+        && request.resource.data.url is string
+        && request.resource.data.storagePath is string
+        && request.resource.data.createdBy == request.auth.uid;
+      allow update: if false;
+      allow delete: if isStaff();
     }
 
     match /artifacts/{artifactId}/public/data/{document=**} {

@@ -4,8 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { useSyncExternalStore } from "react";
+import { LFF_LOGO_DATA_URL } from "@/config/lff-logo";
 
-type LastCompetition = "league" | "cup" | null;
+type LastCompetition = "league" | "cup" | "lff" | null;
 
 const cards = [
   {
@@ -24,6 +25,15 @@ const cards = [
     description: "Consulta el fixture, resultados y la información vigente disponible.",
     className: "cup-card",
   },
+  {
+    id: "lff" as const,
+    href: "/lff",
+    title: "LFF",
+    kicker: "Liga Femenina",
+    description: "Fixture, posiciones, equipos y galerías de cada categoría.",
+    className: "lff-card",
+    logo: LFF_LOGO_DATA_URL,
+  },
 ];
 
 export function CompetitionLobby() {
@@ -31,7 +41,7 @@ export function CompetitionLobby() {
     (onChange) => { window.addEventListener("storage", onChange); return () => window.removeEventListener("storage", onChange); },
     () => {
     const stored = window.localStorage.getItem("lifi:last-competition");
-      return stored === "league" || stored === "cup" ? stored : null;
+      return stored === "league" || stored === "cup" || stored === "lff" ? stored : null;
     },
     () => null,
   );
@@ -61,7 +71,7 @@ export function CompetitionLobby() {
               className={`competition-card ${card.className}`}
               onClick={() => window.localStorage.setItem("lifi:last-competition", card.id)}
             >
-              <span className="competition-card-icon"><Trophy /></span>
+              <span className="competition-card-icon">{"logo" in card && card.logo ? <Image src={card.logo} alt="" width={48} height={48} /> : <Trophy />}</span>
               <span className="competition-card-copy">
                 <span className="competition-kicker">{card.kicker}</span>
                 <strong>{card.title}</strong>

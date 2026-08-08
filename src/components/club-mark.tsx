@@ -3,7 +3,7 @@ import { getClub } from "@/lib/text";
 
 export function ClubMark({ name, size = 48 }: { name: string; size?: number }) {
   const club = getClub(name);
-  if (!club) return <span className="club-fallback" aria-hidden="true">{name.slice(0, 3)}</span>;
+  if (!club?.logo) return <span className="club-fallback" aria-hidden="true">{name.split(" ").map((part) => part[0]).slice(0, 3).join("")}</span>;
   return (
     <Image
       className="club-logo"

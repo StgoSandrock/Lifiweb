@@ -1,4 +1,4 @@
-import type { CategoryId, Match, MatchStatus, Player } from "../../types/domain";
+import type { CategoryId, Competition, Match, MatchStatus, Player, TeamPhoto } from "../../types/domain";
 import { CATEGORY_IDS } from "../../config/league";
 import { normalizeClubName } from "../text";
 
@@ -19,6 +19,10 @@ const nullableDetail = (value: unknown) => {
   const result = text(value);
   return result && result !== "Por definir" ? result : null;
 };
+const competition = (raw: Raw, legacyCupField: "isCup" | "cupPlayer"): Competition => {
+  if (raw.competition === "lff" || raw.competition === "cup" || raw.competition === "league") return raw.competition;
+  return raw[legacyCupField] === true ? "cup" : "league";
+};
 
 export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
   const matchCategory = category(raw.category);
@@ -26,12 +30,12 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
   const away = normalizeClubName(text(raw.visita ?? raw.away));
   if (!matchCategory || !home || !away) return null;
   const played = raw.status === "played";
-  const isCup = raw.isCup === true;
+  const matchCompetition = competition(raw, "isCup");
   const roundText = text(raw.fecha);
   const roundMatch = roundText.match(/\d+/);
   const parsedRound = Number(raw.round ?? roundMatch?.[0]);
   const hasNumberedRound = Number.isInteger(parsedRound) && parsedRound >= 1;
-  if (!hasNumberedRound && !isCup) return null;
+  if (!hasNumberedRound && matchCompetition !== "cup") return null;
   const round = hasNumberedRound ? parsedRound : 99;
   const mappedStatus: MatchStatus = played
     ? "played"
@@ -41,7 +45,7 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
   return {
     id,
     tournament: "clausura",
-    competition: isCup ? "cup" : "league",
+    competition: matchCompetition,
     category: matchCategory,
     round,
     roundLabel: hasNumberedRound ? undefined : roundText || "Por definir",
@@ -68,11 +72,21 @@ export function fromFirestorePlayer(id: string, raw: Raw): Player | null {
     position: text(raw.posicion ?? raw.position) || "Jugador",
     club,
     category: playerCategory,
-    competition: raw.cupPlayer === true ? "cup" : "league",
+    competition: competition(raw, "cupPlayer"),
     goals: nonNegative(raw.goles ?? raw.goals),
     assists: nonNegative(raw.asistencias ?? raw.assists),
     appearances: nonNegative(raw.pj ?? raw.appearances),
     yellowCards: nonNegative(raw.ta ?? raw.yellowCards),
     redCards: nonNegative(raw.tr ?? raw.redCards),
   };
+}
+
+export function fromFirestoreTeamPhoto(id: string, raw: Raw): TeamPhoto | null {
+  const photoCategory = category(raw.category);
+  const photoCompetition = raw.competition;
+  const club = text(raw.club);
+  const url = text(raw.url);
+  const storagePath = text(raw.storagePath);
+  if (!photoCategory || (photoCompetition !== "league" && photoCompetition !== "cup" && photoCompetition !== "lff") || !club || !url || !storagePath) return null;
+  return { id, category: photoCategory, competition: photoCompetition, club, url, storagePath, order: nonNegative(raw.order) };
 }
