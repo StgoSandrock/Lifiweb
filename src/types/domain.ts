@@ -1,4 +1,4 @@
-export type Competition = "league" | "cup";
+export type Competition = "league" | "cup" | "lff";
 export type CategoryId = "pre-peque" | "peque" | "mini" | "infantil" | "intermedia";
 export type MatchStatus = "scheduled" | "played" | "postponed" | "cancelled";
 
@@ -27,6 +27,16 @@ export interface Player {
   appearances: number;
   yellowCards: number;
   redCards: number;
+}
+
+export interface TeamPhoto {
+  id: string;
+  competition: Competition;
+  category: CategoryId;
+  club: string;
+  url: string;
+  storagePath: string;
+  order: number;
 }
 
 export interface Match {

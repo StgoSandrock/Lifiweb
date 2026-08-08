@@ -11,13 +11,15 @@ import {
   doc,
   getDoc,
   serverTimestamp,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
-import { firebaseArtifactId, firebaseAuth, firebaseDb } from "@/lib/firebase/client";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { firebaseArtifactId, firebaseAuth, firebaseDb, firebaseStorage } from "@/lib/firebase/client";
 import { matchInputSchema, playerInputSchema } from "@/lib/validation";
-import type { Match, Player } from "@/types/domain";
+import type { CategoryId, Competition, Match, Player, TeamPhoto } from "@/types/domain";
 
-function dataCollection(name: "jugadores" | "partidos") {
+function dataCollection(name: "jugadores" | "partidos" | "teamPhotos") {
   return collection(firebaseDb, "artifacts", firebaseArtifactId, "public", "data", name);
 }
 
@@ -44,9 +46,10 @@ export const observeStaffUser = (callback: (user: User | null) => void) => onIdT
 export async function saveMatch(input: Match, user: User) {
   if (!(await isStaffUser(user))) throw new Error("Sesión Staff no autorizada.");
   const parsed = matchInputSchema.parse(input);
-  await updateDoc(doc(dataCollection("partidos"), parsed.id), {
+  await setDoc(doc(dataCollection("partidos"), parsed.id), {
     tournament: "clausura",
     isCup: input.competition === "cup",
+    competition: input.competition,
     category: parsed.category,
     fecha: input.roundLabel ?? `Fecha ${parsed.round}`,
     local: parsed.home,
@@ -59,7 +62,7 @@ export async function saveMatch(input: Match, user: User) {
     golesV: parsed.awayScore,
     updatedAt: serverTimestamp(),
     updatedBy: user.uid,
-  });
+  }, { merge: true });
 }
 
 export async function savePlayer(input: Omit<Player, "id"> & { id?: string }, user: User) {
@@ -71,6 +74,7 @@ export async function savePlayer(input: Omit<Player, "id"> & { id?: string }, us
     club: parsed.club,
     categoria: parsed.category,
     cupPlayer: parsed.competition === "cup",
+    competition: parsed.competition,
     goles: parsed.goals,
     asistencias: parsed.assists,
     pj: parsed.appearances,
@@ -87,4 +91,34 @@ export async function savePlayer(input: Omit<Player, "id"> & { id?: string }, us
 export async function deletePlayer(playerId: string, user: User) {
   if (!(await isStaffUser(user))) throw new Error("Sesión Staff no autorizada.");
   await deleteDoc(doc(dataCollection("jugadores"), playerId));
+}
+
+function safeSegment(value: string) {
+  return value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+}
+
+export async function uploadTeamPhotos(input: { files: File[]; competition: Competition; category: CategoryId; club: string }, user: User) {
+  if (!(await isStaffUser(user))) throw new Error("Sesión Staff no autorizada.");
+  if (!input.files.length) throw new Error("Selecciona al menos una foto.");
+  const invalid = input.files.find((file) => !file.type.startsWith("image/") || file.size > 10 * 1024 * 1024);
+  if (invalid) throw new Error("Cada archivo debe ser una imagen de hasta 10 MB.");
+  const uploaded: TeamPhoto[] = [];
+  for (const [index, file] of input.files.entries()) {
+    const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+    const id = crypto.randomUUID();
+    const storagePath = `team-galleries/${input.competition}/${input.category}/${safeSegment(input.club)}/${id}.${extension}`;
+    const storageRef = ref(firebaseStorage, storagePath);
+    await uploadBytes(storageRef, file, { contentType: file.type });
+    const url = await getDownloadURL(storageRef);
+    const photo = { id, competition: input.competition, category: input.category, club: input.club, url, storagePath, order: Date.now() + index };
+    await setDoc(doc(dataCollection("teamPhotos"), id), { ...photo, createdAt: serverTimestamp(), createdBy: user.uid });
+    uploaded.push(photo);
+  }
+  return uploaded;
+}
+
+export async function deleteTeamPhoto(photo: TeamPhoto, user: User) {
+  if (!(await isStaffUser(user))) throw new Error("Sesión Staff no autorizada.");
+  await deleteObject(ref(firebaseStorage, photo.storagePath));
+  await deleteDoc(doc(dataCollection("teamPhotos"), photo.id));
 }

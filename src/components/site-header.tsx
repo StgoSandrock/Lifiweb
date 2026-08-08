@@ -10,7 +10,7 @@ type View = "standings" | "fixture" | "clubs";
 
 export function SiteHeader({ competition, onNavigate }: { competition?: Competition; onNavigate?: (view: View) => void }) {
   const [open, setOpen] = useState(false);
-  const basePath = competition === "cup" ? "/lifi-cup" : "/liga";
+  const basePath = competition === "cup" ? "/lifi-cup" : competition === "lff" ? "/lff" : "/liga";
   const navigate = (view: View) => { onNavigate?.(view); setOpen(false); };
   return (
     <header className="site-header">
@@ -23,7 +23,7 @@ export function SiteHeader({ competition, onNavigate }: { competition?: Competit
       </button>
       <nav id="main-nav" className={open ? "main-nav is-open" : "main-nav"} aria-label="Navegación principal">
         <Link className="home-link" href="/" onClick={() => setOpen(false)}><Home size={16} /> Competencias</Link>
-        {competition && <div className="header-competition-switch" aria-label="Cambiar competencia"><Link className={competition === "league" ? "active" : ""} href="/liga">Liga</Link><Link className={competition === "cup" ? "active" : ""} href="/lifi-cup">Cup</Link></div>}
+        {competition && <div className="header-competition-switch" aria-label="Cambiar competencia"><Link className={competition === "league" ? "active" : ""} href="/liga">Liga</Link><Link className={competition === "cup" ? "active" : ""} href="/lifi-cup">Cup</Link><Link className={competition === "lff" ? "active" : ""} href="/lff">LFF</Link></div>}
         <a href={`${basePath}#posiciones`} onClick={() => navigate("standings")}>Posiciones</a>
         <a href={`${basePath}#fixture`} onClick={() => navigate("fixture")}>Fixture</a>
         <a href={`${basePath}#clubes`} onClick={() => navigate("clubs")}>Clubes</a>

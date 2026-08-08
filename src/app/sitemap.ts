@@ -7,5 +7,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: base, lastModified, changeFrequency: "weekly", priority: 1 },
     { url: `${base}/liga`, lastModified, changeFrequency: "daily", priority: 0.95 },
     { url: `${base}/lifi-cup`, lastModified, changeFrequency: "daily", priority: 0.8 },
+    { url: `${base}/lff`, lastModified, changeFrequency: "daily", priority: 0.9 },
   ];
 }
