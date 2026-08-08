@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Newspaper, ShieldCheck, Sparkles, Trophy } from "lucide-react";
 import { useSyncExternalStore } from "react";
 import { LFF_LOGO_DATA_URL } from "@/config/lff-logo";
 
@@ -82,6 +82,19 @@ export function CompetitionLobby() {
             </Link>
           ))}
         </div>
+        <section className="lobby-news" aria-labelledby="lobby-news-title">
+          <article className="lobby-news-card">
+            <div className="lobby-news-image">
+              <Image src="/news/bienvenida-inter-lifi.jpeg" alt="Inter y Club Manquehue juntos tras su amistoso de categoría Intermedia" fill sizes="(max-width: 768px) 100vw, 48vw" />
+            </div>
+            <div className="lobby-news-copy">
+              <span><Newspaper /> Noticias LIFI</span>
+              <h2 id="lobby-news-title">¡Bienvenido, Inter!</h2>
+              <p>Inter se suma a LIFI con un amistoso frente a la categoría Intermedia de Club Manquehue.</p>
+              <Link href="/liga" onClick={() => window.localStorage.setItem("lifi:last-competition", "league")}>Ver la Liga <ArrowRight /></Link>
+            </div>
+          </article>
+        </section>
         <p className="lobby-hint">Elige una competencia para ver su información oficial.</p>
       </section>
     </main>

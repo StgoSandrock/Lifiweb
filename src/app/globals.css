@@ -229,6 +229,18 @@ button { color: inherit; }
 .competition-card:hover .competition-arrow { transform: translateX(4px); }
 .competition-arrow svg { width: 19px; }
 .last-visit { position: absolute; top: 17px; right: 18px; padding: 6px 9px; color: #dbe9f8; background: rgba(5,19,38,.55); border-radius: 8px; font-size: 8px; font-weight: 850; letter-spacing: .07em; text-transform: uppercase; }
+.lobby-news { margin-top: 22px; }
+.lobby-news-card { overflow: hidden; display: grid; grid-template-columns: minmax(280px, .9fr) 1.1fr; min-height: 250px; border: 1px solid rgba(255,255,255,.13); border-radius: 27px; background: rgba(255,255,255,.075); box-shadow: 0 24px 70px rgba(0,0,0,.18); }
+.lobby-news-image { position: relative; min-height: 250px; }
+.lobby-news-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 65%, rgba(5,19,38,.5)); pointer-events: none; }
+.lobby-news-image img { object-fit: cover; }
+.lobby-news-copy { display: flex; flex-direction: column; justify-content: center; padding: clamp(26px, 5vw, 48px); }
+.lobby-news-copy > span { display: flex; align-items: center; gap: 7px; color: var(--yellow); font-size: 9px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
+.lobby-news-copy > span svg { width: 16px; }
+.lobby-news-copy h2 { margin: 13px 0 8px; font-size: clamp(31px, 4.5vw, 52px); font-style: italic; letter-spacing: -.055em; }
+.lobby-news-copy p { max-width: 510px; margin: 0; color: #b7c8dc; font-size: 13px; line-height: 1.65; }
+.lobby-news-copy a { align-self: flex-start; display: inline-flex; align-items: center; gap: 8px; margin-top: 19px; color: var(--navy-950); background: var(--yellow); border-radius: 11px; padding: 11px 14px; font-size: 10px; font-weight: 900; text-transform: uppercase; }
+.lobby-news-copy a svg { width: 16px; }
 .lobby-hint { margin: 25px 0 0; color: #8298b2; text-align: center; font-size: 11px; }
 
 .competition-page { overflow: clip; }
@@ -297,6 +309,7 @@ button { color: inherit; }
 .photo-admin-grid article > div { position: absolute; inset: 0; }
 .photo-admin-grid img { object-fit: cover; }
 .photo-admin-grid .icon-danger { position: absolute; z-index: 2; top: 8px; right: 8px; box-shadow: 0 4px 12px rgba(5,19,38,.2); }
+.photo-seed-badge { position: absolute; z-index: 2; top: 8px; right: 8px; padding: 7px 9px; border-radius: 8px; color: #fff; background: rgba(5,19,38,.72); font-size: 8px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
 .empty-state.compact { min-height: 260px; }
 .list-filters { display: flex; gap: 8px; }
 .list-filters label { height: 42px; display: flex; align-items: center; gap: 7px; border: 1px solid #cdd7e4; border-radius: 11px; padding: 0 10px; }
@@ -369,6 +382,9 @@ button { color: inherit; }
   .lobby-brand p { max-width: 290px; margin-top: 12px; font-size: 12px; line-height: 1.45; }
   .competition-cards { grid-template-columns: 1fr; }
   .competition-card { min-height: 172px; }
+  .lobby-news-card { grid-template-columns: 1fr; }
+  .lobby-news-image { min-height: 230px; }
+  .lobby-news-image::after { background: linear-gradient(0deg, rgba(5,19,38,.45), transparent 45%); }
   .hero { min-height: auto; grid-template-columns: 1fr; padding: 60px 24px; }
   .hero h1 { font-size: clamp(46px, 13vw, 68px); }
   .hero-scoreboard { display: none; }

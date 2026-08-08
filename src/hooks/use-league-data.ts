@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import fallbackFixtures from "@/data/league-fixtures.json";
 import { LFF_FIXTURES } from "@/data/lff-fixtures";
+import { SEEDED_TEAM_PHOTOS } from "@/data/seed-team-photos";
 import { fromFirestorePlayer } from "@/lib/firebase/adapters";
 import { subscribeToLeagueData } from "@/lib/firebase/public-data";
 import type { Match, Player, TeamPhoto } from "@/types/domain";
@@ -17,7 +18,7 @@ function includeLffFixtures(matches: Match[]) {
 export function useLeagueData() {
   const [matches, setMatches] = useState<Match[]>(fallbackMatches);
   const [players, setPlayers] = useState<Player[]>([]);
-  const [photos, setPhotos] = useState<TeamPhoto[]>([]);
+  const [photos, setPhotos] = useState<TeamPhoto[]>(SEEDED_TEAM_PHOTOS);
   const [status, setStatus] = useState<"loading" | "live" | "fallback">("loading");
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +34,8 @@ export function useLeagueData() {
       setError(null);
     },
     photos: (nextPhotos) => {
-      setPhotos(nextPhotos);
+      const seededIds = new Set(SEEDED_TEAM_PHOTOS.map((photo) => photo.id));
+      setPhotos([...SEEDED_TEAM_PHOTOS, ...nextPhotos.filter((photo) => !seededIds.has(photo.id))]);
       setStatus("live");
       setError(null);
     },
