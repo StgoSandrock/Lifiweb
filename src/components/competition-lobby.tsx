@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, Newspaper, ShieldCheck, Sparkles, Trophy } from "lucide-react";
+import { ArrowRight, Newspaper, ShieldCheck, Sparkles } from "lucide-react";
 import { useSyncExternalStore } from "react";
 import { LFF_LOGO_DATA_URL } from "@/config/lff-logo";
 
@@ -16,6 +16,8 @@ const cards = [
     kicker: "Clausura 2026",
     description: "Posiciones, nueve fechas, fixture oficial, clubes y planteles.",
     className: "league-card",
+    logo: "/lifi-logo.png",
+    logoAlt: "Logo de LIFI Liga",
   },
   {
     id: "cup" as const,
@@ -24,6 +26,8 @@ const cards = [
     kicker: "Competencia LIFI",
     description: "Consulta el fixture, resultados y la información vigente disponible.",
     className: "cup-card",
+    logo: "/lifi-logo.png",
+    logoAlt: "Logo de LIFI Cup",
   },
   {
     id: "lff" as const,
@@ -33,6 +37,7 @@ const cards = [
     description: "Fixture, posiciones, equipos y galerías de cada categoría.",
     className: "lff-card",
     logo: LFF_LOGO_DATA_URL,
+    logoAlt: "Logo de LFF",
   },
 ];
 
@@ -56,7 +61,7 @@ export function CompetitionLobby() {
 
       <section className="lobby-content" aria-labelledby="lobby-title">
         <div className="lobby-brand">
-          <Image src="/lifi-logo.png" alt="Escudo de LIFI" width={116} height={116} priority />
+          <Image className="lifi-logo-round" src="/lifi-logo.png" alt="Escudo de LIFI" width={116} height={116} priority />
           <div>
             <h1 id="lobby-title">LIFI</h1>
             <p>Liga Infantil de Fútbol Interestadios</p>
@@ -71,7 +76,7 @@ export function CompetitionLobby() {
               className={`competition-card ${card.className}`}
               onClick={() => window.localStorage.setItem("lifi:last-competition", card.id)}
             >
-              <span className="competition-card-icon">{"logo" in card && card.logo ? <Image src={card.logo} alt="" width={48} height={48} /> : <Trophy />}</span>
+              <span className="competition-card-icon"><Image className={card.id === "lff" ? "" : "lifi-logo-round"} src={card.logo} alt={card.logoAlt} width={48} height={48} /></span>
               <span className="competition-card-copy">
                 <span className="competition-kicker">{card.kicker}</span>
                 <strong>{card.title}</strong>

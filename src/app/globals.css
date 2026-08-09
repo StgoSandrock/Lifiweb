@@ -32,6 +32,7 @@ button { color: inherit; }
 .site-header { height: 80px; padding: 0 clamp(20px, 5vw, 72px); background: rgba(255,255,255,.96); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; backdrop-filter: blur(12px); }
 .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
 .brand img { object-fit: contain; }
+.lifi-logo-round { border-radius: 50%; clip-path: circle(49.5% at 50% 50%); object-fit: cover; }
 .brand > span { display: flex; flex-direction: column; }
 .brand strong { font-size: 25px; line-height: 1; font-style: italic; letter-spacing: -.05em; color: var(--navy-900); }
 .brand small { color: var(--muted); font-size: 9px; text-transform: uppercase; font-weight: 750; letter-spacing: .1em; margin-top: 4px; }
@@ -54,8 +55,8 @@ button { color: inherit; }
 .eyebrow span { width: 24px; height: 3px; background: var(--yellow); border-radius: 9px; flex: 0 0 auto; }
 .hero h1 { max-width: 760px; font-size: clamp(48px, 6.3vw, 86px); line-height: .96; letter-spacing: -.065em; margin: 0; font-style: italic; text-transform: uppercase; }
 .hero h1 em { color: var(--yellow); font-style: inherit; }
-.hero h1.lff-title { display: flex; align-items: center; flex-wrap: wrap; gap: 13px; }
-.hero h1.lff-title img { width: clamp(62px, 7vw, 84px); height: clamp(62px, 7vw, 84px); border-radius: 50%; box-shadow: 0 12px 28px rgba(0,0,0,.22); }
+.hero h1.competition-title { display: flex; align-items: center; flex-wrap: wrap; gap: 13px; }
+.hero h1.competition-title img { width: clamp(62px, 7vw, 84px); height: clamp(62px, 7vw, 84px); border-radius: 50%; box-shadow: 0 12px 28px rgba(0,0,0,.22); }
 .hero-copy > p:not(.eyebrow) { max-width: 620px; color: #b9c8dc; font-size: clamp(16px, 1.5vw, 20px); line-height: 1.65; margin: 28px 0 34px; }
 .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
 .primary-button, .secondary-button, .danger-button, .save-button { min-height: 46px; border-radius: 13px; border: 0; padding: 0 20px; font-weight: 800; font-size: 13px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; cursor: pointer; }

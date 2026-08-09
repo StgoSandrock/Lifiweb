@@ -42,6 +42,8 @@ export function LeagueApp({ competition }: { competition: Competition }) {
     : competition === "cup"
       ? { eyebrow: "Competencia LIFI", title: "LIFI", accent: "Cup", name: "LIFI Cup", description: "Fixture, resultados y planteles disponibles de LIFI Cup, sin completar información que aún no haya sido publicada.", label: "LIFI Cup" }
       : { eyebrow: `Temporada ${SEASON} · Liga Femenina`, title: "LFF", accent: "Liga Femenina", name: "LFF", description: "Fixture, posiciones, equipos y galerías oficiales de la Liga Femenina.", label: "LFF · Liga Femenina" };
+  const competitionLogo = competition === "lff" ? LFF_LOGO_DATA_URL : "/lifi-logo.png";
+  const competitionLogoAlt = competition === "lff" ? "Logo de LFF" : `Logo de ${copy.name}`;
 
   useEffect(() => {
     window.localStorage.setItem("lifi:last-competition", competition);
@@ -54,7 +56,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
         <section className="hero route-enter">
           <div className="hero-copy">
             <p className="eyebrow"><span /> {copy.eyebrow}</p>
-            <h1 className={competition === "lff" ? "lff-title" : ""}>{competition === "lff" && <Image src={LFF_LOGO_DATA_URL} alt="Logo de LFF" width={84} height={84} unoptimized />} {copy.title} <em>{copy.accent}</em></h1>
+            <h1 className="competition-title"><Image className={competition === "lff" ? "" : "lifi-logo-round"} src={competitionLogo} alt={competitionLogoAlt} width={84} height={84} unoptimized={competition === "lff"} /> {copy.title} <em>{copy.accent}</em></h1>
             <p>{copy.description}</p>
             <div className="hero-actions">
               <a className="primary-button" href="#fixture" onClick={() => setView("fixture")}>Ver fixture <ArrowRight /></a>
