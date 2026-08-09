@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AlertTriangle, Camera, CheckCircle2, LoaderCircle, LogOut, Save, Search, ShieldCheck, Trash2, Upload, UserPlus, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { CATEGORIES, clubsForCompetition } from "@/config/league";
+import { categoriesForCompetition, clubsForCompetition } from "@/config/league";
 import { FixtureList } from "@/components/fixture-list";
 import { SiteHeader } from "@/components/site-header";
 import { useLeagueData } from "@/hooks/use-league-data";
@@ -36,14 +36,15 @@ export function StaffDashboard() {
   const selectedPlayers = players.filter((player) => player.category === category && player.competition === competition);
   const selectedPhotos = photos.filter((photo) => photo.category === category && photo.competition === competition);
   const competitionClubs = clubsForCompetition(competition);
+  const competitionCategories = categoriesForCompetition(competition);
 
   return <><SiteHeader /><main className="staff-page">
     <header className="staff-heading"><div><p className="eyebrow"><span /> Acceso autorizado</p><h1>Panel Staff</h1><p>Actualiza información oficial con validaciones y registro de auditoría.</p></div><button className="secondary-button" type="button" onClick={() => signOutStaff()}><LogOut /> Cerrar sesión</button></header>
     {notice && <div className={`notice ${notice.kind}`} role="status">{notice.kind === "success" ? <CheckCircle2 /> : <AlertTriangle />}<span>{notice.message}</span><button type="button" onClick={() => setNotice(null)} aria-label="Cerrar mensaje"><X /></button></div>}
     {dataError && <div className="notice error"><AlertTriangle /><span>Firestore no está disponible. La edición está deshabilitada hasta recuperar la conexión.</span></div>}
     <div className="staff-toolbar">
-      <div className="field"><label htmlFor="staff-competition">Competencia</label><select id="staff-competition" value={competition} onChange={(event) => setCompetition(event.target.value as Competition)}><option value="league">Liga · Clausura</option><option value="cup">LIFI Cup</option><option value="lff">LFF · Liga Femenina</option></select></div>
-      <div className="field"><label htmlFor="staff-category">Categoría</label><select id="staff-category" value={category} onChange={(event) => setCategory(event.target.value as CategoryId)}>{CATEGORIES.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.birthYears}</option>)}</select></div>
+      <div className="field"><label htmlFor="staff-competition">Competencia</label><select id="staff-competition" value={competition} onChange={(event) => { const nextCompetition = event.target.value as Competition; setCompetition(nextCompetition); setCategory(nextCompetition === "lff" ? "superior" : "pre-peque"); }}><option value="league">Liga · Clausura</option><option value="cup">LIFI Cup</option><option value="lff">LFF · Liga Femenina</option></select></div>
+      <div className="field"><label htmlFor="staff-category">Categoría</label><select id="staff-category" value={category} onChange={(event) => setCategory(event.target.value as CategoryId)}>{competitionCategories.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.birthYears}</option>)}</select></div>
       <div className="staff-section-tabs" role="tablist"><button role="tab" aria-selected={section === "matches"} className={section === "matches" ? "active" : ""} onClick={() => setSection("matches")}>Partidos</button><button role="tab" aria-selected={section === "players"} className={section === "players" ? "active" : ""} onClick={() => setSection("players")}>Jugadores</button><button role="tab" aria-selected={section === "photos"} className={section === "photos" ? "active" : ""} onClick={() => setSection("photos")}>Fotos</button></div>
       <span className={`data-status ${status}`}>{status === "live" ? "Firebase conectado" : "Datos de respaldo"}</span>
     </div>

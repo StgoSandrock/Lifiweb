@@ -85,6 +85,23 @@ button { color: inherit; }
 .loading-line { color: var(--muted); justify-content: center; }
 .loading-line svg { width: 18px; animation: spin 1s linear infinite; }
 
+.lff-history { width: min(1280px, calc(100% - 40px)); margin: 48px auto 0; overflow: hidden; display: grid; grid-template-columns: minmax(320px, .9fr) 1.1fr; background: #fff; border: 1px solid var(--line); border-radius: 28px; box-shadow: var(--shadow); scroll-margin-top: 105px; }
+.lff-history-image { position: relative; min-height: 620px; background: var(--navy-950); }
+.lff-history-image::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 65%, rgba(5,19,38,.2)); pointer-events: none; }
+.lff-history-image img { object-fit: cover; }
+.lff-history-copy { padding: clamp(30px, 5vw, 58px); }
+.lff-history-copy h2 { margin: 0 0 14px; font-size: clamp(32px, 4vw, 51px); line-height: 1; letter-spacing: -.05em; }
+.lff-history-intro { margin: 0 0 26px; color: var(--muted); line-height: 1.7; font-size: 14px; }
+.lff-history-tournaments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.lff-history-tournaments article { padding: 20px; border-radius: 18px; background: var(--canvas); border: 1px solid var(--line); }
+.lff-history-tournaments h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 16px; font-size: 18px; }
+.lff-history-tournaments h3 svg { width: 20px; color: #a67c00; }
+.lff-history-tournaments dl { display: flex; flex-direction: column; gap: 13px; margin: 0; }
+.lff-history-tournaments dl > div { padding-top: 12px; border-top: 1px solid var(--line); }
+.lff-history-tournaments dt { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 9px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.lff-history-tournaments dt svg { width: 14px; }
+.lff-history-tournaments dd { display: flex; flex-direction: column; gap: 3px; margin: 6px 0 0; font-size: 12px; font-weight: 800; line-height: 1.45; }
+
 .league-controls, .content-section, .staff-page { width: min(1280px, calc(100% - 40px)); margin-inline: auto; }
 .league-controls { margin-top: 38px; display: flex; flex-direction: column; gap: 18px; }
 .competition-switch { display: flex; gap: 8px; align-self: flex-start; background: #e8edf4; border-radius: 14px; padding: 5px; }
@@ -92,6 +109,7 @@ button { color: inherit; }
 .competition-switch a svg { width: 17px; }
 .competition-switch a.active { background: var(--surface); color: var(--navy-900); box-shadow: 0 5px 15px rgba(0,0,0,.08); }
 .category-tabs { background: var(--surface); border: 1px solid var(--line); padding: 7px; border-radius: 18px; display: grid; grid-template-columns: repeat(5, 1fr); box-shadow: 0 8px 24px rgba(5,19,38,.04); }
+.category-tabs.single { grid-template-columns: minmax(220px, 1fr); }
 .category-tabs button { min-height: 62px; border: 0; background: transparent; border-radius: 12px; display: flex; flex-direction: column; justify-content: center; gap: 4px; cursor: pointer; color: var(--muted); }
 .category-tabs span { font-size: 13px; font-weight: 850; }
 .category-tabs small { font-size: 10px; }
@@ -360,6 +378,8 @@ button { color: inherit; }
   .player-manager { grid-template-columns: 300px minmax(0, 1fr); }
   .photo-manager { grid-template-columns: 300px minmax(0, 1fr); }
   .photo-admin-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .lff-history { grid-template-columns: 1fr; }
+  .lff-history-image { min-height: 430px; }
   .player-list-heading, .list-filters { align-items: stretch; flex-direction: column; }
   .list-filters select { width: 100%; }
 }
@@ -383,6 +403,9 @@ button { color: inherit; }
   .lobby-brand p { max-width: 290px; margin-top: 12px; font-size: 12px; line-height: 1.45; }
   .competition-cards { grid-template-columns: 1fr; }
   .competition-card { min-height: 172px; }
+  .lff-history { width: min(100% - 28px, 1280px); margin-top: 28px; border-radius: 22px; }
+  .lff-history-image { min-height: 300px; }
+  .lff-history-tournaments { grid-template-columns: 1fr; }
   .lobby-news-card { grid-template-columns: 1fr; }
   .lobby-news-image { min-height: 230px; }
   .lobby-news-image::after { background: linear-gradient(0deg, rgba(5,19,38,.45), transparent 45%); }
@@ -392,6 +415,7 @@ button { color: inherit; }
   .connection-alert, .loading-line { margin-inline: 20px; }
   .league-controls, .content-section, .staff-page { width: min(100% - 28px, 1280px); }
   .category-tabs { overflow-x: auto; grid-template-columns: repeat(5, minmax(118px, 1fr)); scrollbar-width: thin; }
+  .category-tabs.single { grid-template-columns: minmax(220px, 1fr); }
   .category-tabs button { min-height: 58px; }
   .content-section { padding-top: 52px; }
   .section-heading { align-items: stretch; flex-direction: column; }

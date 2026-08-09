@@ -11,6 +11,10 @@ export const CATEGORIES: readonly Category[] = [
   { id: "intermedia", name: "Intermedia", birthYears: "2009–2010" },
 ] as const;
 
+export const LFF_CATEGORIES: readonly Category[] = [
+  { id: "superior", name: "Superior", birthYears: "Categoría única" },
+] as const;
+
 export const CLUBS: readonly Club[] = [
   { id: "israelita", name: "Estadio Israelita", aliases: ["Israelita"], logo: "/clubs/israelita.svg" },
   { id: "espanol", name: "Estadio Español", aliases: ["Estadio Espanol", "Español"], logo: "/clubs/espanol.svg" },
@@ -33,10 +37,15 @@ export const LFF_CLUBS: readonly Club[] = [
   { id: "lff-stadio-italiano", name: "Stadio Italiano", aliases: [], logo: "/clubs/italiano.svg" },
   { id: "lff-country-club-a", name: "Country Club A", aliases: [], logo: "/clubs/country-club.png" },
   { id: "lff-country-club-b", name: "Country Club B", aliases: [], logo: "/clubs/country-club.png" },
+  { id: "lff-sport-academy", name: "Sport Academy", aliases: [], logo: "" },
 ] as const;
 
 export function clubsForCompetition(competition: import("../types/domain").Competition) {
   return competition === "lff" ? LFF_CLUBS : CLUBS;
 }
 
-export const CATEGORY_IDS = CATEGORIES.map((category) => category.id) as CategoryId[];
+export function categoriesForCompetition(competition: import("../types/domain").Competition) {
+  return competition === "lff" ? LFF_CATEGORIES : CATEGORIES;
+}
+
+export const CATEGORY_IDS = [...CATEGORIES, ...LFF_CATEGORIES].map((category) => category.id) as CategoryId[];

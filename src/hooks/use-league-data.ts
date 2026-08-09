@@ -11,8 +11,7 @@ import type { Match, Player, TeamPhoto } from "@/types/domain";
 const fallbackMatches = [...(fallbackFixtures as Match[]), ...LFF_FIXTURES];
 
 function includeLffFixtures(matches: Match[]) {
-  const liveIds = new Set(matches.map((match) => match.id));
-  return [...matches, ...LFF_FIXTURES.filter((match) => !liveIds.has(match.id))];
+  return [...matches.filter((match) => match.competition !== "lff"), ...LFF_FIXTURES];
 }
 
 export function useLeagueData() {

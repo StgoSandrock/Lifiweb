@@ -1,39 +1,75 @@
-import { CATEGORIES, LFF_CLUBS } from "@/config/league";
 import type { Match } from "@/types/domain";
 
-function roundRobin(teams: string[]) {
-  const rotating = [...teams];
-  const rounds: Array<Array<[string, string]>> = [];
-  for (let round = 0; round < rotating.length - 1; round += 1) {
-    const pairings: Array<[string, string]> = [];
-    for (let index = 0; index < rotating.length / 2; index += 1) {
-      const home = rotating[index];
-      const away = rotating[rotating.length - 1 - index];
-      pairings.push(round % 2 === 0 ? [home, away] : [away, home]);
-    }
-    rounds.push(pairings);
-    rotating.splice(1, 0, rotating.pop()!);
-  }
-  return rounds;
-}
+// El documento oficial lista primero al local original. La web publica cada
+// cruce con la localía invertida, según la instrucción recibida.
+const SOURCE_ROUNDS: ReadonlyArray<ReadonlyArray<readonly [string, string]>> = [
+  [
+    ["Club Palestino A", "Country Club B"],
+    ["Estadio Español", "Equipo Médico"],
+    ["Stadio Italiano", "Sport Academy"],
+    ["Country Club A", "Club Palestino B"],
+  ],
+  [
+    ["Estadio Español", "Country Club B"],
+    ["Stadio Italiano", "Club Deportivo Manquehue"],
+    ["Country Club A", "Equipo Médico"],
+    ["Club Palestino A", "Sport Academy"],
+  ],
+  [
+    ["Country Club B", "Sport Academy"],
+    ["Stadio Italiano", "Club Palestino B"],
+    ["Club Palestino A", "Club Deportivo Manquehue"],
+    ["Estadio Español", "Country Club A"],
+  ],
+  [
+    ["Country Club B", "Club Deportivo Manquehue"],
+    ["Estadio Español", "Sport Academy"],
+    ["Club Palestino A", "Club Palestino B"],
+    ["Equipo Médico", "Stadio Italiano"],
+  ],
+  [
+    ["Country Club B", "Club Palestino B"],
+    ["Sport Academy", "Club Deportivo Manquehue"],
+    ["Country Club A", "Stadio Italiano"],
+    ["Club Palestino A", "Equipo Médico"],
+  ],
+  [
+    ["Estadio Español", "Club Deportivo Manquehue"],
+    ["Club Palestino B", "Sport Academy"],
+  ],
+  [
+    ["Club Deportivo Manquehue", "Club Palestino B"],
+    ["Country Club A", "Club Palestino A"],
+  ],
+  [
+    ["Club Deportivo Manquehue", "Equipo Médico"],
+    ["Estadio Español", "Stadio Italiano"],
+    ["Country Club B", "Equipo Médico"],
+    ["Stadio Italiano", "Club Palestino A"],
+  ],
+  [
+    ["Estadio Español", "Club Palestino A"],
+    ["Country Club A", "Sport Academy"],
+    ["Estadio Español", "Club Palestino B"],
+    ["Stadio Italiano", "Country Club B"],
+  ],
+];
 
-const rounds = roundRobin(LFF_CLUBS.map((club) => club.name));
-
-export const LFF_FIXTURES: Match[] = CATEGORIES.flatMap((category) =>
-  rounds.flatMap((matches, roundIndex) => matches.map(([home, away], order) => ({
-    id: `lff-${category.id}-r${roundIndex + 1}-m${order + 1}`,
+export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex) =>
+  matches.map(([sourceHome, sourceAway], order) => ({
+    id: `lff-superior-r${roundIndex + 1}-m${order + 1}`,
     tournament: "clausura" as const,
     competition: "lff" as const,
-    category: category.id,
+    category: "superior" as const,
     round: roundIndex + 1,
     order: order + 1,
-    home,
-    away,
+    home: sourceAway,
+    away: sourceHome,
     homeScore: null,
     awayScore: null,
     status: "scheduled" as const,
     date: null,
     time: null,
     venue: null,
-  }))),
+  })),
 );

@@ -4,12 +4,13 @@ import { ArrowRight, BarChart3, CalendarRange, ChevronLeft, CircleAlert, LoaderC
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { CATEGORIES, CLUBS, LFF_CLUBS, SEASON } from "@/config/league";
+import { categoriesForCompetition, CLUBS, LFF_CLUBS, SEASON } from "@/config/league";
 import { FixtureList } from "@/components/fixture-list";
 import { ClubMark } from "@/components/club-mark";
 import { StandingsTable } from "@/components/standings-table";
 import { SiteHeader } from "@/components/site-header";
 import { TeamGallery } from "@/components/team-gallery";
+import { LffHistory } from "@/components/lff-history";
 import { calculateStandings } from "@/lib/standings";
 import { foldText } from "@/lib/text";
 import { useLeagueData } from "@/hooks/use-league-data";
@@ -20,12 +21,13 @@ type View = "standings" | "fixture" | "clubs";
 
 export function LeagueApp({ competition }: { competition: Competition }) {
   const { matches, players, photos, status, error } = useLeagueData();
-  const [category, setCategory] = useState<CategoryId>("pre-peque");
+  const [category, setCategory] = useState<CategoryId>(() => competition === "lff" ? "superior" : "pre-peque");
   const [view, setView] = useState<View>("standings");
   const [selectedClub, setSelectedClub] = useState<string | null>(null);
   const filteredMatches = useMemo(() => matches.filter((match) => match.competition === competition && match.category === category), [matches, competition, category]);
   const filteredPlayers = useMemo(() => players.filter((player) => player.competition === competition && player.category === category), [players, competition, category]);
   const filteredPhotos = useMemo(() => photos.filter((photo) => photo.competition === competition && photo.category === category).sort((a, b) => a.order - b.order), [photos, competition, category]);
+  const categories = categoriesForCompetition(competition);
   const visibleClubs = useMemo(() => {
     if (competition === "league") return CLUBS;
     if (competition === "lff") return LFF_CLUBS;
@@ -41,8 +43,8 @@ export function LeagueApp({ competition }: { competition: Competition }) {
     ? { eyebrow: `Temporada ${SEASON} · Torneo Clausura`, title: "LIFI", accent: "Liga", name: "Liga LIFI", description: "Fixture, posiciones y planteles oficiales de la Liga Infantil de Fútbol Interestadios.", label: "Liga · Clausura" }
     : competition === "cup"
       ? { eyebrow: "Competencia LIFI", title: "LIFI", accent: "Cup", name: "LIFI Cup", description: "Fixture, resultados y planteles disponibles de LIFI Cup, sin completar información que aún no haya sido publicada.", label: "LIFI Cup" }
-      : { eyebrow: `Temporada ${SEASON} · Liga Femenina`, title: "LFF", accent: "Liga Femenina", name: "LFF", description: "Fixture, posiciones, equipos y galerías oficiales de la Liga Femenina.", label: "LFF · Liga Femenina" };
-  const competitionLogo = competition === "lff" ? LFF_LOGO_DATA_URL : "/lifi-logo.png";
+      : { eyebrow: `Temporada ${SEASON} · Categoría Superior`, title: "LFF", accent: "Liga Femenina", name: "LFF", description: "Fixture, posiciones, historia, equipos y galerías oficiales de la categoría Superior.", label: "LFF · Superior" };
+  const competitionLogo = competition === "lff" ? LFF_LOGO_DATA_URL : competition === "cup" ? "/lifi-cup-logo.jpeg" : "/lifi-logo.jpeg";
   const competitionLogoAlt = competition === "lff" ? "Logo de LFF" : `Logo de ${copy.name}`;
 
   useEffect(() => {
@@ -65,10 +67,12 @@ export function LeagueApp({ competition }: { competition: Competition }) {
           </div>
           <div className="hero-scoreboard" aria-label={`Resumen de ${copy.name}`}>
             <div className="scoreboard-top"><span>{copy.label}</span><span className={status === "live" ? "live-dot" : "sync-dot"}>{status === "live" ? "Actualizado" : "Sincronizando"}</span></div>
-            <strong>{competition === "league" ? 9 : roundCount || "—"}</strong><p>{competition === "league" || competition === "lff" ? "fechas por categoría" : "fechas publicadas"}</p>
-            <div className="scoreboard-stats"><span><b>{competition === "league" ? 10 : new Set(competitionMatches.flatMap((match) => [match.home, match.away])).size || "—"}</b> equipos</span><span><b>{competition === "league" ? 5 : categoryCount || "—"}</b> categorías</span><span><b>{competition === "league" ? 225 : competitionMatches.length || "—"}</b> partidos</span></div>
+            <strong>{competition === "league" ? 9 : roundCount || "—"}</strong><p>{competition === "league" ? "fechas por categoría" : "fechas publicadas"}</p>
+            <div className="scoreboard-stats"><span><b>{competition === "league" ? 10 : new Set(competitionMatches.flatMap((match) => [match.home, match.away])).size || "—"}</b> equipos</span><span><b>{competition === "league" ? 5 : categoryCount || "—"}</b> {categoryCount === 1 ? "categoría" : "categorías"}</span><span><b>{competition === "league" ? 225 : competitionMatches.length || "—"}</b> partidos</span></div>
           </div>
         </section>
+
+        {competition === "lff" && <LffHistory />}
 
         {error && <div className="connection-alert" role="status"><WifiOff /><span><strong>Modo respaldo</strong>{error}</span></div>}
         {status === "loading" && <div className="loading-line" role="status"><LoaderCircle /> Cargando información oficial…</div>}
@@ -79,14 +83,14 @@ export function LeagueApp({ competition }: { competition: Competition }) {
             <Link className={competition === "cup" ? "active" : ""} href="/lifi-cup"><Trophy /> LIFI Cup</Link>
             <Link className={competition === "lff" ? "active" : ""} href="/lff"><Trophy /> LFF</Link>
           </div>
-          <div className="category-tabs" role="group" aria-label="Categoría">
-            {CATEGORIES.map((item) => <button key={item.id} type="button" className={category === item.id ? "active" : ""} onClick={() => { setCategory(item.id); setSelectedClub(null); }}><span>{item.name}</span><small>{item.birthYears}</small></button>)}
+          <div className={`category-tabs ${categories.length === 1 ? "single" : ""}`} role="group" aria-label="Categoría">
+            {categories.map((item) => <button key={item.id} type="button" className={category === item.id ? "active" : ""} onClick={() => { setCategory(item.id); setSelectedClub(null); }}><span>{item.name}</span><small>{item.birthYears}</small></button>)}
           </div>
         </section>
 
         <section className="content-section" id={view === "fixture" ? "fixture" : view === "clubs" ? "clubes" : "posiciones"}>
           <div className="section-heading">
-            <div><p className="eyebrow"><span /> {copy.name} · {CATEGORIES.find((item) => item.id === category)?.name}</p><h2>{view === "standings" ? "Tabla de posiciones" : view === "fixture" ? "Fixture oficial" : competition === "lff" ? "Equipos y galerías" : "Clubes y planteles"}</h2></div>
+            <div><p className="eyebrow"><span /> {copy.name} · {categories.find((item) => item.id === category)?.name}</p><h2>{view === "standings" ? "Tabla de posiciones" : view === "fixture" ? "Fixture oficial" : competition === "lff" ? "Equipos y galerías" : "Clubes y planteles"}</h2></div>
             <div className="view-tabs" role="tablist" aria-label="Sección deportiva">
               <button role="tab" aria-selected={view === "standings"} className={view === "standings" ? "active" : ""} onClick={() => setView("standings")}><BarChart3 /> Posiciones</button>
               <button role="tab" aria-selected={view === "fixture"} className={view === "fixture" ? "active" : ""} onClick={() => setView("fixture")}><CalendarRange /> Fixture</button>

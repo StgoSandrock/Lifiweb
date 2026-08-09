@@ -1,5 +1,5 @@
 export type Competition = "league" | "cup" | "lff";
-export type CategoryId = "pre-peque" | "peque" | "mini" | "infantil" | "intermedia";
+export type CategoryId = "pre-peque" | "peque" | "mini" | "infantil" | "intermedia" | "superior";
 export type MatchStatus = "scheduled" | "played" | "postponed" | "cancelled";
 
 export interface Club {

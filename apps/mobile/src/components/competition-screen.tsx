@@ -1,4 +1,4 @@
-import { CATEGORIES, CLUBS, SEASON } from "@shared/config/league";
+import { categoriesForCompetition, CLUBS, SEASON } from "@shared/config/league";
 import { calculateStandings } from "@shared/lib/standings";
 import { foldText } from "@shared/lib/text";
 import type { CategoryId, Club, Competition } from "@shared/types/domain";
@@ -27,7 +27,7 @@ export function CompetitionScreen({ competition }: { competition: Competition })
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { matches, players, status, error } = useLeagueData();
-  const [category, setCategory] = useState<CategoryId>(competition === "cup" ? "mini" : "pre-peque");
+  const [category, setCategory] = useState<CategoryId>(competition === "lff" ? "superior" : competition === "cup" ? "mini" : "pre-peque");
   const [view, setView] = useState<ViewMode>("standings");
   const filteredMatches = useMemo(() => matches.filter((match) => match.competition === competition && match.category === category), [matches, competition, category]);
   const filteredPlayers = useMemo(() => players.filter((player) => player.competition === competition && player.category === category), [players, competition, category]);
@@ -38,7 +38,8 @@ export function CompetitionScreen({ competition }: { competition: Competition })
     return names.map((name) => CLUBS.find((club) => club.name === name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
   }, [competition, filteredMatches, filteredPlayers]);
   const standings = useMemo(() => calculateStandings(filteredMatches, clubs), [filteredMatches, clubs]);
-  const categoryInfo = CATEGORIES.find((item) => item.id === category);
+  const categories = categoriesForCompetition(competition);
+  const categoryInfo = categories.find((item) => item.id === category);
   const openClub = (clubId: string) => router.push({ pathname: "/club/[clubId]", params: { clubId, competition, category } });
 
   return <ScrollView style={styles.screen} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
@@ -62,7 +63,7 @@ export function CompetitionScreen({ competition }: { competition: Competition })
 
     <View style={styles.body}>
       <DataStatus status={status} error={error} />
-      <View style={styles.block}><Text style={styles.controlLabel}>CATEGORÍA</Text><CategoryPicker value={category} items={CATEGORIES} onChange={setCategory} /></View>
+      <View style={styles.block}><Text style={styles.controlLabel}>CATEGORÍA</Text><CategoryPicker value={category} items={categories} onChange={setCategory} /></View>
       <SegmentedControl value={view} options={sections} onChange={setView} accessibilityLabel="Sección deportiva" />
       <SectionTitle eyebrow={`${competition === "league" ? "Liga LIFI" : "LIFI Cup"} · ${categoryInfo?.name}`} title={view === "standings" ? "Tabla de posiciones" : view === "fixture" ? "Fixture oficial" : "Clubes y planteles"} detail={view === "standings" ? "PJ, PG, PE, PP, GF, GC, DG y puntos calculados desde resultados oficiales." : undefined} />
       {view === "standings" ? <StandingsView standings={standings} onClub={openClub} /> : view === "fixture" ? <FixtureView matches={filteredMatches} /> : <ClubsView clubs={clubs} players={filteredPlayers} onClub={openClub} />}

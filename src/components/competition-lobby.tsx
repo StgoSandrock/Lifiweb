@@ -16,7 +16,7 @@ const cards = [
     kicker: "Clausura 2026",
     description: "Posiciones, nueve fechas, fixture oficial, clubes y planteles.",
     className: "league-card",
-    logo: "/lifi-logo.png",
+    logo: "/lifi-logo.jpeg",
     logoAlt: "Logo de LIFI Liga",
   },
   {
@@ -26,7 +26,7 @@ const cards = [
     kicker: "Competencia LIFI",
     description: "Consulta el fixture, resultados y la información vigente disponible.",
     className: "cup-card",
-    logo: "/lifi-logo.png",
+    logo: "/lifi-cup-logo.jpeg",
     logoAlt: "Logo de LIFI Cup",
   },
   {
@@ -34,7 +34,7 @@ const cards = [
     href: "/lff",
     title: "LFF",
     kicker: "Liga Femenina",
-    description: "Fixture, posiciones, equipos y galerías de cada categoría.",
+    description: "Fixture, posiciones, historia, equipos y galerías de la categoría Superior.",
     className: "lff-card",
     logo: LFF_LOGO_DATA_URL,
     logoAlt: "Logo de LFF",
@@ -61,7 +61,7 @@ export function CompetitionLobby() {
 
       <section className="lobby-content" aria-labelledby="lobby-title">
         <div className="lobby-brand">
-          <Image className="lifi-logo-round" src="/lifi-logo.png" alt="Escudo de LIFI" width={116} height={116} priority />
+          <Image className="lifi-logo-round" src="/lifi-logo.jpeg" alt="Escudo de LIFI" width={116} height={116} priority />
           <div>
             <h1 id="lobby-title">LIFI</h1>
             <p>Liga Infantil de Fútbol Interestadios</p>
