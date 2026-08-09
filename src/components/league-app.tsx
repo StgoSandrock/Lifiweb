@@ -72,8 +72,6 @@ export function LeagueApp({ competition }: { competition: Competition }) {
           </div>
         </section>
 
-        {competition === "lff" && <LffHistory />}
-
         {error && <div className="connection-alert" role="status"><WifiOff /><span><strong>Modo respaldo</strong>{error}</span></div>}
         {status === "loading" && <div className="loading-line" role="status"><LoaderCircle /> Cargando información oficial…</div>}
 
@@ -102,6 +100,8 @@ export function LeagueApp({ competition }: { competition: Competition }) {
           {view === "fixture" && <FixtureList matches={filteredMatches} />}
           {view === "clubs" && <ClubRosters clubs={visibleClubs} players={filteredPlayers} photos={filteredPhotos} selectedClub={selectedClub} onSelect={setSelectedClub} />}
         </section>
+
+        {competition === "lff" && <LffHistory />}
       </main>
       <footer className="site-footer"><div><ImageLogo /><p>Liga Infantil de Fútbol Interestadios · Santiago de Chile</p></div><p>Temporada {SEASON} · Información oficial en actualización</p></footer>
     </>
