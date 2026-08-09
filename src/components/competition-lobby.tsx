@@ -56,7 +56,7 @@ export function CompetitionLobby() {
 
       <section className="lobby-content" aria-labelledby="lobby-title">
         <div className="lobby-brand">
-          <Image src="/lifi-logo.svg" alt="Escudo de LIFI" width={116} height={116} priority />
+          <Image src="/lifi-logo.png" alt="Escudo de LIFI" width={116} height={116} priority />
           <div>
             <h1 id="lobby-title">LIFI</h1>
             <p>Liga Infantil de Fútbol Interestadios</p>

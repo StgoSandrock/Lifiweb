@@ -37,4 +37,13 @@ export const SEEDED_TEAM_PHOTOS: TeamPhoto[] = [
     storagePath: "static/team-galleries/league/intermedia/manquehue/img-5031.jpeg",
     order: 1,
   },
+  {
+    id: "seed-lff-manquehue-intermedia-equipo",
+    competition: "lff",
+    category: "intermedia",
+    club: "Club Deportivo Manquehue",
+    url: "/team-galleries/lff/intermedia/manquehue/foto-equipo.jpg",
+    storagePath: "static/team-galleries/lff/intermedia/manquehue/foto-equipo.jpg",
+    order: 1,
+  },
 ];

@@ -27,12 +27,12 @@ export const CLUBS: readonly Club[] = [
 export const LFF_CLUBS: readonly Club[] = [
   { id: "lff-palestino-a", name: "Club Palestino A", aliases: [], logo: "/clubs/palestino.svg" },
   { id: "lff-palestino-b", name: "Club Palestino B", aliases: [], logo: "/clubs/palestino.svg" },
-  { id: "lff-equipo-medico", name: "Equipo Médico", aliases: ["Equipo Medico"], logo: "" },
+  { id: "lff-equipo-medico", name: "Equipo Médico", aliases: ["Equipo Medico"], logo: "/clubs/equipo-medico.png" },
   { id: "lff-manquehue", name: "Club Deportivo Manquehue", aliases: [], logo: "/clubs/manquehue.svg" },
   { id: "lff-estadio-espanol", name: "Estadio Español", aliases: ["Estadio Espanol"], logo: "/clubs/espanol.svg" },
   { id: "lff-stadio-italiano", name: "Stadio Italiano", aliases: [], logo: "/clubs/italiano.svg" },
-  { id: "lff-country-club-a", name: "Country Club A", aliases: [], logo: "" },
-  { id: "lff-country-club-b", name: "Country Club B", aliases: [], logo: "" },
+  { id: "lff-country-club-a", name: "Country Club A", aliases: [], logo: "/clubs/country-club.png" },
+  { id: "lff-country-club-b", name: "Country Club B", aliases: [], logo: "/clubs/country-club.png" },
 ] as const;
 
 export function clubsForCompetition(competition: import("../types/domain").Competition) {
