@@ -16,7 +16,7 @@ service cloud.firestore {
     }
 
     function validCategory(value) {
-      return value in ['pre-peque', 'peque', 'mini', 'infantil', 'intermedia'];
+      return value in ['pre-peque', 'peque', 'mini', 'infantil', 'intermedia', 'superior'];
     }
 
     function validPlayer(data) {
