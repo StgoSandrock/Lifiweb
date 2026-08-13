@@ -1,12 +1,29 @@
 import type { Match } from "../types/domain";
 
+const LEAGUE_ROUND_ORDER: Readonly<Record<number, number>> = {
+  1: 1,
+  2: 2,
+  3: 5,
+  4: 8,
+  5: 3,
+  6: 9,
+  7: 4,
+  8: 6,
+  9: 7,
+};
+
 function valueOrLast(value: string | null) {
   return value && value !== "Por definir" ? value : "9999-99-99";
 }
 
+export function displayRound(match: Match) {
+  if (match.competition !== "league") return match.round;
+  return LEAGUE_ROUND_ORDER[match.round] ?? match.round;
+}
+
 export function sortMatches(matches: readonly Match[]) {
   return [...matches].sort((a, b) =>
-    a.round - b.round
+    displayRound(a) - displayRound(b)
     || valueOrLast(a.date).localeCompare(valueOrLast(b.date))
     || valueOrLast(a.time).localeCompare(valueOrLast(b.time))
     || a.order - b.order
@@ -17,7 +34,8 @@ export function sortMatches(matches: readonly Match[]) {
 export function groupMatchesByRound(matches: readonly Match[]) {
   const groups = new Map<number, Match[]>();
   for (const match of sortMatches(matches)) {
-    groups.set(match.round, [...(groups.get(match.round) ?? []), match]);
+    const round = displayRound(match);
+    groups.set(round, [...(groups.get(round) ?? []), match]);
   }
   return [...groups.entries()];
 }
