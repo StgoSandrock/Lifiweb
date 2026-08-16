@@ -4,12 +4,12 @@ const LEAGUE_ROUND_ORDER: Readonly<Record<number, number>> = {
   1: 1,
   2: 2,
   3: 5,
-  4: 8,
+  4: 7,
   5: 3,
-  6: 9,
-  7: 4,
-  8: 6,
-  9: 7,
+  6: 8,
+  7: 9,
+  8: 4,
+  9: 6,
 };
 
 function valueOrLast(value: string | null) {
