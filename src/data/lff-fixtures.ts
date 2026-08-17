@@ -71,8 +71,8 @@ const MATCH_OVERRIDES: Record<string, Partial<Pick<Match, "home" | "away" | "dat
     venue: "Estadio Español",
   },
   "lff-superior-r1-m3": {
-    home: "Stadio Italiano",
-    away: "Sport Academy",
+    home: "Sport Academy",
+    away: "Stadio Italiano",
     date: "Miércoles 19 de agosto",
     time: "18:45 hrs",
     venue: "Stadio Italiano",
