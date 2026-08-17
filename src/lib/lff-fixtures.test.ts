@@ -29,8 +29,8 @@ describe("fixture oficial LFF", () => {
       venue: "Estadio Español",
     });
     expect(LFF_FIXTURES[2]).toMatchObject({
-      home: "Stadio Italiano",
-      away: "Sport Academy",
+      home: "Sport Academy",
+      away: "Stadio Italiano",
       date: "Miércoles 19 de agosto",
       time: "18:45 hrs",
       venue: "Stadio Italiano",
