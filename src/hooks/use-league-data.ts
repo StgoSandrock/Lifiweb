@@ -8,10 +8,55 @@ import { fromFirestorePlayer } from "@/lib/firebase/adapters";
 import { subscribeToLeagueData } from "@/lib/firebase/public-data";
 import type { Match, Player, TeamPhoto } from "@/types/domain";
 
-const fallbackMatches = [...(fallbackFixtures as Match[]), ...LFF_FIXTURES];
+const LEAGUE_SCHEDULE_OVERRIDES: Record<string, Partial<Pick<Match, "home" | "away" | "date" | "time" | "venue">>> = {
+  "clausura-mini-f3-p2": {
+    home: "LIF",
+    away: "Club Manquehue",
+    date: "Viernes 21 de agosto",
+    time: "17:00 hrs",
+    venue: "Club Palestino",
+  },
+  "clausura-infantil-f3-p2": {
+    home: "LIF",
+    away: "Club Manquehue",
+    date: "Viernes 21 de agosto",
+    time: "18:00 hrs",
+    venue: "Club Palestino",
+  },
+  "clausura-intermedia-f3-p2": {
+    home: "LIF",
+    away: "Club Manquehue",
+    date: "Viernes 21 de agosto",
+    time: "19:00 hrs",
+    venue: "Club Palestino",
+  },
+  "clausura-peque-f3-p2": {
+    home: "LIF",
+    away: "Club Manquehue",
+    date: "Sábado 22 de agosto",
+    time: "09:00 hrs",
+    venue: "Club Palestino",
+  },
+  "clausura-pre-peque-f3-p2": {
+    home: "LIF",
+    away: "Club Manquehue",
+    date: "Sábado 22 de agosto",
+    time: "10:00 hrs",
+    venue: "Club Palestino",
+  },
+};
+
+function applyScheduleOverrides(matches: Match[]) {
+  return matches.map((match) => ({ ...match, ...LEAGUE_SCHEDULE_OVERRIDES[match.id] }));
+}
+
+const fallbackMatches = applyScheduleOverrides([...(fallbackFixtures as Match[]), ...LFF_FIXTURES]);
 
 function includeLffFixtures(matches: Match[]) {
-  return [...matches.filter((match) => match.competition !== "lff"), ...LFF_FIXTURES];
+  return applyScheduleOverrides([
+    ...matches.filter((match) => match.competition !== "lff"),
+    ...LFF_FIXTURES,
+  ]);
 }
 
 export function useLeagueData() {
