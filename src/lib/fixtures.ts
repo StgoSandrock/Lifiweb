@@ -12,6 +12,18 @@ const LEAGUE_ROUND_ORDER: Readonly<Record<number, number>> = {
   9: 6,
 };
 
+const LEAGUE_WEEK_BY_ROUND: Readonly<Record<number, string>> = {
+  1: "Semana del 22 de agosto de 2026",
+  2: "Semana del 29 de agosto de 2026",
+  3: "Semana del 5 de septiembre de 2026",
+  4: "Semana del 12 de septiembre de 2026",
+  5: "Semana del 3 de octubre de 2026",
+  6: "Semana del 7 de octubre de 2026",
+  7: "Semana del 24 de octubre de 2026",
+  8: "Semana del 7 de noviembre de 2026",
+  9: "Semana del 21 de noviembre de 2026",
+};
+
 function valueOrLast(value: string | null) {
   return value && value !== "Por definir" ? value : "9999-99-99";
 }
@@ -19,6 +31,11 @@ function valueOrLast(value: string | null) {
 export function displayRound(match: Match) {
   if (match.competition !== "league") return match.round;
   return LEAGUE_ROUND_ORDER[match.round] ?? match.round;
+}
+
+export function scheduledWeek(match: Match) {
+  if (match.competition !== "league") return null;
+  return LEAGUE_WEEK_BY_ROUND[displayRound(match)] ?? null;
 }
 
 export function sortMatches(matches: readonly Match[]) {
