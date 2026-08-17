@@ -55,21 +55,31 @@ const SOURCE_ROUNDS: ReadonlyArray<ReadonlyArray<readonly [string, string]>> = [
   ],
 ];
 
-const MATCH_OVERRIDES: Record<string, Partial<Pick<Match, "home" | "away" | "venue">>> = {
+const MATCH_OVERRIDES: Record<string, Partial<Pick<Match, "home" | "away" | "date" | "time" | "venue">>> = {
   "lff-superior-r1-m1": {
     home: "Club Palestino A",
     away: "Country Club B",
+    date: "Jueves 20 de agosto",
+    time: "19:45 hrs",
     venue: "Palestino",
   },
   "lff-superior-r1-m2": {
     home: "Estadio Español",
     away: "Equipo Médico",
+    date: "Miércoles 19 de agosto",
+    time: "19:45 hrs",
     venue: "Estadio Español",
   },
   "lff-superior-r1-m3": {
     home: "Stadio Italiano",
     away: "Sport Academy",
+    date: "Miércoles 19 de agosto",
+    time: "18:45 hrs",
     venue: "Stadio Italiano",
+  },
+  "lff-superior-r1-m4": {
+    date: "Miércoles 19 de agosto",
+    time: "19:45 hrs",
   },
 };
 
