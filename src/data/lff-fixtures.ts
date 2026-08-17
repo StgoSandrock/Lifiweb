@@ -1,7 +1,7 @@
 import type { Match } from "@/types/domain";
 
 // El documento oficial lista primero al local original. La web publica cada
-// cruce con la localía invertida, según la instrucción recibida.
+// cruce con la localía invertida por defecto, salvo ajustes confirmados.
 const SOURCE_ROUNDS: ReadonlyArray<ReadonlyArray<readonly [string, string]>> = [
   [
     ["Club Palestino A", "Country Club B"],
@@ -55,21 +55,44 @@ const SOURCE_ROUNDS: ReadonlyArray<ReadonlyArray<readonly [string, string]>> = [
   ],
 ];
 
+const MATCH_OVERRIDES: Record<string, Partial<Pick<Match, "home" | "away" | "venue">>> = {
+  "lff-superior-r1-m1": {
+    home: "Club Palestino A",
+    away: "Country Club B",
+    venue: "Palestino",
+  },
+  "lff-superior-r1-m2": {
+    home: "Estadio Español",
+    away: "Equipo Médico",
+    venue: "Estadio Español",
+  },
+  "lff-superior-r1-m3": {
+    home: "Stadio Italiano",
+    away: "Sport Academy",
+    venue: "Stadio Italiano",
+  },
+};
+
 export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex) =>
-  matches.map(([sourceHome, sourceAway], order) => ({
-    id: `lff-superior-r${roundIndex + 1}-m${order + 1}`,
-    tournament: "clausura" as const,
-    competition: "lff" as const,
-    category: "superior" as const,
-    round: roundIndex + 1,
-    order: order + 1,
-    home: sourceAway,
-    away: sourceHome,
-    homeScore: null,
-    awayScore: null,
-    status: "scheduled" as const,
-    date: null,
-    time: null,
-    venue: null,
-  })),
+  matches.map(([sourceHome, sourceAway], order) => {
+    const id = `lff-superior-r${roundIndex + 1}-m${order + 1}`;
+
+    return {
+      id,
+      tournament: "clausura" as const,
+      competition: "lff" as const,
+      category: "superior" as const,
+      round: roundIndex + 1,
+      order: order + 1,
+      home: sourceAway,
+      away: sourceHome,
+      homeScore: null,
+      awayScore: null,
+      status: "scheduled" as const,
+      date: null,
+      time: null,
+      venue: null,
+      ...MATCH_OVERRIDES[id],
+    };
+  }),
 );
