@@ -9,36 +9,36 @@ import { subscribeToLeagueData } from "@/lib/firebase/public-data";
 import type { Match, Player, TeamPhoto } from "@/types/domain";
 
 const LEAGUE_SCHEDULE_OVERRIDES: Record<string, Partial<Pick<Match, "home" | "away" | "date" | "time" | "venue">>> = {
-  "clausura-mini-f3-p2": {
-    home: "LIF",
+  "clausura-mini-f1-p2": {
+    home: "Club Palestino",
     away: "Club Manquehue",
     date: "Viernes 21 de agosto",
     time: "17:00 hrs",
     venue: "Club Palestino",
   },
-  "clausura-infantil-f3-p2": {
-    home: "LIF",
+  "clausura-infantil-f1-p2": {
+    home: "Club Palestino",
     away: "Club Manquehue",
     date: "Viernes 21 de agosto",
     time: "18:00 hrs",
     venue: "Club Palestino",
   },
-  "clausura-intermedia-f3-p2": {
-    home: "LIF",
+  "clausura-intermedia-f1-p2": {
+    home: "Club Palestino",
     away: "Club Manquehue",
     date: "Viernes 21 de agosto",
     time: "19:00 hrs",
     venue: "Club Palestino",
   },
-  "clausura-peque-f3-p2": {
-    home: "LIF",
+  "clausura-peque-f1-p2": {
+    home: "Club Palestino",
     away: "Club Manquehue",
     date: "Sábado 22 de agosto",
     time: "09:00 hrs",
     venue: "Club Palestino",
   },
-  "clausura-pre-peque-f3-p2": {
-    home: "LIF",
+  "clausura-pre-peque-f1-p2": {
+    home: "Club Palestino",
     away: "Club Manquehue",
     date: "Sábado 22 de agosto",
     time: "10:00 hrs",
