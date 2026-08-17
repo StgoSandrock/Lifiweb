@@ -1,6 +1,6 @@
 import { CalendarDays, Clock3, MapPin } from "lucide-react";
 import { ClubMark } from "@/components/club-mark";
-import { groupMatchesByRound } from "@/lib/fixtures";
+import { groupMatchesByRound, scheduledWeek } from "@/lib/fixtures";
 import type { Match } from "@/types/domain";
 
 export function FixtureList({ matches, editable }: { matches: Match[]; editable?: (match: Match) => React.ReactNode }) {
@@ -15,6 +15,7 @@ export function FixtureList({ matches, editable }: { matches: Match[]; editable?
 
 export function MatchCard({ match }: { match: Match }) {
   const played = match.status === "played" && match.homeScore !== null && match.awayScore !== null;
+  const dateLabel = match.date ?? scheduledWeek(match) ?? "Por definir";
   return (
     <article className="match-card">
       <div className="match-teams">
@@ -25,7 +26,7 @@ export function MatchCard({ match }: { match: Match }) {
         <div><span className="mark-shell"><ClubMark name={match.away} size={50} /></span><strong>{match.away}</strong></div>
       </div>
       <dl className="match-meta">
-        <div><CalendarDays /><dt className="sr-only">Fecha</dt><dd>{match.date ?? "Por definir"}</dd></div>
+        <div><CalendarDays /><dt className="sr-only">Fecha</dt><dd>{dateLabel}</dd></div>
         <div><Clock3 /><dt className="sr-only">Hora</dt><dd>{match.time ?? "Por definir"}</dd></div>
         <div><MapPin /><dt className="sr-only">Cancha</dt><dd>{match.venue ?? "Por definir"}</dd></div>
       </dl>
