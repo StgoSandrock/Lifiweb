@@ -10,6 +10,13 @@ import type { Match, Player, TeamPhoto } from "@/types/domain";
 
 const fallbackMatches = [...(fallbackFixtures as Match[]), ...LFF_FIXTURES];
 
+function mergeMatchesWithFallback(liveMatches: Match[]) {
+  const liveById = new Map(liveMatches.map((match) => [match.id, match]));
+  const merged = fallbackMatches.map((match) => liveById.get(match.id) ?? match);
+  const fallbackIds = new Set(fallbackMatches.map((match) => match.id));
+  return [...merged, ...liveMatches.filter((match) => !fallbackIds.has(match.id))];
+}
+
 export function useLeagueData() {
   const [matches, setMatches] = useState<Match[]>(fallbackMatches);
   const [players, setPlayers] = useState<Player[]>([]);
@@ -19,7 +26,7 @@ export function useLeagueData() {
 
   useEffect(() => subscribeToLeagueData({
     matches: (nextMatches) => {
-      setMatches(nextMatches);
+      setMatches(mergeMatchesWithFallback(nextMatches));
       setStatus("live");
       setError(null);
     },
