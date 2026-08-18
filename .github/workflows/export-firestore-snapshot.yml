@@ -1,0 +1,42 @@
+name: Export Firestore migration snapshot
+
+on:
+  push:
+    branches:
+      - agent/supabase-data-migration
+    paths:
+      - .github/workflows/export-firestore-snapshot.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Export live Firestore plus local fallbacks
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyBLGMtJ6QJSNwakmD_PdgtstARICyu1sEI
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: lifiwebapp
+          NEXT_PUBLIC_FIREBASE_ARTIFACT_ID: lifi-2026-prod
+        run: node scripts/migrate-to-supabase.mjs
+
+      - name: Verify snapshot exists
+        run: |
+          test -n "$(find .migration-backups -maxdepth 1 -name 'lifi-pre-supabase-*.json' -print -quit)"
+          sha256sum .migration-backups/lifi-pre-supabase-*.json
+
+      - name: Upload migration snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifi-firestore-migration-snapshot
+          path: .migration-backups/lifi-pre-supabase-*.json
+          if-no-files-found: error
+          retention-days: 7
