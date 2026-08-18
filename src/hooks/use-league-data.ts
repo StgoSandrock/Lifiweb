@@ -8,55 +8,13 @@ import { fromFirestorePlayer } from "@/lib/firebase/adapters";
 import { subscribeToLeagueData } from "@/lib/firebase/public-data";
 import type { Match, Player, TeamPhoto } from "@/types/domain";
 
-const LEAGUE_SCHEDULE_OVERRIDES: Record<string, Partial<Pick<Match, "home" | "away" | "date" | "time" | "venue">>> = {
-  "clausura-mini-f1-p2": {
-    home: "Club Palestino",
-    away: "Club Manquehue",
-    date: "Viernes 21 de agosto",
-    time: "17:00 hrs",
-    venue: "Club Palestino",
-  },
-  "clausura-infantil-f1-p2": {
-    home: "Club Palestino",
-    away: "Club Manquehue",
-    date: "Viernes 21 de agosto",
-    time: "18:00 hrs",
-    venue: "Club Palestino",
-  },
-  "clausura-intermedia-f1-p2": {
-    home: "Club Palestino",
-    away: "Club Manquehue",
-    date: "Viernes 21 de agosto",
-    time: "19:00 hrs",
-    venue: "Club Palestino",
-  },
-  "clausura-peque-f1-p2": {
-    home: "Club Palestino",
-    away: "Club Manquehue",
-    date: "Sábado 22 de agosto",
-    time: "09:00 hrs",
-    venue: "Club Palestino",
-  },
-  "clausura-pre-peque-f1-p2": {
-    home: "Club Palestino",
-    away: "Club Manquehue",
-    date: "Sábado 22 de agosto",
-    time: "10:00 hrs",
-    venue: "Club Palestino",
-  },
-};
+const fallbackMatches = [...(fallbackFixtures as Match[]), ...LFF_FIXTURES];
 
-function applyScheduleOverrides(matches: Match[]) {
-  return matches.map((match) => ({ ...match, ...LEAGUE_SCHEDULE_OVERRIDES[match.id] }));
-}
-
-const fallbackMatches = applyScheduleOverrides([...(fallbackFixtures as Match[]), ...LFF_FIXTURES]);
-
-function includeLffFixtures(matches: Match[]) {
-  return applyScheduleOverrides([
-    ...matches.filter((match) => match.competition !== "lff"),
-    ...LFF_FIXTURES,
-  ]);
+function mergeMatchesWithFallback(liveMatches: Match[]) {
+  const liveById = new Map(liveMatches.map((match) => [match.id, match]));
+  const merged = fallbackMatches.map((match) => liveById.get(match.id) ?? match);
+  const fallbackIds = new Set(fallbackMatches.map((match) => match.id));
+  return [...merged, ...liveMatches.filter((match) => !fallbackIds.has(match.id))];
 }
 
 export function useLeagueData() {
@@ -68,7 +26,7 @@ export function useLeagueData() {
 
   useEffect(() => subscribeToLeagueData({
     matches: (nextMatches) => {
-      setMatches(includeLffFixtures(nextMatches));
+      setMatches(mergeMatchesWithFallback(nextMatches));
       setStatus("live");
       setError(null);
     },
@@ -85,6 +43,7 @@ export function useLeagueData() {
     },
     error: async () => {
       const fallbackPlayers = await import("@/data/legacy-players.json");
+      setMatches(fallbackMatches);
       setPlayers(fallbackPlayers.default.flatMap((player, index) => {
         const mapped = fromFirestorePlayer(String(player.id ?? `fallback-${index}`), player);
         return mapped ? [mapped] : [];
