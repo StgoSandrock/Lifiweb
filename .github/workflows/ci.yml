@@ -20,6 +20,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: node --check scripts/migrate-to-supabase.mjs
       - run: node --check scripts/export-firestore-raw.mjs
+      - run: node --check scripts/build-supabase-export.mjs
       - name: Export raw Firestore snapshot
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyBLGMtJ6QJSNwakmD_PdgtstARICyu1sEI
@@ -34,17 +35,17 @@ jobs:
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 7
-      - name: Preflight normalized migration snapshot
+      - name: Build normalized zero-loss Supabase export
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyBLGMtJ6QJSNwakmD_PdgtstARICyu1sEI
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: lifiwebapp
           NEXT_PUBLIC_FIREBASE_ARTIFACT_ID: lifi-2026-prod
-        run: pnpm migrate:supabase:dry
-      - name: Upload normalized migration snapshot
+        run: node scripts/build-supabase-export.mjs
+      - name: Upload normalized Supabase export
         uses: actions/upload-artifact@v4
         with:
-          name: lifi-firestore-migration-snapshot
-          path: .migration-backups/lifi-pre-supabase-*.json
+          name: lifi-supabase-normalized-export
+          path: .migration-backups/lifi-supabase-export-*.json
           if-no-files-found: error
           include-hidden-files: true
           retention-days: 7
