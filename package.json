@@ -12,6 +12,8 @@
     "test": "vitest run",
     "audit:firestore": "node scripts/audit-firestore.mjs",
     "qa:security": "node scripts/test-public-write.mjs",
+    "migrate:supabase:dry": "node scripts/migrate-to-supabase.mjs",
+    "migrate:supabase:apply": "node scripts/migrate-to-supabase.mjs --apply",
     "mobile:assets": "node scripts/generate-mobile-assets.mjs",
     "mobile:start": "pnpm --filter @lifi/mobile start",
     "mobile:android": "pnpm --filter @lifi/mobile android",
