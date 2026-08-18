@@ -52,6 +52,8 @@ export async function saveMatch(input: Match, user: User) {
     competition: input.competition,
     category: parsed.category,
     fecha: input.roundLabel ?? `Fecha ${parsed.round}`,
+    round: parsed.round,
+    orden: Number.isInteger(input.order) && input.order >= 0 ? input.order : 99,
     local: parsed.home,
     visita: parsed.away,
     status: parsed.status === "played" ? "played" : parsed.status === "scheduled" ? "pending" : parsed.status,
@@ -63,6 +65,11 @@ export async function saveMatch(input: Match, user: User) {
     updatedAt: serverTimestamp(),
     updatedBy: user.uid,
   }, { merge: true });
+}
+
+export async function deleteMatch(matchId: string, user: User) {
+  if (!(await isStaffUser(user))) throw new Error("Sesión Staff no autorizada.");
+  await deleteDoc(doc(dataCollection("partidos"), matchId));
 }
 
 export async function savePlayer(input: Omit<Player, "id"> & { id?: string }, user: User) {
