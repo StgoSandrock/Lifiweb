@@ -11,3 +11,4 @@ tsconfig.tsbuildinfo
 .expo/
 apps/mobile/dist/
 apps/mobile/.expo/
+.migration-backups/
