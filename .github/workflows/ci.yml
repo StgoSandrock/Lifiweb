@@ -19,13 +19,27 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: node --check scripts/migrate-to-supabase.mjs
-      - name: Preflight live Firestore migration snapshot
+      - run: node --check scripts/export-firestore-raw.mjs
+      - name: Export raw Firestore snapshot
+        env:
+          NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyBLGMtJ6QJSNwakmD_PdgtstARICyu1sEI
+          NEXT_PUBLIC_FIREBASE_PROJECT_ID: lifiwebapp
+          NEXT_PUBLIC_FIREBASE_ARTIFACT_ID: lifi-2026-prod
+        run: node scripts/export-firestore-raw.mjs
+      - name: Upload raw Firestore snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: lifi-firestore-raw-snapshot
+          path: .migration-backups/firestore-raw-*.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Preflight normalized migration snapshot
         env:
           NEXT_PUBLIC_FIREBASE_API_KEY: AIzaSyBLGMtJ6QJSNwakmD_PdgtstARICyu1sEI
           NEXT_PUBLIC_FIREBASE_PROJECT_ID: lifiwebapp
           NEXT_PUBLIC_FIREBASE_ARTIFACT_ID: lifi-2026-prod
         run: pnpm migrate:supabase:dry
-      - name: Upload migration snapshot
+      - name: Upload normalized migration snapshot
         uses: actions/upload-artifact@v4
         with:
           name: lifi-firestore-migration-snapshot
