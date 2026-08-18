@@ -32,6 +32,7 @@ jobs:
           name: lifi-firestore-raw-snapshot
           path: .migration-backups/firestore-raw-*.json
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 7
       - name: Preflight normalized migration snapshot
         env:
@@ -45,6 +46,7 @@ jobs:
           name: lifi-firestore-migration-snapshot
           path: .migration-backups/lifi-pre-supabase-*.json
           if-no-files-found: error
+          include-hidden-files: true
           retention-days: 7
       - run: pnpm lint
       - run: pnpm typecheck
