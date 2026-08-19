@@ -5,16 +5,11 @@ on:
   push:
     branches: [main]
 
-permissions:
-  contents: write
-
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
       - uses: pnpm/action-setup@v4
         with:
           version: 11.9.0
@@ -22,19 +17,7 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --no-frozen-lockfile
-      - name: Persist regenerated lockfile
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          if git diff --quiet -- pnpm-lock.yaml; then
-            echo "Lockfile already current."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pnpm-lock.yaml
-          git commit -m "Update lockfile for Supabase SDK"
-          git push origin HEAD:${{ github.event.pull_request.head.ref }}
+      - run: pnpm install --frozen-lockfile
       - run: node --check scripts/migrate-to-supabase.mjs
       - run: node --check scripts/export-firestore-raw.mjs
       - run: node --check scripts/build-supabase-export.mjs
