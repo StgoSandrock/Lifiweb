@@ -1,16 +1,17 @@
 "use client";
 
-import type { User } from "firebase/auth";
+import type { User } from "@supabase/supabase-js";
 import { AlertTriangle, CheckCircle2, LoaderCircle, LogOut, Plus, Save, ShieldCheck, Trash2, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { categoriesForCompetition, clubsForCompetition } from "@/config/league";
 import { SiteHeader } from "@/components/site-header";
+import { useLeagueCatalog } from "@/hooks/use-league-catalog";
 import { useLeagueData } from "@/hooks/use-league-data";
-import { deleteMatch, isStaffUser, observeStaffUser, saveMatch, signInStaff, signOutStaff } from "@/lib/firebase/staff";
-import type { CategoryId, Competition, Match } from "@/types/domain";
+import { deleteMatch, isStaffUser, observeStaffUser, saveMatch, signInStaff, signOutStaff } from "@/lib/supabase/staff";
+import type { Category, CategoryId, Club, Competition, Match } from "@/types/domain";
 
 type Notice = { kind: "success" | "error"; message: string } | null;
+type CatalogClub = Club & { competitions: Competition[] };
 
 function emptyMatch(competition: Competition, category: CategoryId, order: number): Match {
   return {
@@ -31,8 +32,15 @@ function emptyMatch(competition: Competition, category: CategoryId, order: numbe
   };
 }
 
+function categoriesForCompetition(categories: Category[], competition: Competition) {
+  return competition === "lff"
+    ? categories.filter((item) => item.id === "superior")
+    : categories.filter((item) => item.id !== "superior");
+}
+
 export function StaffMatchManager() {
   const { matches, status, error: dataError } = useLeagueData();
+  const { clubs: catalogClubs, categories } = useLeagueCatalog();
   const [user, setUser] = useState<User | null>(null);
   const [checking, setChecking] = useState(true);
   const [notice, setNotice] = useState<Notice>(null);
@@ -45,8 +53,11 @@ export function StaffMatchManager() {
     setChecking(false);
   }), []);
 
-  const categories = categoriesForCompetition(competition);
-  const clubs = clubsForCompetition(competition);
+  const availableCategories = categoriesForCompetition(categories, competition);
+  const clubs = useMemo(
+    () => catalogClubs.filter((club) => club.competitions.includes(competition)),
+    [catalogClubs, competition],
+  );
   const selectedMatches = useMemo(() => matches
     .filter((match) => match.competition === competition && match.category === category)
     .sort((a, b) => a.round - b.round || a.order - b.order), [matches, competition, category]);
@@ -56,25 +67,25 @@ export function StaffMatchManager() {
 
   return <><SiteHeader /><main className="staff-page">
     <header className="staff-heading">
-      <div><p className="eyebrow"><span /> Administración Firestore</p><h1>Partidos y fixture</h1><p>Crea, edita o elimina partidos sin modificar GitHub ni volver a desplegar la web.</p></div>
-      <div className="form-actions"><Link className="secondary-button" href="/staff/legacy">Jugadores y fotos</Link><button className="secondary-button" type="button" onClick={() => signOutStaff()}><LogOut /> Cerrar sesión</button></div>
+      <div><p className="eyebrow"><span /> Administración Supabase</p><h1>Partidos y fixture</h1><p>Crea, edita o elimina partidos sin modificar GitHub ni volver a desplegar la web.</p></div>
+      <div className="form-actions"><Link className="secondary-button" href="/staff/legacy">Jugadores, fotos, clubes y categorías</Link><button className="secondary-button" type="button" onClick={() => signOutStaff()}><LogOut /> Cerrar sesión</button></div>
     </header>
 
     {notice && <div className={`notice ${notice.kind}`} role="status">{notice.kind === "success" ? <CheckCircle2 /> : <AlertTriangle />}<span>{notice.message}</span><button type="button" onClick={() => setNotice(null)} aria-label="Cerrar mensaje"><X /></button></div>}
-    {dataError && <div className="notice error"><AlertTriangle /><span>Firestore no está disponible. Los cambios están bloqueados hasta recuperar la conexión.</span></div>}
+    {dataError && <div className="notice error"><AlertTriangle /><span>Supabase no está disponible. Los cambios están bloqueados y la web está usando el respaldo local.</span></div>}
 
     <div className="staff-toolbar">
       <div className="field"><label htmlFor="match-admin-competition">Competencia</label><select id="match-admin-competition" value={competition} onChange={(event) => { const next = event.target.value as Competition; setCompetition(next); setCategory(next === "lff" ? "superior" : "pre-peque"); setCreating(null); }}><option value="league">Liga · Clausura</option><option value="cup">LIFI Cup</option><option value="lff">LFF</option></select></div>
-      <div className="field"><label htmlFor="match-admin-category">Categoría</label><select id="match-admin-category" value={category} onChange={(event) => { setCategory(event.target.value as CategoryId); setCreating(null); }}>{categories.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.birthYears}</option>)}</select></div>
-      <button className="primary-button" type="button" disabled={status !== "live"} onClick={() => setCreating(emptyMatch(competition, category, selectedMatches.length + 1))}><Plus /> Crear partido</button>
-      <span className={`data-status ${status}`}>{status === "live" ? "Firebase conectado" : "Datos de respaldo"}</span>
+      <div className="field"><label htmlFor="match-admin-category">Categoría</label><select id="match-admin-category" value={category} onChange={(event) => { setCategory(event.target.value as CategoryId); setCreating(null); }}>{availableCategories.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.birthYears}</option>)}</select></div>
+      <button className="primary-button" type="button" disabled={status !== "live" || clubs.length < 2} onClick={() => setCreating(emptyMatch(competition, category, selectedMatches.length + 1))}><Plus /> Crear partido</button>
+      <span className={`data-status ${status}`}>{status === "live" ? "Supabase conectado" : "Datos de respaldo"}</span>
     </div>
 
     {creating && <section className="player-form-panel"><h2>Nuevo partido</h2><MatchForm match={creating} clubs={clubs} user={user} disabled={status !== "live"} isNew notify={setNotice} done={() => setCreating(null)} /></section>}
 
     <section className="player-list-panel">
       <div className="player-list-heading"><div><h2>Fixture editable</h2><p>{selectedMatches.length} partidos en esta categoría</p></div></div>
-      {selectedMatches.length ? <div className="staff-player-list">{selectedMatches.map((match) => <MatchRow key={match.id} match={match} clubs={clubs} user={user} disabled={status !== "live"} notify={setNotice} />)}</div> : <div className="empty-state"><AlertTriangle /><h3>No hay partidos cargados</h3><p>Usa “Crear partido” para cargar el fixture directamente en Firestore.</p></div>}
+      {selectedMatches.length ? <div className="staff-player-list">{selectedMatches.map((match) => <MatchRow key={match.id} match={match} clubs={clubs} user={user} disabled={status !== "live"} notify={setNotice} />)}</div> : <div className="empty-state"><AlertTriangle /><h3>No hay partidos cargados</h3><p>Usa “Crear partido” para cargar el fixture directamente en Supabase.</p></div>}
     </section>
   </main></>;
 }
@@ -91,27 +102,31 @@ function StaffLogin() {
     catch { setMessage("No pudimos iniciar sesión. Verifica tus credenciales y el rol Staff."); }
     finally { setSubmitting(false); }
   }
-  return <main className="login-page"><Link className="login-brand" href="/">LIFI<span>.</span></Link><form className="login-card" onSubmit={submit}><span className="login-icon"><ShieldCheck /></span><p className="eyebrow"><span /> Área privada</p><h1>Acceso Staff</h1><p>Usa una cuenta autorizada mediante Firebase Authentication.</p><div className="field"><label htmlFor="staff-email">Correo electrónico</label><input id="staff-email" name="email" type="email" autoComplete="username" required /></div><div className="field"><label htmlFor="staff-password">Contraseña</label><input id="staff-password" name="password" type="password" autoComplete="current-password" minLength={8} required /></div>{message && <p className="form-error" role="alert">{message}</p>}<button className="primary-button full" type="submit" disabled={submitting}>{submitting ? <><LoaderCircle className="spin" /> Verificando…</> : <>Ingresar <ShieldCheck /></>}</button></form></main>;
+  return <main className="login-page"><Link className="login-brand" href="/">LIFI<span>.</span></Link><form className="login-card" onSubmit={submit}><span className="login-icon"><ShieldCheck /></span><p className="eyebrow"><span /> Área privada</p><h1>Acceso Staff</h1><p>Usa una cuenta autorizada mediante Supabase Auth.</p><div className="field"><label htmlFor="staff-email">Correo electrónico</label><input id="staff-email" name="email" type="email" autoComplete="username" required /></div><div className="field"><label htmlFor="staff-password">Contraseña</label><input id="staff-password" name="password" type="password" autoComplete="current-password" minLength={8} required /></div>{message && <p className="form-error" role="alert">{message}</p>}<button className="primary-button full" type="submit" disabled={submitting}>{submitting ? <><LoaderCircle className="spin" /> Verificando…</> : <>Ingresar <ShieldCheck /></>}</button></form></main>;
 }
 
-function MatchRow({ match, clubs, user, disabled, notify }: { match: Match; clubs: ReturnType<typeof clubsForCompetition>; user: User; disabled: boolean; notify: (notice: Notice) => void }) {
+function MatchRow({ match, clubs, user, disabled, notify }: { match: Match; clubs: CatalogClub[]; user: User; disabled: boolean; notify: (notice: Notice) => void }) {
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   if (editing) return <article><MatchForm match={match} clubs={clubs} user={user} disabled={disabled} notify={notify} done={() => setEditing(false)} /></article>;
-  return <article><button className="player-main" type="button" onClick={() => setEditing(true)}><span>{match.round}</span><span><strong>{match.home} vs {match.away}</strong><small>{match.date ?? "Fecha por definir"} · {match.time ?? "Hora por definir"} · {match.venue ?? "Cancha por definir"}</small></span></button><dl><div><dt>Estado</dt><dd>{match.status === "played" ? `${match.homeScore}-${match.awayScore}` : match.status}</dd></div><div><dt>Orden</dt><dd>{match.order}</dd></div></dl><button className="icon-danger" type="button" disabled={disabled || deleting} onClick={async () => { if (!window.confirm(`¿Eliminar ${match.home} vs ${match.away}?`)) return; setDeleting(true); try { await deleteMatch(match.id, user); notify({ kind: "success", message: "Partido eliminado de Firestore." }); } catch (error) { notify({ kind: "error", message: error instanceof Error ? error.message : "No fue posible eliminar el partido." }); } finally { setDeleting(false); } }} aria-label={`Eliminar ${match.home} vs ${match.away}`}><Trash2 /></button></article>;
+  return <article><button className="player-main" type="button" onClick={() => setEditing(true)}><span>{match.round}</span><span><strong>{match.home} vs {match.away}</strong><small>{match.date ?? "Fecha por definir"} · {match.time ?? "Hora por definir"} · {match.venue ?? "Cancha por definir"}</small></span></button><dl><div><dt>Estado</dt><dd>{match.status === "played" ? `${match.homeScore}-${match.awayScore}` : match.status}</dd></div><div><dt>Orden</dt><dd>{match.order}</dd></div></dl><button className="icon-danger" type="button" disabled={disabled || deleting} onClick={async () => { if (!window.confirm(`¿Eliminar ${match.home} vs ${match.away}?`)) return; setDeleting(true); try { await deleteMatch(match.id, user); notify({ kind: "success", message: "Partido eliminado de Supabase." }); } catch (error) { notify({ kind: "error", message: error instanceof Error ? error.message : "No fue posible eliminar el partido." }); } finally { setDeleting(false); } }} aria-label={`Eliminar ${match.home} vs ${match.away}`}><Trash2 /></button></article>;
 }
 
-function MatchForm({ match, clubs, user, disabled, notify, done, isNew = false }: { match: Match; clubs: ReturnType<typeof clubsForCompetition>; user: User; disabled: boolean; notify: (notice: Notice) => void; done: () => void; isNew?: boolean }) {
+function MatchForm({ match, clubs, user, disabled, notify, done, isNew = false }: { match: Match; clubs: CatalogClub[]; user: User; disabled: boolean; notify: (notice: Notice) => void; done: () => void; isNew?: boolean }) {
   const [draft, setDraft] = useState(match);
   const [saving, setSaving] = useState(false);
   const set = <K extends keyof Match>(key: K, value: Match[K]) => setDraft((current) => ({ ...current, [key]: value }));
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (saving || disabled) return;
+    if (!draft.home || !draft.away || draft.home === draft.away) {
+      notify({ kind: "error", message: "Selecciona dos clubes distintos." });
+      return;
+    }
     setSaving(true);
     try {
       await saveMatch(draft, user);
-      notify({ kind: "success", message: `${draft.home} vs ${draft.away} guardado en Firestore.` });
+      notify({ kind: "success", message: `${draft.home} vs ${draft.away} guardado en Supabase.` });
       done();
     } catch (error) {
       notify({ kind: "error", message: error instanceof Error ? error.message : "No fue posible guardar el partido." });
