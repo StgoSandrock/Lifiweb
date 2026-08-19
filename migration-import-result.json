@@ -1,5 +1,5 @@
 {
-  "httpStatus": 422,
-  "body": "{\"ok\":false,\"error\":\"Canonical dataset digest mismatch\",\"digest\":\"22d2b1faa85376e00abd9f16b593ce208bcdfb7db43913849fd3429b1c210fc1\"}",
-  "capturedAt": "2026-08-19T00:07:04.871Z"
+  "httpStatus": 200,
+  "body": "{\"ok\":true,\"digest\":\"22d2b1faa85376e00abd9f16b593ce208bcdfb7db43913849fd3429b1c210fc1\",\"counts\":{\"categories\":6,\"clubs\":26,\"club_competitions\":36,\"players\":1503,\"matches\":298,\"team_photos\":6,\"migration_aliases\":561}}",
+  "capturedAt": "2026-08-19T00:08:38.419Z"
 }
