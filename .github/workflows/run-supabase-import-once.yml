@@ -1,0 +1,27 @@
+name: Run canonical Supabase import once
+
+on:
+  push:
+    branches:
+      - agent/supabase-data-migration
+    paths:
+      - .github/workflows/run-supabase-import-once.yml
+
+permissions:
+  contents: read
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Apply frozen canonical migration snapshot
+        shell: bash
+        run: |
+          set -euo pipefail
+          RESPONSE="$(curl --fail-with-body --silent --show-error --retry 3 --retry-all-errors \
+            -X POST \
+            'https://ndqoaqgepbuuatvbkvtc.supabase.co/functions/v1/migration-import-once?token=AiKUFFXPR5eYza7EIcjYNjoEOuSsFmMXzt2f7MdLOXc' \
+            -H 'Content-Type: application/json' \
+            --data '{}')"
+          printf '%s\n' "$RESPONSE"
+          node -e 'const x=JSON.parse(process.argv[1]); if(x.ok!==true) process.exit(1);' "$RESPONSE"
