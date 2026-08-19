@@ -1,5 +1,5 @@
 {
-  "httpStatus": 500,
-  "body": "{\"ok\":false,\"error\":\"Failed to decode base64\"}",
-  "capturedAt": "2026-08-19T00:04:13.130Z"
+  "httpStatus": 422,
+  "body": "{\"ok\":false,\"error\":\"Canonical dataset digest mismatch\",\"digest\":\"22d2b1faa85376e00abd9f16b593ce208bcdfb7db43913849fd3429b1c210fc1\"}",
+  "capturedAt": "2026-08-19T00:07:04.871Z"
 }
