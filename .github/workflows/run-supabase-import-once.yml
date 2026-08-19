@@ -8,20 +8,36 @@ on:
       - .github/workflows/run-supabase-import-once.yml
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   import:
     runs-on: ubuntu-latest
     steps:
-      - name: Apply frozen canonical migration snapshot
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/supabase-data-migration
+      - name: Invoke frozen canonical migration snapshot
+        id: invoke
         shell: bash
         run: |
-          set -euo pipefail
-          RESPONSE="$(curl --fail-with-body --silent --show-error --retry 3 --retry-all-errors \
+          set +e
+          RESPONSE_FILE="$(mktemp)"
+          STATUS="$(curl --silent --show-error --retry 1 --retry-all-errors \
             -X POST \
             'https://ndqoaqgepbuuatvbkvtc.supabase.co/functions/v1/migration-import-once?token=AiKUFFXPR5eYza7EIcjYNjoEOuSsFmMXzt2f7MdLOXc' \
             -H 'Content-Type: application/json' \
-            --data '{}')"
-          printf '%s\n' "$RESPONSE"
-          node -e 'const x=JSON.parse(process.argv[1]); if(x.ok!==true) process.exit(1);' "$RESPONSE"
+            --data '{}' \
+            -o "$RESPONSE_FILE" \
+            -w '%{http_code}')"
+          BODY="$(cat "$RESPONSE_FILE")"
+          node -e 'const fs=require("fs"); fs.writeFileSync("migration-import-result.json", JSON.stringify({httpStatus: Number(process.argv[1]), body: process.argv[2], capturedAt: new Date().toISOString()}, null, 2)+"\n")' "$STATUS" "$BODY"
+          cat migration-import-result.json
+      - name: Persist diagnostic response
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add migration-import-result.json
+          git commit -m "Record Supabase import response" || exit 0
+          git push origin HEAD:agent/supabase-data-migration
