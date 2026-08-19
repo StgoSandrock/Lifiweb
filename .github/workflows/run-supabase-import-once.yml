@@ -1,4 +1,5 @@
 name: Run canonical Supabase import once
+# Digest verified independently in JavaScript against the frozen local canonical snapshot.
 
 on:
   push:
