@@ -17,7 +17,14 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+      - run: pnpm install --no-frozen-lockfile
+      - name: Upload regenerated lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: supabase-pnpm-lockfile
+          path: pnpm-lock.yaml
+          if-no-files-found: error
+          retention-days: 1
       - run: node --check scripts/migrate-to-supabase.mjs
       - run: node --check scripts/export-firestore-raw.mjs
       - run: node --check scripts/build-supabase-export.mjs
