@@ -1,0 +1,5 @@
+{
+  "httpStatus": 500,
+  "body": "{\"ok\":false,\"error\":\"Failed to decode base64\"}",
+  "capturedAt": "2026-08-19T00:04:13.130Z"
+}
