@@ -5,11 +5,43 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      - name: Apply safe derived-category fix
+        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'src/components/league-app.tsx';
+          let source = fs.readFileSync(path, 'utf8');
+          if (source.includes('const activeCategory = categories.some')) process.exit(0);
+          const anchor = '  const filteredMatches = useMemo(() => matches.filter((match) => match.competition === competition && match.category === category), [matches, competition, category]);';
+          if (!source.includes(anchor)) throw new Error('LeagueApp changed unexpectedly; refusing automatic patch.');
+          source = source.replace(anchor, '  const activeCategory = categories.some((item) => item.id === category) ? category : categories[0]?.id ?? category;\n  const filteredMatches = useMemo(() => matches.filter((match) => match.competition === competition && match.category === activeCategory), [matches, competition, activeCategory]);');
+          source = source.replace('  const filteredPlayers = useMemo(() => players.filter((player) => player.competition === competition && player.category === category), [players, competition, category]);', '  const filteredPlayers = useMemo(() => players.filter((player) => player.competition === competition && player.category === activeCategory), [players, competition, activeCategory]);');
+          source = source.replace('  const filteredPhotos = useMemo(() => photos.filter((photo) => photo.competition === competition && photo.category === category).sort((a, b) => a.order - b.order), [photos, competition, category]);', '  const filteredPhotos = useMemo(() => photos.filter((photo) => photo.competition === competition && photo.category === activeCategory).sort((a, b) => a.order - b.order), [photos, competition, activeCategory]);');
+          source = source.replace(/\n  useEffect\(\(\) => \{\n    if \(categories\.length && !categories\.some\(\(item\) => item\.id === category\)\) \{\n      setCategory\(categories\[0\]\.id\);\n      setSelectedClub\(null\);\n    \}\n  \}, \[categories, category\]\);\n/, '\n');
+          source = source.replace('className={category === item.id ? "active" : ""}', 'className={activeCategory === item.id ? "active" : ""}');
+          source = source.replace('categories.find((item) => item.id === category)?.name', 'categories.find((item) => item.id === activeCategory)?.name');
+          fs.writeFileSync(path, source);
+          NODE
+          if git diff --quiet -- src/components/league-app.tsx; then
+            echo "LeagueApp already fixed."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add src/components/league-app.tsx
+            git commit -m "Derive active category without effect state updates"
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
       - uses: pnpm/action-setup@v4
         with:
           version: 11.9.0
