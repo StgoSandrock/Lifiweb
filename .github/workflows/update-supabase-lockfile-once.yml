@@ -1,0 +1,34 @@
+name: Update Supabase lockfile once
+
+on:
+  push:
+    branches:
+      - agent/supabase-data-migration
+    paths:
+      - .github/workflows/update-supabase-lockfile-once.yml
+
+permissions:
+  contents: write
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: agent/supabase-data-migration
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11.9.0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --lockfile-only --no-frozen-lockfile
+      - name: Commit lockfile
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git commit -m "Update lockfile for Supabase SDK" || exit 0
+          git push origin HEAD:agent/supabase-data-migration
