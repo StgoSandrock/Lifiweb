@@ -31,9 +31,10 @@ export function LeagueApp({ competition }: { competition: Competition }) {
     () => competition === "lff" ? catalogCategories.filter((item) => item.id === "superior") : catalogCategories.filter((item) => item.id !== "superior"),
     [catalogCategories, competition],
   );
-  const filteredMatches = useMemo(() => matches.filter((match) => match.competition === competition && match.category === category), [matches, competition, category]);
-  const filteredPlayers = useMemo(() => players.filter((player) => player.competition === competition && player.category === category), [players, competition, category]);
-  const filteredPhotos = useMemo(() => photos.filter((photo) => photo.competition === competition && photo.category === category).sort((a, b) => a.order - b.order), [photos, competition, category]);
+  const activeCategory = categories.some((item) => item.id === category) ? category : categories[0]?.id ?? category;
+  const filteredMatches = useMemo(() => matches.filter((match) => match.competition === competition && match.category === activeCategory), [matches, competition, activeCategory]);
+  const filteredPlayers = useMemo(() => players.filter((player) => player.competition === competition && player.category === activeCategory), [players, competition, activeCategory]);
+  const filteredPhotos = useMemo(() => photos.filter((photo) => photo.competition === competition && photo.category === activeCategory).sort((a, b) => a.order - b.order), [photos, competition, activeCategory]);
   const visibleClubs = useMemo(() => {
     const fromCatalog = catalogClubs.filter((club) => club.competitions.includes(competition));
     if (catalogLive || competition !== "cup") return fromCatalog;
@@ -58,12 +59,6 @@ export function LeagueApp({ competition }: { competition: Competition }) {
     window.localStorage.setItem("lifi:last-competition", competition);
   }, [competition]);
 
-  useEffect(() => {
-    if (categories.length && !categories.some((item) => item.id === category)) {
-      setCategory(categories[0].id);
-      setSelectedClub(null);
-    }
-  }, [categories, category]);
 
   return (
     <>
@@ -96,13 +91,13 @@ export function LeagueApp({ competition }: { competition: Competition }) {
             <Link className={competition === "lff" ? "active" : ""} href="/lff"><Trophy /> LFF</Link>
           </div>
           <div className={`category-tabs ${categories.length === 1 ? "single" : ""}`} role="group" aria-label="Categoría">
-            {categories.map((item) => <button key={item.id} type="button" className={category === item.id ? "active" : ""} onClick={() => { setCategory(item.id); setSelectedClub(null); }}><span>{item.name}</span><small>{item.birthYears}</small></button>)}
+            {categories.map((item) => <button key={item.id} type="button" className={activeCategory === item.id ? "active" : ""} onClick={() => { setCategory(item.id); setSelectedClub(null); }}><span>{item.name}</span><small>{item.birthYears}</small></button>)}
           </div>
         </section>
 
         <section className="content-section" id={view === "fixture" ? "fixture" : view === "clubs" ? "clubes" : "posiciones"}>
           <div className="section-heading">
-            <div><p className="eyebrow"><span /> {copy.name} · {categories.find((item) => item.id === category)?.name}</p><h2>{view === "standings" ? "Tabla de posiciones" : view === "fixture" ? "Fixture oficial" : competition === "lff" ? "Equipos y galerías" : "Clubes y planteles"}</h2></div>
+            <div><p className="eyebrow"><span /> {copy.name} · {categories.find((item) => item.id === activeCategory)?.name}</p><h2>{view === "standings" ? "Tabla de posiciones" : view === "fixture" ? "Fixture oficial" : competition === "lff" ? "Equipos y galerías" : "Clubes y planteles"}</h2></div>
             <div className="view-tabs" role="tablist" aria-label="Sección deportiva">
               <button role="tab" aria-selected={view === "standings"} className={view === "standings" ? "active" : ""} onClick={() => setView("standings")}><BarChart3 /> Posiciones</button>
               <button role="tab" aria-selected={view === "fixture"} className={view === "fixture" ? "active" : ""} onClick={() => setView("fixture")}><CalendarRange /> Fixture</button>
