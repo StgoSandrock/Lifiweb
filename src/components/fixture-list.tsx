@@ -1,17 +1,14 @@
 "use client";
 
 import { CalendarDays, Clock3, MapPin, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ClubMark } from "@/components/club-mark";
 import { groupMatchesByRound, scheduledWeek } from "@/lib/fixtures";
-import { useLeagueData } from "@/hooks/use-league-data";
 import type { Match, MatchEvent, Player } from "@/types/domain";
 import styles from "@/components/fixture-list.module.css";
 
-export function FixtureList({ matches, players: suppliedPlayers, editable }: { matches: Match[]; players?: Player[]; editable?: (match: Match) => React.ReactNode }) {
+export function FixtureList({ matches, editable }: { matches: Match[]; players?: Player[]; editable?: (match: Match) => React.ReactNode }) {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
-  const { players: livePlayers } = useLeagueData();
-  const players = suppliedPlayers ?? livePlayers;
 
   useEffect(() => {
     if (!selectedMatch) return;
@@ -35,7 +32,7 @@ export function FixtureList({ matches, players: suppliedPlayers, editable }: { m
         ))}</div>
       </section>
     ))}</div>
-    {selectedMatch && <MatchDetail match={selectedMatch} players={players} onClose={() => setSelectedMatch(null)} />}
+    {selectedMatch && <MatchDetail match={selectedMatch} onClose={() => setSelectedMatch(null)} />}
   </>;
 }
 
@@ -60,11 +57,9 @@ export function MatchCard({ match }: { match: Match }) {
   );
 }
 
-function MatchDetail({ match, players, onClose }: { match: Match; players: Player[]; onClose: () => void }) {
+function MatchDetail({ match, onClose }: { match: Match; onClose: () => void }) {
   const played = match.status === "played" && match.homeScore !== null && match.awayScore !== null;
   const events = match.events ?? [];
-  const homePlayers = useMemo(() => players.filter((player) => player.competition === match.competition && player.category === match.category && player.club === match.home).sort((a, b) => a.name.localeCompare(b.name, "es")), [players, match]);
-  const awayPlayers = useMemo(() => players.filter((player) => player.competition === match.competition && player.category === match.category && player.club === match.away).sort((a, b) => a.name.localeCompare(b.name, "es")), [players, match]);
   const dateLabel = match.date ?? scheduledWeek(match) ?? "Por definir";
 
   return <div className={styles.backdrop} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
@@ -82,14 +77,7 @@ function MatchDetail({ match, players, onClose }: { match: Match; players: Playe
       </div>
       <div className={styles.section}>
         <h4>Goles y tarjetas</h4>
-        {events.length ? <div className={styles.eventList}>{events.map((event) => <EventRow key={event.id} event={event} />)}</div> : <p className={styles.empty}>Aún no hay goles o tarjetas individualizados para este partido.</p>}
-      </div>
-      <div className={styles.section}>
-        <h4>Jugadores/as</h4>
-        <div className={styles.rosters}>
-          <Roster title={match.home} players={homePlayers} />
-          <Roster title={match.away} players={awayPlayers} />
-        </div>
+        {events.length ? <div className={styles.eventList}>{events.map((event) => <EventRow key={event.id} event={event} />)}</div> : <p className={styles.empty}>Aún no hay goleadores/as o tarjetas individualizados para este partido.</p>}
       </div>
     </section>
   </div>;
@@ -99,8 +87,4 @@ function EventRow({ event }: { event: MatchEvent }) {
   const label = event.type === "goal" ? "Gol" : event.type === "yellow-card" ? "Tarjeta amarilla" : "Tarjeta roja";
   const icon = event.type === "goal" ? "⚽" : event.type === "yellow-card" ? "🟨" : "🟥";
   return <div className={styles.event}><span className={styles.eventIcon} aria-hidden="true">{icon}</span><div><strong>{event.player}</strong><small>{label} · {event.team}</small></div><span className={styles.minute}>{typeof event.minute === "number" ? `${event.minute}′` : ""}</span></div>;
-}
-
-function Roster({ title, players }: { title: string; players: Player[] }) {
-  return <div className={styles.roster}><h5>{title}</h5>{players.length ? <ul>{players.map((player) => <li key={player.id}>{player.name}{player.position ? ` · ${player.position}` : ""}</li>)}</ul> : <p className={styles.empty}>Plantel aún no cargado.</p>}</div>;
 }
