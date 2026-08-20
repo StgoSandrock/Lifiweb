@@ -4,11 +4,14 @@ import { CalendarDays, Clock3, MapPin, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ClubMark } from "@/components/club-mark";
 import { groupMatchesByRound, scheduledWeek } from "@/lib/fixtures";
+import { useLeagueData } from "@/hooks/use-league-data";
 import type { Match, MatchEvent, Player } from "@/types/domain";
 import styles from "@/components/fixture-list.module.css";
 
-export function FixtureList({ matches, players = [], editable }: { matches: Match[]; players?: Player[]; editable?: (match: Match) => React.ReactNode }) {
+export function FixtureList({ matches, players: suppliedPlayers, editable }: { matches: Match[]; players?: Player[]; editable?: (match: Match) => React.ReactNode }) {
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null);
+  const { players: livePlayers } = useLeagueData();
+  const players = suppliedPlayers ?? livePlayers;
 
   useEffect(() => {
     if (!selectedMatch) return;
@@ -60,8 +63,8 @@ export function MatchCard({ match }: { match: Match }) {
 function MatchDetail({ match, players, onClose }: { match: Match; players: Player[]; onClose: () => void }) {
   const played = match.status === "played" && match.homeScore !== null && match.awayScore !== null;
   const events = match.events ?? [];
-  const homePlayers = useMemo(() => players.filter((player) => player.club === match.home).sort((a, b) => a.name.localeCompare(b.name, "es")), [players, match.home]);
-  const awayPlayers = useMemo(() => players.filter((player) => player.club === match.away).sort((a, b) => a.name.localeCompare(b.name, "es")), [players, match.away]);
+  const homePlayers = useMemo(() => players.filter((player) => player.competition === match.competition && player.category === match.category && player.club === match.home).sort((a, b) => a.name.localeCompare(b.name, "es")), [players, match]);
+  const awayPlayers = useMemo(() => players.filter((player) => player.competition === match.competition && player.category === match.category && player.club === match.away).sort((a, b) => a.name.localeCompare(b.name, "es")), [players, match]);
   const dateLabel = match.date ?? scheduledWeek(match) ?? "Por definir";
 
   return <div className={styles.backdrop} role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) onClose(); }}>
