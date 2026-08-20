@@ -57,7 +57,7 @@ const SOURCE_ROUNDS: ReadonlyArray<ReadonlyArray<readonly [string, string]>> = [
 
 const MATCH_OVERRIDES: Record<
   string,
-  Partial<Pick<Match, "home" | "away" | "homeScore" | "awayScore" | "status" | "date" | "time" | "venue">>
+  Partial<Pick<Match, "home" | "away" | "homeScore" | "awayScore" | "status" | "date" | "time" | "venue" | "events">>
 > = {
   "lff-superior-r1-m1": {
     home: "Club Palestino A",
@@ -68,6 +68,15 @@ const MATCH_OVERRIDES: Record<
     date: "Jueves 20 de agosto",
     time: "19:45 hrs",
     venue: "Palestino",
+    events: [
+      { id: "pal-soubnit-1", type: "goal", team: "Club Palestino A", player: "Soubnit" },
+      { id: "pal-ortiz-1", type: "goal", team: "Club Palestino A", player: "Ortiz" },
+      { id: "pal-ortiz-2", type: "goal", team: "Club Palestino A", player: "Ortiz" },
+      { id: "pal-martinez-1", type: "goal", team: "Club Palestino A", player: "Martínez" },
+      { id: "country-pena-1", type: "goal", team: "Country Club B", player: "Peña" },
+      { id: "country-pena-2", type: "goal", team: "Country Club B", player: "Peña" },
+      { id: "country-riveros-1", type: "goal", team: "Country Club B", player: "Riveros" },
+    ],
   },
   "lff-superior-r1-m2": {
     home: "Estadio Español",
@@ -78,6 +87,11 @@ const MATCH_OVERRIDES: Record<
     date: "Miércoles 19 de agosto",
     time: "19:45 hrs",
     venue: "Estadio Español",
+    events: [
+      { id: "esp-arancibia-1", type: "goal", team: "Estadio Español", player: "Arancibia" },
+      { id: "esp-arancibia-2", type: "goal", team: "Estadio Español", player: "Arancibia" },
+      { id: "med-swett-1", type: "goal", team: "Equipo Médico", player: "Swett" },
+    ],
   },
   "lff-superior-r1-m3": {
     home: "Stadio Italiano",
@@ -88,6 +102,13 @@ const MATCH_OVERRIDES: Record<
     date: "Miércoles 19 de agosto",
     time: "18:45 hrs",
     venue: "Stadio Italiano",
+    events: [
+      { id: "ita-serre-1", type: "goal", team: "Stadio Italiano", player: "Serre" },
+      { id: "ita-serre-2", type: "goal", team: "Stadio Italiano", player: "Serre" },
+      { id: "ita-ormeno-1", type: "goal", team: "Stadio Italiano", player: "Ormeño" },
+      { id: "ita-ormeno-2", type: "goal", team: "Stadio Italiano", player: "Ormeño" },
+      { id: "ita-mierzo-1", type: "goal", team: "Stadio Italiano", player: "Mierzo" },
+    ],
   },
   "lff-superior-r1-m4": {
     date: "Miércoles 19 de agosto",
@@ -114,6 +135,7 @@ export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex)
       date: null,
       time: null,
       venue: null,
+      events: [],
       ...MATCH_OVERRIDES[id],
     };
   }),
