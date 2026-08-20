@@ -80,8 +80,11 @@ const MATCH_OVERRIDES: Record<
     venue: "Estadio Español",
   },
   "lff-superior-r1-m3": {
-    home: "Sport Academy",
-    away: "Stadio Italiano",
+    home: "Stadio Italiano",
+    away: "Sport Academy",
+    homeScore: 5,
+    awayScore: 0,
+    status: "played",
     date: "Miércoles 19 de agosto",
     time: "18:45 hrs",
     venue: "Stadio Italiano",
