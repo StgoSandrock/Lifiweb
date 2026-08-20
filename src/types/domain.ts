@@ -1,6 +1,7 @@
 export type Competition = "league" | "cup" | "lff";
 export type CategoryId = "pre-peque" | "peque" | "mini" | "infantil" | "intermedia" | "superior";
 export type MatchStatus = "scheduled" | "played" | "postponed" | "cancelled";
+export type MatchEventType = "goal" | "yellow-card" | "red-card";
 
 export interface Club {
   id: string;
@@ -39,6 +40,14 @@ export interface TeamPhoto {
   order: number;
 }
 
+export interface MatchEvent {
+  id: string;
+  type: MatchEventType;
+  team: string;
+  player: string;
+  minute?: number | null;
+}
+
 export interface Match {
   id: string;
   tournament: "clausura";
@@ -55,6 +64,7 @@ export interface Match {
   date: string | null;
   time: string | null;
   venue: string | null;
+  events?: MatchEvent[];
 }
 
 export interface Standing {
