@@ -57,13 +57,15 @@ const SOURCE_ROUNDS: ReadonlyArray<ReadonlyArray<readonly [string, string]>> = [
 
 const MATCH_OVERRIDES: Record<
   string,
-  Partial<Pick<Match, "home" | "away" | "homeScore" | "awayScore" | "status" | "date" | "time" | "venue" | "events">>
+  Partial<Pick<Match, "home" | "away" | "homeScore" | "awayScore" | "homePenalties" | "awayPenalties" | "status" | "date" | "time" | "venue" | "events">>
 > = {
   "lff-superior-r1-m1": {
     home: "Club Palestino A",
     away: "Country Club B",
     homeScore: 0,
     awayScore: 0,
+    homePenalties: 3,
+    awayPenalties: 2,
     status: "played",
     date: "Jueves 20 de agosto",
     time: "19:45 hrs",
@@ -111,7 +113,15 @@ const MATCH_OVERRIDES: Record<
     date: "Miércoles 19 de agosto",
     time: "19:45 hrs",
     venue: "Palestino",
-    events: [],
+    events: [
+      { id: "palb-soubnit-1", type: "goal", team: "Club Palestino B", player: "Soubnit" },
+      { id: "palb-ortiz-1", type: "goal", team: "Club Palestino B", player: "Ortiz" },
+      { id: "palb-ortiz-2", type: "goal", team: "Club Palestino B", player: "Ortiz" },
+      { id: "palb-martinez-1", type: "goal", team: "Club Palestino B", player: "Martínez" },
+      { id: "countrya-pena-1", type: "goal", team: "Country Club A", player: "Peña" },
+      { id: "countrya-pena-2", type: "goal", team: "Country Club A", player: "Peña" },
+      { id: "countrya-riveros-1", type: "goal", team: "Country Club A", player: "Riveros" },
+    ],
   },
 };
 
@@ -130,6 +140,8 @@ export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex)
       away: sourceHome,
       homeScore: null,
       awayScore: null,
+      homePenalties: null,
+      awayPenalties: null,
       status: "scheduled" as const,
       date: null,
       time: null,
