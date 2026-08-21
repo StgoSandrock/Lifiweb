@@ -38,13 +38,14 @@ export function FixtureList({ matches, editable }: { matches: Match[]; players?:
 
 export function MatchCard({ match }: { match: Match }) {
   const played = match.status === "played" && match.homeScore !== null && match.awayScore !== null;
+  const hasPenalties = match.homePenalties != null && match.awayPenalties != null;
   const dateLabel = match.date ?? scheduledWeek(match) ?? "Por definir";
   return (
     <article className="match-card">
       <div className="match-teams">
         <div><span className="mark-shell"><ClubMark name={match.home} size={50} /></span><strong>{match.home}</strong></div>
-        <div className="score" aria-label={played ? `${match.homeScore} a ${match.awayScore}` : "Partido programado"}>
-          {played ? <><b>{match.homeScore}</b><span>–</span><b>{match.awayScore}</b></> : <span>VS</span>}
+        <div className="score" aria-label={played ? `${match.homeScore} a ${match.awayScore}${hasPenalties ? `, penales ${match.homePenalties} a ${match.awayPenalties}` : ""}` : "Partido programado"}>
+          {played ? <><b>{match.homeScore}{hasPenalties ? ` (${match.homePenalties})` : ""}</b><span>–</span><b>{hasPenalties ? `(${match.awayPenalties}) ` : ""}{match.awayScore}</b></> : <span>VS</span>}
         </div>
         <div><span className="mark-shell"><ClubMark name={match.away} size={50} /></span><strong>{match.away}</strong></div>
       </div>
@@ -59,6 +60,7 @@ export function MatchCard({ match }: { match: Match }) {
 
 function MatchDetail({ match, onClose }: { match: Match; onClose: () => void }) {
   const played = match.status === "played" && match.homeScore !== null && match.awayScore !== null;
+  const hasPenalties = match.homePenalties != null && match.awayPenalties != null;
   const events = match.events ?? [];
   const dateLabel = match.date ?? scheduledWeek(match) ?? "Por definir";
 
@@ -70,6 +72,7 @@ function MatchDetail({ match, onClose }: { match: Match; onClose: () => void }) 
         <div className={styles.bigScore}>{played ? <><b>{match.homeScore}</b><span>–</span><b>{match.awayScore}</b></> : <span>VS</span>}</div>
         <div className={styles.team}><span className="mark-shell large"><ClubMark name={match.away} size={72} /></span><strong>{match.away}</strong></div>
       </div>
+      {hasPenalties && <div className={styles.meta}><div><strong>Penales:</strong>&nbsp; {match.home} {match.homePenalties}–{match.awayPenalties} {match.away}</div></div>}
       <div className={styles.meta}>
         <div><CalendarDays /> {dateLabel}</div>
         <div><Clock3 /> {match.time ?? "Por definir"}</div>
