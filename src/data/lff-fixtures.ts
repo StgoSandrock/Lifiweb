@@ -62,21 +62,13 @@ const MATCH_OVERRIDES: Record<
   "lff-superior-r1-m1": {
     home: "Club Palestino A",
     away: "Country Club B",
-    homeScore: 4,
-    awayScore: 3,
+    homeScore: 0,
+    awayScore: 0,
     status: "played",
     date: "Jueves 20 de agosto",
     time: "19:45 hrs",
     venue: "Palestino",
-    events: [
-      { id: "pal-soubnit-1", type: "goal", team: "Club Palestino A", player: "Soubnit" },
-      { id: "pal-ortiz-1", type: "goal", team: "Club Palestino A", player: "Ortiz" },
-      { id: "pal-ortiz-2", type: "goal", team: "Club Palestino A", player: "Ortiz" },
-      { id: "pal-martinez-1", type: "goal", team: "Club Palestino A", player: "Martínez" },
-      { id: "country-pena-1", type: "goal", team: "Country Club B", player: "Peña" },
-      { id: "country-pena-2", type: "goal", team: "Country Club B", player: "Peña" },
-      { id: "country-riveros-1", type: "goal", team: "Country Club B", player: "Riveros" },
-    ],
+    events: [],
   },
   "lff-superior-r1-m2": {
     home: "Estadio Español",
@@ -111,8 +103,15 @@ const MATCH_OVERRIDES: Record<
     ],
   },
   "lff-superior-r1-m4": {
+    home: "Club Palestino B",
+    away: "Country Club A",
+    homeScore: 4,
+    awayScore: 3,
+    status: "played",
     date: "Miércoles 19 de agosto",
     time: "19:45 hrs",
+    venue: "Palestino",
+    events: [],
   },
 };
 
