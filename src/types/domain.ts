@@ -60,6 +60,8 @@ export interface Match {
   away: string;
   homeScore: number | null;
   awayScore: number | null;
+  homePenalties?: number | null;
+  awayPenalties?: number | null;
   status: MatchStatus;
   date: string | null;
   time: string | null;
