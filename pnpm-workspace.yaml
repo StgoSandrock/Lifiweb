@@ -1,13 +1,10 @@
 packages:
   - "apps/*"
 
+# pnpm 11 blocks dependency build scripts unless explicitly approved.
+# Allow only the packages already required by the current application.
 allowBuilds:
-  '@firebase/util': set this to true or false
-  protobufjs: set this to true or false
-  sharp: set this to true or false
-  unrs-resolver: set this to true or false
-ignoredBuiltDependencies:
-  - "@firebase/util"
-  - protobufjs
-  - sharp
-  - unrs-resolver
+  '@firebase/util': true
+  protobufjs: true
+  sharp: true
+  unrs-resolver: true

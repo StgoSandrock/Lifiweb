@@ -18,6 +18,12 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: node --check scripts/migrate-to-supabase.mjs
+      - run: node --check scripts/export-firestore-raw.mjs
+      - run: node --check scripts/build-supabase-export.mjs
+      - run: node --check scripts/reconcile-supabase-export.mjs
+      - name: Validate local fallback mapping without live Firestore reads
+        run: pnpm migrate:supabase:dry
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
