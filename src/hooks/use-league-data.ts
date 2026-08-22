@@ -6,15 +6,46 @@ import { LFF_FIXTURES } from "@/data/lff-fixtures";
 import { SEEDED_TEAM_PHOTOS } from "@/data/seed-team-photos";
 import { fromFirestorePlayer } from "@/lib/firebase/adapters";
 import { subscribeToLeagueData } from "@/lib/firebase/public-data";
+import { normalizeClubName } from "@/lib/text";
 import type { Match, Player, TeamPhoto } from "@/types/domain";
 
 const fallbackMatches = [...(fallbackFixtures as Match[]), ...LFF_FIXTURES];
 
-function mergeMatchesWithFallback(liveMatches: Match[]) {
-  const liveById = new Map(liveMatches.map((match) => [match.id, match]));
-  const merged = fallbackMatches.map((match) => liveById.get(match.id) ?? match);
-  const fallbackIds = new Set(fallbackMatches.map((match) => match.id));
-  return [...merged, ...liveMatches.filter((match) => !fallbackIds.has(match.id))];
+function matchIdentity(match: Match) {
+  return [
+    match.competition,
+    match.category,
+    match.round,
+    normalizeClubName(match.home),
+    normalizeClubName(match.away),
+  ].join("|");
+}
+
+function preferredLiveMatch(matches: Match[], fallbackId?: string) {
+  return [...matches].sort((a, b) => {
+    const played = Number(b.status === "played") - Number(a.status === "played");
+    if (played) return played;
+    return Number(b.id === fallbackId) - Number(a.id === fallbackId);
+  })[0];
+}
+
+export function mergeMatchesWithFallback(liveMatches: Match[]) {
+  const liveByIdentity = new Map<string, Match[]>();
+  for (const match of liveMatches) {
+    const identity = matchIdentity(match);
+    liveByIdentity.set(identity, [...(liveByIdentity.get(identity) ?? []), match]);
+  }
+
+  const fallbackIdentities = new Set(fallbackMatches.map(matchIdentity));
+  const merged = fallbackMatches.map((match) => {
+    const liveMatchesForFixture = liveByIdentity.get(matchIdentity(match));
+    return liveMatchesForFixture?.length ? preferredLiveMatch(liveMatchesForFixture, match.id) : match;
+  });
+  const additional = [...liveByIdentity.entries()]
+    .filter(([identity]) => !fallbackIdentities.has(identity))
+    .map(([, matches]) => preferredLiveMatch(matches));
+
+  return [...merged, ...additional];
 }
 
 export function useLeagueData() {
