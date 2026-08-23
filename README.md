@@ -1,4 +1,4 @@
-# LIFI · Liga Infantil de Fútbol Interestadios
+# LIFI · Liga de Fútbol Infantil
 
 Aplicación oficial del Torneo Clausura 2026. La versión 2 migra el antiguo HTML monolítico a Next.js, TypeScript y Firebase modular, sin resembrar ni modificar automáticamente Firestore.
 

@@ -5,13 +5,13 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lifi.cl";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: "LIFI · Liga Infantil de Fútbol Interestadios", template: "%s · LIFI" },
+  title: { default: "LIFI · Liga de Fútbol Infantil", template: "%s · LIFI" },
   description: "Fixture, posiciones, resultados y planteles oficiales del Torneo Clausura 2026 de LIFI.",
   applicationName: "LIFI",
   keywords: ["LIFI", "fútbol infantil", "Liga Interestadios", "Clausura 2026", "Santiago"],
   openGraph: {
     title: "LIFI · Clausura 2026",
-    description: "Fixture, posiciones y planteles oficiales de la Liga Infantil de Fútbol Interestadios.",
+    description: "Fixture, posiciones y planteles oficiales de la Liga de Fútbol Infantil.",
     type: "website",
     locale: "es_CL",
     siteName: "LIFI",

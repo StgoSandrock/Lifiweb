@@ -64,7 +64,7 @@ export function CompetitionLobby() {
           <Image className="lifi-logo-round" src="/lifi-logo.jpeg" alt="Escudo de LIFI" width={116} height={116} priority />
           <div>
             <h1 id="lobby-title">LIFI</h1>
-            <p>Liga Infantil de Fútbol Interestadios</p>
+            <p>Liga de Fútbol Infantil</p>
           </div>
         </div>
 

@@ -4,7 +4,7 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View, type 
 import { colors, radius } from "../theme";
 
 export function Brand({ compact = false }: { compact?: boolean }) {
-  return <View style={styles.brand}><Text style={[styles.brandTitle, compact && styles.brandTitleCompact]}>LIFI<Text style={styles.brandDot}>.</Text></Text>{!compact && <Text style={styles.brandSubtitle}>Liga Infantil de Fútbol Interestadios</Text>}</View>;
+  return <View style={styles.brand}><Text style={[styles.brandTitle, compact && styles.brandTitleCompact]}>LIFI<Text style={styles.brandDot}>.</Text></Text>{!compact && <Text style={styles.brandSubtitle}>Liga de Fútbol Infantil</Text>}</View>;
 }
 
 export function Pill({ children, tone = "blue" }: { children: ReactNode; tone?: "blue" | "yellow" | "green" }) {

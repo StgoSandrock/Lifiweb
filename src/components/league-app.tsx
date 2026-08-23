@@ -40,7 +40,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
   const roundCount = new Set(competitionMatches.filter((match) => !match.roundLabel).map((match) => match.round)).size;
   const categoryCount = new Set(competitionMatches.map((match) => match.category)).size;
   const copy = competition === "league"
-    ? { eyebrow: `Temporada ${SEASON} · Torneo Clausura`, title: "LIFI", accent: "Liga", name: "Liga LIFI", description: "Fixture, posiciones y planteles oficiales de la Liga Infantil de Fútbol Interestadios.", label: "Liga · Clausura" }
+    ? { eyebrow: `Temporada ${SEASON} · Torneo Clausura`, title: "LIFI", accent: "Liga", name: "Liga LIFI", description: "Fixture, posiciones y planteles oficiales de la Liga de Fútbol Infantil.", label: "Liga · Clausura" }
     : competition === "cup"
       ? { eyebrow: "Competencia LIFI", title: "LIFI", accent: "Cup", name: "LIFI Cup", description: "Fixture, resultados y planteles disponibles de LIFI Cup, sin completar información que aún no haya sido publicada.", label: "LIFI Cup" }
       : { eyebrow: `Temporada ${SEASON} · Categoría Superior`, title: "LFF", accent: "Liga Femenina", name: "LFF", description: "Fixture, posiciones, historia, equipos y galerías oficiales de la categoría Superior.", label: "LFF · Superior" };
@@ -103,7 +103,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
 
         {competition === "lff" && <LffHistory />}
       </main>
-      <footer className="site-footer"><div><ImageLogo /><p>Liga Infantil de Fútbol Interestadios · Santiago de Chile</p></div><p>Temporada {SEASON} · Información oficial en actualización</p></footer>
+      <footer className="site-footer"><div><ImageLogo /><p>Liga de Fútbol Infantil · Santiago de Chile</p></div><p>Temporada {SEASON} · Información oficial en actualización</p></footer>
     </>
   );
 }

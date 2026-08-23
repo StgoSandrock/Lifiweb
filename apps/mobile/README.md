@@ -1,6 +1,6 @@
 # LIFI App
 
-Aplicación nativa multiplataforma de la Liga Infantil de Fútbol Interestadios, construida con Expo SDK 54, React Native, Expo Router, TypeScript y Firebase.
+Aplicación nativa multiplataforma de la Liga de Fútbol Infantil, construida con Expo SDK 54, React Native, Expo Router, TypeScript y Firebase.
 
 ## Primer hito implementado
 

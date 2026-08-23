@@ -52,7 +52,7 @@ export function CompetitionScreen({ competition }: { competition: Competition })
       <View style={styles.heroCopy}>
         <Text style={styles.kicker}>{competition === "league" ? `TEMPORADA ${SEASON} · TORNEO CLAUSURA` : "COMPETENCIA LIFI"}</Text>
         <Text style={styles.title}>LIFI <Text>{competition === "league" ? "Liga" : "Cup"}</Text></Text>
-        <Text style={styles.description}>{competition === "league" ? "Fixture, posiciones y planteles oficiales de la Liga Infantil de Fútbol Interestadios." : "Fixture, resultados y planteles vigentes de LIFI Cup."}</Text>
+        <Text style={styles.description}>{competition === "league" ? "Fixture, posiciones y planteles oficiales de la Liga de Fútbol Infantil." : "Fixture, resultados y planteles vigentes de LIFI Cup."}</Text>
       </View>
       <View style={styles.metrics}>
         <Metric value={competition === "league" ? "9" : String(new Set(competitionMatches.map((match) => match.roundLabel ?? match.round)).size || "—")} label="fechas" />

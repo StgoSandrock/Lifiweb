@@ -16,7 +16,7 @@ export function SiteHeader({ competition, onNavigate }: { competition?: Competit
     ? { logo: LFF_LOGO_DATA_URL, name: "LFF", description: "Liga Femenina" }
     : competition === "cup"
       ? { logo: "/lifi-cup-logo.jpeg", name: "LIFI Cup", description: "Competencia LIFI" }
-      : { logo: "/lifi-logo.jpeg", name: "LIFI", description: "Liga Infantil de Fútbol Interestadios" };
+      : { logo: "/lifi-logo.jpeg", name: "LIFI", description: "Liga de Fútbol Infantil" };
   const navigate = (view: View) => { onNavigate?.(view); setOpen(false); };
   return (
     <header className="site-header">
