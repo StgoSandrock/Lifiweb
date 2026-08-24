@@ -119,4 +119,33 @@ describe("mergeMatchesWithFallback", () => {
     expect(players.filter((player) => player.name === "Jose Antonio Garreton Gorostegui")).toHaveLength(1);
     expect(players.find((player) => player.name === "Jose Antonio Garreton Gorostegui")?.goals).toBe(2);
   });
+
+  it("adds the latest LIF roster and removes a superseded registration", () => {
+    const players = mergePlayersWithOfficialStats([{
+      id: "old-lif-player",
+      name: "Amaro André Ávila Pizarro",
+      position: "Jugador",
+      club: "LIF",
+      category: "intermedia",
+      competition: "league",
+      goals: 0,
+      assists: 0,
+      appearances: 0,
+      yellowCards: 0,
+      redCards: 0,
+    }]);
+
+    expect(players.some((player) => player.name === "Amaro André Ávila Pizarro")).toBe(false);
+    expect(players.some((player) => player.name === "Fabio Alonzo Betancourt Vera" && player.club === "LIF")).toBe(true);
+    expect(players.some((player) => player.name === "Martín Enrique Cuevas Valderrama" && player.category === "pre-peque")).toBe(true);
+  });
+
+  it("publishes the four Infantil scorers from Palestino versus Manquehue", () => {
+    const players = mergePlayersWithOfficialStats([]);
+
+    expect(players.find((player) => player.name === "Matías Mohr")).toMatchObject({ club: "Club Palestino", goals: 1 });
+    expect(players.find((player) => player.name === "Tomás Ojeda")).toMatchObject({ club: "Club Manquehue", goals: 1 });
+    expect(players.find((player) => player.name === "Santiago Parada")).toMatchObject({ club: "Club Manquehue", goals: 1 });
+    expect(players.find((player) => player.name === "Clemente Vergara")).toMatchObject({ club: "Club Manquehue", goals: 1 });
+  });
 });

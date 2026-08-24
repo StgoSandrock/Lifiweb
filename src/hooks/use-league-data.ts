@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import fallbackFixtures from "@/data/league-fixtures.json";
 import { LFF_FIXTURES } from "@/data/lff-fixtures";
 import { OFFICIAL_PLAYER_STATS } from "@/data/official-player-stats";
+import { OFFICIAL_ROSTER_PLAYERS, REMOVED_ROSTER_PLAYERS } from "@/data/official-roster-updates";
 import { SEEDED_TEAM_PHOTOS } from "@/data/seed-team-photos";
 import { fromFirestorePlayer } from "@/lib/firebase/adapters";
 import { subscribeToLeagueData } from "@/lib/firebase/public-data";
@@ -73,7 +74,13 @@ function playerIdentity(player: Player) {
 }
 
 export function mergePlayersWithOfficialStats(livePlayers: Player[]) {
-  const merged = new Map(livePlayers.map((player) => [playerIdentity(player), player]));
+  const merged = new Map(livePlayers
+    .filter((player) => !REMOVED_ROSTER_PLAYERS.has(playerIdentity(player)))
+    .map((player) => [playerIdentity(player), player]));
+  for (const official of OFFICIAL_ROSTER_PLAYERS) {
+    const identity = playerIdentity(official);
+    if (!merged.has(identity)) merged.set(identity, official);
+  }
   for (const official of OFFICIAL_PLAYER_STATS) {
     const identity = playerIdentity(official);
     const live = merged.get(identity);
