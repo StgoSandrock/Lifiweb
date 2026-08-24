@@ -16,6 +16,8 @@ export const matchInputSchema = z.object({
   venue: optionalText,
   homeScore: z.number().int().min(0).max(99).nullable(),
   awayScore: z.number().int().min(0).max(99).nullable(),
+  homePenalties: z.number().int().min(0).max(99).nullable().optional(),
+  awayPenalties: z.number().int().min(0).max(99).nullable().optional(),
 }).superRefine((match, context) => {
   if (match.home === match.away) context.addIssue({ code: "custom", path: ["away"], message: "Local y visita deben ser distintos" });
   if (match.status === "played" && (match.homeScore === null || match.awayScore === null)) {
@@ -23,6 +25,12 @@ export const matchInputSchema = z.object({
   }
   if (match.status !== "played" && (match.homeScore !== null || match.awayScore !== null)) {
     context.addIssue({ code: "custom", path: ["homeScore"], message: "Un partido pendiente no debe tener marcador" });
+  }
+  const hasHomePenalties = match.homePenalties !== null && match.homePenalties !== undefined;
+  const hasAwayPenalties = match.awayPenalties !== null && match.awayPenalties !== undefined;
+  if (hasHomePenalties !== hasAwayPenalties) context.addIssue({ code: "custom", path: ["homePenalties"], message: "Ingresa ambos marcadores de penales" });
+  if ((hasHomePenalties || hasAwayPenalties) && (match.status !== "played" || match.homeScore !== match.awayScore)) {
+    context.addIssue({ code: "custom", path: ["homePenalties"], message: "Los penales solo corresponden a un empate jugado" });
   }
 });
 

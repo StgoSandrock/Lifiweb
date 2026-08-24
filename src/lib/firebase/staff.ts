@@ -62,6 +62,8 @@ export async function saveMatch(input: Match, user: User) {
     cancha: parsed.venue ?? "Por definir",
     golesL: parsed.homeScore,
     golesV: parsed.awayScore,
+    penalesL: parsed.homePenalties,
+    penalesV: parsed.awayPenalties,
     updatedAt: serverTimestamp(),
     updatedBy: user.uid,
   }, { merge: true });

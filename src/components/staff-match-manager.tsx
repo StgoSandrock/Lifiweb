@@ -24,6 +24,8 @@ function emptyMatch(competition: Competition, category: CategoryId, order: numbe
     away: "",
     homeScore: null,
     awayScore: null,
+    homePenalties: null,
+    awayPenalties: null,
     status: "scheduled",
     date: null,
     time: null,
@@ -125,7 +127,8 @@ function MatchForm({ match, clubs, user, disabled, notify, done, isNew = false }
     <div className="field"><label>Fecha</label><input type="date" value={draft.date ?? ""} onChange={(event) => set("date", event.target.value || null)} /></div>
     <div className="field"><label>Hora</label><input type="time" value={draft.time ?? ""} onChange={(event) => set("time", event.target.value || null)} /></div>
     <div className="field span-2"><label>Cancha</label><input value={draft.venue ?? ""} placeholder="Por definir" onChange={(event) => set("venue", event.target.value || null)} /></div>
-    <div className="field"><label>Estado</label><select value={draft.status} onChange={(event) => { const next = event.target.value as Match["status"]; setDraft((current) => ({ ...current, status: next, homeScore: next === "played" ? current.homeScore ?? 0 : null, awayScore: next === "played" ? current.awayScore ?? 0 : null })); }}><option value="scheduled">Programado</option><option value="played">Jugado</option><option value="postponed">Postergado</option><option value="cancelled">Cancelado</option></select></div>
+    <div className="field"><label>Estado</label><select value={draft.status} onChange={(event) => { const next = event.target.value as Match["status"]; setDraft((current) => ({ ...current, status: next, homeScore: next === "played" ? current.homeScore ?? 0 : null, awayScore: next === "played" ? current.awayScore ?? 0 : null, homePenalties: next === "played" ? current.homePenalties ?? null : null, awayPenalties: next === "played" ? current.awayPenalties ?? null : null })); }}><option value="scheduled">Programado</option><option value="played">Jugado</option><option value="postponed">Postergado</option><option value="cancelled">Cancelado</option></select></div>
     <div className="score-inputs"><div className="field"><label>Goles local</label><input type="number" min="0" max="99" disabled={draft.status !== "played"} value={draft.homeScore ?? ""} onChange={(event) => set("homeScore", event.target.value === "" ? null : Number(event.target.value))} /></div><div className="field"><label>Goles visita</label><input type="number" min="0" max="99" disabled={draft.status !== "played"} value={draft.awayScore ?? ""} onChange={(event) => set("awayScore", event.target.value === "" ? null : Number(event.target.value))} /></div></div>
+    <div className="score-inputs"><div className="field"><label>Penales local</label><input type="number" min="0" max="99" disabled={draft.status !== "played" || draft.homeScore !== draft.awayScore} value={draft.homePenalties ?? ""} onChange={(event) => set("homePenalties", event.target.value === "" ? null : Number(event.target.value))} /></div><div className="field"><label>Penales visita</label><input type="number" min="0" max="99" disabled={draft.status !== "played" || draft.homeScore !== draft.awayScore} value={draft.awayPenalties ?? ""} onChange={(event) => set("awayPenalties", event.target.value === "" ? null : Number(event.target.value))} /></div></div>
   </div><div className="form-actions"><button className="secondary-button" type="button" onClick={done}>Cancelar</button><button className="save-button" type="submit" disabled={disabled || saving}>{saving ? <LoaderCircle className="spin" /> : <Save />} {saving ? "Guardando…" : "Guardar"}</button></div></form>;
 }

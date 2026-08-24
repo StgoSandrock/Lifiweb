@@ -54,6 +54,8 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
     away,
     homeScore: nullableScore(raw.golesL ?? raw.homeScore, played),
     awayScore: nullableScore(raw.golesV ?? raw.awayScore, played),
+    homePenalties: nullableScore(raw.penalesL ?? raw.homePenalties, played),
+    awayPenalties: nullableScore(raw.penalesV ?? raw.awayPenalties, played),
     status: mappedStatus,
     date: nullableDetail(raw.fechaCompleta ?? raw.date),
     time: nullableDetail(raw.hora ?? raw.time),

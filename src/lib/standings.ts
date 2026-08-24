@@ -46,8 +46,13 @@ export function calculateStandings(matches: readonly Match[], clubs: readonly Cl
     } else {
       home.drawn += 1;
       away.drawn += 1;
-      home.points += 1;
-      away.points += 1;
+      if (match.homePenalties != null && match.awayPenalties != null && match.homePenalties !== match.awayPenalties) {
+        home.points += match.homePenalties > match.awayPenalties ? 2 : 1;
+        away.points += match.awayPenalties > match.homePenalties ? 2 : 1;
+      } else {
+        home.points += 1;
+        away.points += 1;
+      }
     }
     home.goalDifference = home.goalsFor - home.goalsAgainst;
     away.goalDifference = away.goalsFor - away.goalsAgainst;

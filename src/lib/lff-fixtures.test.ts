@@ -17,9 +17,11 @@ describe("fixture oficial LFF", () => {
       date: "Jueves 20 de agosto",
       time: "19:45 hrs",
       venue: "Palestino",
-      homeScore: null,
-      awayScore: null,
-      status: "scheduled",
+      homeScore: 0,
+      awayScore: 0,
+      homePenalties: 3,
+      awayPenalties: 2,
+      status: "played",
     });
     expect(LFF_FIXTURES[1]).toMatchObject({
       home: "Estadio Español",
@@ -29,8 +31,8 @@ describe("fixture oficial LFF", () => {
       venue: "Estadio Español",
     });
     expect(LFF_FIXTURES[2]).toMatchObject({
-      home: "Sport Academy",
-      away: "Stadio Italiano",
+      home: "Stadio Italiano",
+      away: "Sport Academy",
       date: "Miércoles 19 de agosto",
       time: "18:45 hrs",
       venue: "Stadio Italiano",
@@ -40,8 +42,8 @@ describe("fixture oficial LFF", () => {
       away: "Country Club A",
       date: "Miércoles 19 de agosto",
       time: "19:45 hrs",
-      venue: null,
+      venue: "Palestino",
     });
-    expect(LFF_FIXTURES.every((match) => match.homeScore === null && match.awayScore === null)).toBe(true);
+    expect(LFF_FIXTURES.filter((match) => match.round === 1 && match.status === "played")).toHaveLength(4);
   });
 });

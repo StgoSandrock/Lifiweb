@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { mergeMatchesWithFallback } from "./use-league-data";
+import { mergeMatchesWithFallback, mergePlayersWithOfficialStats } from "./use-league-data";
 import type { Match } from "@/types/domain";
 
 describe("mergeMatchesWithFallback", () => {
@@ -72,5 +72,49 @@ describe("mergeMatchesWithFallback", () => {
     const merged = mergeMatchesWithFallback(matches);
     expect(merged).toEqual(expect.arrayContaining(matches));
     expect(merged.filter((match) => matches.some(({ id }) => id === match.id))).toHaveLength(2);
+  });
+
+  it("preserves official penalty details when the live result omits them", () => {
+    const merged = mergeMatchesWithFallback([{
+      id: "live-palestino-a",
+      tournament: "clausura",
+      competition: "lff",
+      category: "superior",
+      round: 1,
+      order: 1,
+      home: "Club Palestino A",
+      away: "Country Club B",
+      homeScore: 0,
+      awayScore: 0,
+      status: "played",
+      date: null,
+      time: null,
+      venue: null,
+    }]);
+
+    expect(merged.find((match) => match.id === "live-palestino-a")).toMatchObject({
+      homePenalties: 3,
+      awayPenalties: 2,
+      date: "Jueves 20 de agosto",
+    });
+  });
+
+  it("keeps the highest official player totals without duplicating a live player", () => {
+    const players = mergePlayersWithOfficialStats([{
+      id: "live-garreton",
+      name: "Jose Antonio Garreton Gorostegui",
+      position: "Jugador",
+      club: "Club Manquehue",
+      category: "intermedia",
+      competition: "league",
+      goals: 1,
+      assists: 0,
+      appearances: 1,
+      yellowCards: 0,
+      redCards: 0,
+    }]);
+
+    expect(players.filter((player) => player.name === "Jose Antonio Garreton Gorostegui")).toHaveLength(1);
+    expect(players.find((player) => player.name === "Jose Antonio Garreton Gorostegui")?.goals).toBe(2);
   });
 });

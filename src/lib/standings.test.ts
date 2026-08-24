@@ -40,6 +40,15 @@ describe("calculateStandings", () => {
     expect(row(matches, "LIF")).toMatchObject({ played: 1, drawn: 1, points: 1 });
   });
 
+  it("otorga dos puntos al ganador por penales y uno al perdedor", () => {
+    const standings = calculateStandings([
+      match({ status: "played", homeScore: 0, awayScore: 0, homePenalties: 3, awayPenalties: 2 }),
+    ]);
+
+    expect(standings.find((row) => row.club.name === "Inter")).toMatchObject({ drawn: 1, points: 2 });
+    expect(standings.find((row) => row.club.name === "LIF")).toMatchObject({ drawn: 1, points: 1 });
+  });
+
   it("ignora un partido pendiente aunque tenga ceros accidentales", () => {
     const matches = [match({ status: "scheduled", homeScore: 0, awayScore: 0 })];
     expect(row(matches, "Inter")).toMatchObject({ played: 0, points: 0 });

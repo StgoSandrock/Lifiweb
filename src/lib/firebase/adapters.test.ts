@@ -25,4 +25,21 @@ describe("adaptador de partidos LIFI Cup", () => {
       status: "scheduled",
     });
   });
+
+  it("conserva una definición por penales", () => {
+    const match = fromFirestoreMatch("lff-1", {
+      competition: "lff",
+      category: "superior",
+      fecha: "Fecha 1",
+      local: "Club Palestino A",
+      visita: "Country Club B",
+      status: "played",
+      golesL: 0,
+      golesV: 0,
+      penalesL: 3,
+      penalesV: 2,
+    });
+
+    expect(match).toMatchObject({ homePenalties: 3, awayPenalties: 2 });
+  });
 });

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import fallbackFixtures from "@/data/league-fixtures.json";
 import { LFF_FIXTURES } from "@/data/lff-fixtures";
+import { OFFICIAL_PLAYER_STATS } from "@/data/official-player-stats";
 import { SEEDED_TEAM_PHOTOS } from "@/data/seed-team-photos";
 import { fromFirestorePlayer } from "@/lib/firebase/adapters";
 import { subscribeToLeagueData } from "@/lib/firebase/public-data";
@@ -29,6 +30,19 @@ function preferredLiveMatch(matches: Match[], fallbackId?: string) {
   })[0];
 }
 
+function withFallbackDetails(live: Match, fallback: Match): Match {
+  return {
+    ...fallback,
+    ...live,
+    date: live.date ?? fallback.date,
+    time: live.time ?? fallback.time,
+    venue: live.venue ?? fallback.venue,
+    homePenalties: live.homePenalties ?? fallback.homePenalties,
+    awayPenalties: live.awayPenalties ?? fallback.awayPenalties,
+    events: live.events?.length ? live.events : fallback.events,
+  };
+}
+
 export function mergeMatchesWithFallback(liveMatches: Match[]) {
   const liveByIdentity = new Map<string, Match[]>();
   for (const match of liveMatches) {
@@ -39,13 +53,36 @@ export function mergeMatchesWithFallback(liveMatches: Match[]) {
   const fallbackIdentities = new Set(fallbackMatches.map(matchIdentity));
   const merged = fallbackMatches.map((match) => {
     const liveMatchesForFixture = liveByIdentity.get(matchIdentity(match));
-    return liveMatchesForFixture?.length ? preferredLiveMatch(liveMatchesForFixture, match.id) : match;
+    return liveMatchesForFixture?.length
+      ? withFallbackDetails(preferredLiveMatch(liveMatchesForFixture, match.id), match)
+      : match;
   });
   const additional = [...liveByIdentity.entries()]
     .filter(([identity]) => !fallbackIdentities.has(identity))
     .map(([, matches]) => preferredLiveMatch(matches));
 
   return [...merged, ...additional];
+}
+
+function playerIdentity(player: Player) {
+  return [player.competition, player.category, normalizeClubName(player.club), player.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()].join("|");
+}
+
+export function mergePlayersWithOfficialStats(livePlayers: Player[]) {
+  const merged = new Map(livePlayers.map((player) => [playerIdentity(player), player]));
+  for (const official of OFFICIAL_PLAYER_STATS) {
+    const identity = playerIdentity(official);
+    const live = merged.get(identity);
+    merged.set(identity, live ? {
+      ...live,
+      goals: Math.max(live.goals, official.goals),
+      assists: Math.max(live.assists, official.assists),
+      appearances: Math.max(live.appearances, official.appearances),
+      yellowCards: Math.max(live.yellowCards, official.yellowCards),
+      redCards: Math.max(live.redCards, official.redCards),
+    } : official);
+  }
+  return [...merged.values()];
 }
 
 export function useLeagueData() {
@@ -62,7 +99,7 @@ export function useLeagueData() {
       setError(null);
     },
     players: (nextPlayers) => {
-      setPlayers(nextPlayers);
+      setPlayers(mergePlayersWithOfficialStats(nextPlayers));
       setStatus("live");
       setError(null);
     },
@@ -75,10 +112,10 @@ export function useLeagueData() {
     error: async () => {
       const fallbackPlayers = await import("@/data/legacy-players.json");
       setMatches(fallbackMatches);
-      setPlayers(fallbackPlayers.default.flatMap((player, index) => {
+      setPlayers(mergePlayersWithOfficialStats(fallbackPlayers.default.flatMap((player, index) => {
         const mapped = fromFirestorePlayer(String(player.id ?? `fallback-${index}`), player);
         return mapped ? [mapped] : [];
-      }));
+      })));
       setStatus("fallback");
       setError("No pudimos conectar con Firebase. Mostramos el último respaldo disponible.");
     },
