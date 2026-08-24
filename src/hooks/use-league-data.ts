@@ -31,14 +31,18 @@ function preferredLiveMatch(matches: Match[], fallbackId?: string) {
 }
 
 function withFallbackDetails(live: Match, fallback: Match): Match {
+  const hasOfficialResult = fallback.status === "played";
   return {
     ...fallback,
     ...live,
+    status: hasOfficialResult ? fallback.status : live.status,
+    homeScore: hasOfficialResult ? fallback.homeScore : live.homeScore,
+    awayScore: hasOfficialResult ? fallback.awayScore : live.awayScore,
     date: live.date ?? fallback.date,
     time: live.time ?? fallback.time,
     venue: live.venue ?? fallback.venue,
-    homePenalties: live.homePenalties ?? fallback.homePenalties,
-    awayPenalties: live.awayPenalties ?? fallback.awayPenalties,
+    homePenalties: fallback.homePenalties ?? live.homePenalties,
+    awayPenalties: fallback.awayPenalties ?? live.awayPenalties,
     events: live.events?.length ? live.events : fallback.events,
   };
 }

@@ -84,8 +84,8 @@ describe("mergeMatchesWithFallback", () => {
       order: 1,
       home: "Club Palestino A",
       away: "Country Club B",
-      homeScore: 0,
-      awayScore: 0,
+      homeScore: 4,
+      awayScore: 3,
       status: "played",
       date: null,
       time: null,
@@ -95,6 +95,8 @@ describe("mergeMatchesWithFallback", () => {
     expect(merged.find((match) => match.id === "live-palestino-a")).toMatchObject({
       homePenalties: 3,
       awayPenalties: 2,
+      homeScore: 0,
+      awayScore: 0,
       date: "Jueves 20 de agosto",
     });
   });
