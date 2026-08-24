@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   title: { default: "LIFI · Liga de Fútbol Infantil", template: "%s · LIFI" },
   description: "Fixture, posiciones, resultados y planteles oficiales del Torneo Clausura 2026 de LIFI.",
   applicationName: "LIFI",
-  keywords: ["LIFI", "fútbol infantil", "Liga Interestadios", "Clausura 2026", "Santiago"],
+  keywords: ["LIFI", "fútbol infantil", "Liga de Fútbol Infantil", "Clausura 2026", "Santiago"],
   openGraph: {
     title: "LIFI · Clausura 2026",
     description: "Fixture, posiciones y planteles oficiales de la Liga de Fútbol Infantil.",
