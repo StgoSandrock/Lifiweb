@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
+import { LFF_CLUBS } from "@/config/league";
 import { LFF_FIXTURES } from "@/data/lff-fixtures";
 import { groupMatchesByRound } from "@/lib/fixtures";
+import { calculateStandings } from "@/lib/standings";
 
 describe("fixture oficial LFF", () => {
   it("publica nueve fechas, nueve clubes y una sola categoría Superior", () => {
@@ -45,5 +47,40 @@ describe("fixture oficial LFF", () => {
       venue: "Palestino",
     });
     expect(LFF_FIXTURES.filter((match) => match.round === 1 && match.status === "played")).toHaveLength(4);
+  });
+
+  it("publica los resultados confirmados de la fecha 2 con penales y goleadoras", () => {
+    const countryEspanol = LFF_FIXTURES.find((match) => match.id === "lff-superior-r2-m1");
+    expect(countryEspanol).toMatchObject({
+      home: "Country Club B",
+      away: "Estadio Español",
+      homeScore: 1,
+      awayScore: 1,
+      homePenalties: 2,
+      awayPenalties: 1,
+      status: "played",
+      date: "Lunes 24 de agosto",
+    });
+    expect(countryEspanol?.events).toEqual(expect.arrayContaining([
+      expect.objectContaining({ team: "Country Club B", player: "García A." }),
+      expect.objectContaining({ team: "Estadio Español", player: "Baltra" }),
+    ]));
+
+    const manquehueItaliano = LFF_FIXTURES.find((match) => match.id === "lff-superior-r2-m2");
+    expect(manquehueItaliano).toMatchObject({
+      home: "Club Deportivo Manquehue",
+      away: "Stadio Italiano",
+      homeScore: 4,
+      awayScore: 3,
+      status: "played",
+      date: "Lunes 24 de agosto",
+    });
+    expect(manquehueItaliano?.events?.filter((event) => event.player === "Zach")).toHaveLength(2);
+    expect(manquehueItaliano?.events?.filter((event) => event.player === "Karmenic")).toHaveLength(2);
+    expect(LFF_FIXTURES.filter((match) => match.round === 2 && match.status === "played")).toHaveLength(2);
+
+    const standings = calculateStandings(LFF_FIXTURES, LFF_CLUBS);
+    expect(standings.find((standing) => standing.club.name === "Country Club B")?.points).toBe(3);
+    expect(standings.find((standing) => standing.club.name === "Estadio Español")?.points).toBe(4);
   });
 });

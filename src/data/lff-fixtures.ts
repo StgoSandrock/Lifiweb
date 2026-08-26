@@ -123,6 +123,37 @@ const MATCH_OVERRIDES: Record<
       { id: "countrya-riveros-1", type: "goal", team: "Country Club A", player: "Riveros" },
     ],
   },
+  "lff-superior-r2-m1": {
+    home: "Country Club B",
+    away: "Estadio Español",
+    homeScore: 1,
+    awayScore: 1,
+    homePenalties: 2,
+    awayPenalties: 1,
+    status: "played",
+    date: "Lunes 24 de agosto",
+    events: [
+      { id: "countryb-garcia-a-1", type: "goal", team: "Country Club B", player: "García A." },
+      { id: "esp-baltra-1", type: "goal", team: "Estadio Español", player: "Baltra" },
+    ],
+  },
+  "lff-superior-r2-m2": {
+    home: "Club Deportivo Manquehue",
+    away: "Stadio Italiano",
+    homeScore: 4,
+    awayScore: 3,
+    status: "played",
+    date: "Lunes 24 de agosto",
+    events: [
+      { id: "manquehue-sepulveda-1", type: "goal", team: "Club Deportivo Manquehue", player: "Sepúlveda" },
+      { id: "manquehue-martinez-1", type: "goal", team: "Club Deportivo Manquehue", player: "Martínez" },
+      { id: "manquehue-zach-1", type: "goal", team: "Club Deportivo Manquehue", player: "Zach" },
+      { id: "manquehue-zach-2", type: "goal", team: "Club Deportivo Manquehue", player: "Zach" },
+      { id: "italiano-ormeno-r2-1", type: "goal", team: "Stadio Italiano", player: "Ormeño" },
+      { id: "italiano-karmenic-1", type: "goal", team: "Stadio Italiano", player: "Karmenic" },
+      { id: "italiano-karmenic-2", type: "goal", team: "Stadio Italiano", player: "Karmenic" },
+    ],
+  },
 };
 
 export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex) =>
