@@ -20,6 +20,15 @@ export const SEEDED_TEAM_PHOTOS: TeamPhoto[] = [
     order: 1,
   },
   {
+    id: "seed-ultimate-mini-equipo-2026",
+    competition: "league",
+    category: "mini",
+    club: "Ultimate S.A.",
+    url: "/team-galleries/league/mini/ultimate/equipo-mini-2026.jpeg",
+    storagePath: "static/team-galleries/league/mini/ultimate/equipo-mini-2026.jpeg",
+    order: 1,
+  },
+  {
     id: "seed-manquehue-pre-peque-5044",
     competition: "league",
     category: "pre-peque",
