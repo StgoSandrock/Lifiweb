@@ -11,6 +11,7 @@ import { StandingsTable } from "@/components/standings-table";
 import { SiteHeader } from "@/components/site-header";
 import { TeamGallery } from "@/components/team-gallery";
 import { LffHistory } from "@/components/lff-history";
+import { LifiHistory } from "@/components/lifi-history";
 import { calculateStandings } from "@/lib/standings";
 import { foldText } from "@/lib/text";
 import { useLeagueData } from "@/hooks/use-league-data";
@@ -40,7 +41,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
   const roundCount = new Set(competitionMatches.filter((match) => !match.roundLabel).map((match) => match.round)).size;
   const categoryCount = new Set(competitionMatches.map((match) => match.category)).size;
   const copy = competition === "league"
-    ? { eyebrow: `Temporada ${SEASON} · Torneo Clausura`, title: "LIFI", accent: "Liga", name: "Liga LIFI", description: "Fixture, posiciones y planteles oficiales de la Liga de Fútbol Infantil.", label: "Liga · Clausura" }
+    ? { eyebrow: `Temporada ${SEASON} · Torneo Clausura`, title: "LIFI", accent: "Liga", name: "Liga LIFI", description: "Fixture, posiciones, planteles e historia oficial de la Liga de Fútbol Infantil.", label: "Liga · Clausura" }
     : competition === "cup"
       ? { eyebrow: "Competencia LIFI", title: "LIFI", accent: "Cup", name: "LIFI Cup", description: "Fixture, resultados y planteles disponibles de LIFI Cup, sin completar información que aún no haya sido publicada.", label: "LIFI Cup" }
       : { eyebrow: `Temporada ${SEASON} · Categoría Superior`, title: "LFF", accent: "Liga Femenina", name: "LFF", description: "Fixture, posiciones, historia, equipos y galerías oficiales de la categoría Superior.", label: "LFF · Superior" };
@@ -101,6 +102,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
           {view === "clubs" && <ClubRosters clubs={visibleClubs} players={filteredPlayers} photos={filteredPhotos} selectedClub={selectedClub} onSelect={setSelectedClub} />}
         </section>
 
+        {competition === "league" && <LifiHistory />}
         {competition === "lff" && <LffHistory />}
       </main>
       <footer className="site-footer"><div><ImageLogo /><p>Liga de Fútbol Infantil · Santiago de Chile</p></div><p>Temporada {SEASON} · Información oficial en actualización</p></footer>

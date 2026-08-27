@@ -32,7 +32,7 @@ export function SiteHeader({ competition, onNavigate }: { competition?: Competit
         {competition && <div className="header-competition-switch" aria-label="Cambiar competencia"><Link className={competition === "league" ? "active" : ""} href="/liga">Liga</Link><Link className={competition === "cup" ? "active" : ""} href="/lifi-cup">Cup</Link><Link className={competition === "lff" ? "active" : ""} href="/lff">LFF</Link></div>}
         <a href={`${basePath}#posiciones`} onClick={() => navigate("standings")}>Posiciones</a>
         <a href={`${basePath}#fixture`} onClick={() => navigate("fixture")}>Fixture</a>
-        {competition === "lff" && <a href={`${basePath}#historia`} onClick={() => setOpen(false)}>Historia</a>}
+        {competition && competition !== "cup" && <a href={`${basePath}#historia`} onClick={() => setOpen(false)}>Historia</a>}
         <a href={`${basePath}#clubes`} onClick={() => navigate("clubs")}>{competition === "lff" ? "Equipos" : "Clubes"}</a>
         <Link className="staff-link" href="/staff"><ShieldCheck size={17} /> Staff</Link>
       </nav>
