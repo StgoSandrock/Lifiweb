@@ -48,7 +48,7 @@ export function LifiHistory() {
       <div className="lifi-history-shell">
         <header className="lifi-history-heading">
           <p>Historia de LIFI</p>
-          <h2 id="lifi-history-title">Formando jugadores desde 1985</h2>
+          <h2 id="lifi-history-title">Nuestra Liga de Fútbol Infantil: más de 41 años de trayectoria y sana competencia</h2>
           <div className="lifi-history-heading-meta" aria-label="Datos principales de LIFI">
             <span>41 años de trayectoria</span>
             <span>Cinco categorías</span>
