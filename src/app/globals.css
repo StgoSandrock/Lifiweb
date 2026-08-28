@@ -135,8 +135,8 @@ button { color: inherit; }
 .lifi-history-timeline article > p:last-child { margin: 13px 0 0; color: #5b6878; font-size: 12px; line-height: 1.65; }
 
 .lifi-history-gallery { display: grid; grid-template-columns: .75fr 1.25fr; gap: 16px; align-items: start; margin-top: 100px; }
-.lifi-history-gallery figure { position: relative; min-height: 0; overflow: hidden; margin: 0; background: #d8d7d2; }\n.lifi-history-gallery figure:first-child { aspect-ratio: 968 / 1163; }
-.lifi-history-gallery figure:last-child { min-height: 0; aspect-ratio: 1170 / 1043; margin-top: 54px; }
+.lifi-history-gallery figure { position: relative; min-height: 0; overflow: hidden; margin: 0; background: #d8d7d2; }
+.lifi-history-gallery figure:first-of-type { min-height: 0; aspect-ratio: 968 / 1163; }\n.lifi-history-gallery figure:last-child { min-height: 0; aspect-ratio: 1170 / 1043; margin-top: 54px; }
 
 .lifi-history-legacy { max-width: 920px; margin: 92px auto 0; padding-top: 48px; border-top: 1px solid #cbd1d7; text-align: center; }
 .lifi-history-legacy-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; margin-top: 42px; text-align: left; }
