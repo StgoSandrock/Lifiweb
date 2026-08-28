@@ -106,18 +106,18 @@ button { color: inherit; }
 .lifi-history-shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
 .lifi-history-heading { max-width: 900px; margin-bottom: 52px; }
 .lifi-history-heading > p, .lifi-history-label { margin: 0 0 13px; color: var(--blue-600); font-size: 11px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; }
-.lifi-history-heading h2 { max-width: 820px; margin: 0; color: var(--navy-950); font-family: Georgia, "Times New Roman", serif; font-size: clamp(48px, 7.2vw, 88px); font-weight: 500; line-height: .96; letter-spacing: -.055em; }
+.lifi-history-heading h2 { max-width: 860px; margin: 0; color: var(--navy-950); font-size: clamp(42px, 5.6vw, 70px); font-weight: 800; line-height: 1.04; letter-spacing: -.035em; }
 .lifi-history-heading-meta { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 28px; padding-top: 18px; border-top: 1px solid #cbd1d7; color: #526174; font-size: 12px; font-weight: 750; }
 .lifi-history-heading-meta span + span::before { content: "·"; margin-right: 28px; color: var(--yellow); }
 
 .lifi-history-introduction { display: grid; grid-template-columns: minmax(0, 1.32fr) minmax(280px, .68fr); gap: clamp(34px, 6vw, 74px); align-items: end; }
-.lifi-history-lead-image { position: relative; min-height: 620px; overflow: hidden; margin: 0; background: #d8d7d2; }
+.lifi-history-lead-image { position: relative; min-height: 0; aspect-ratio: 933 / 961; overflow: hidden; margin: 0; background: #d8d7d2; }
 .lifi-history-lead-image::after, .lifi-history-gallery figure::after { content: ""; position: absolute; inset: auto 0 0; height: 34%; background: linear-gradient(transparent, rgba(5,19,38,.72)); pointer-events: none; }
-.lifi-history-lead-image img, .lifi-history-gallery img { object-fit: cover; }
+.lifi-history-lead-image img, .lifi-history-gallery img { object-fit: contain; }
 .lifi-history-lead-image figcaption, .lifi-history-gallery figcaption { position: absolute; z-index: 1; right: 18px; bottom: 16px; left: 18px; color: #fff; font-size: 11px; line-height: 1.45; }
 .lifi-history-intro-copy { padding-bottom: 10px; }
-.lifi-history-year { margin: 0 0 16px; color: #9a7300; font-family: Georgia, "Times New Roman", serif; font-size: 54px; line-height: 1; }
-.lifi-history-intro-copy h3, .lifi-history-founders-copy h3, .lifi-history-legacy h3 { margin: 0; color: var(--navy-950); font-family: Georgia, "Times New Roman", serif; font-size: clamp(30px, 4vw, 47px); font-weight: 500; line-height: 1.08; letter-spacing: -.035em; }
+.lifi-history-year { margin: 0 0 16px; color: #9a7300; font-size: 48px; font-weight: 800; line-height: 1; letter-spacing: -.03em; }
+.lifi-history-intro-copy h3, .lifi-history-founders-copy h3, .lifi-history-legacy h3 { margin: 0; color: var(--navy-950); font-size: clamp(29px, 3.4vw, 42px); font-weight: 800; line-height: 1.12; letter-spacing: -.025em; }
 .lifi-history-intro-copy > p:not(.lifi-history-year), .lifi-history-founders-copy > p:last-child { margin: 20px 0 0; color: #46576b; font-size: 15px; line-height: 1.78; }
 
 .lifi-history-founders { display: grid; grid-template-columns: minmax(260px, .72fr) minmax(0, 1.28fr); gap: clamp(48px, 8vw, 104px); margin-top: 102px; padding: 68px 0; border-top: 1px solid #cbd1d7; border-bottom: 1px solid #cbd1d7; }
@@ -135,8 +135,8 @@ button { color: inherit; }
 .lifi-history-timeline article > p:last-child { margin: 13px 0 0; color: #5b6878; font-size: 12px; line-height: 1.65; }
 
 .lifi-history-gallery { display: grid; grid-template-columns: 1.35fr .65fr; gap: 16px; margin-top: 100px; }
-.lifi-history-gallery figure { position: relative; min-height: 480px; overflow: hidden; margin: 0; background: #d8d7d2; }
-.lifi-history-gallery figure:last-child { min-height: 390px; margin-top: 90px; }
+.lifi-history-gallery figure { position: relative; min-height: 0; overflow: hidden; margin: 0; background: #d8d7d2; }\n.lifi-history-gallery figure:first-child { aspect-ratio: 968 / 1163; }
+.lifi-history-gallery figure:last-child { min-height: 0; aspect-ratio: 1170 / 1043; margin-top: 72px; }
 
 .lifi-history-legacy { max-width: 920px; margin: 92px auto 0; padding-top: 48px; border-top: 1px solid #cbd1d7; text-align: center; }
 .lifi-history-legacy-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 70px; margin-top: 42px; text-align: left; }
@@ -422,7 +422,7 @@ button { color: inherit; }
   .lff-history { grid-template-columns: 1fr; }
   .lff-history-image { min-height: 430px; }
   .lifi-history-introduction { grid-template-columns: 1fr; align-items: start; }
-  .lifi-history-lead-image { min-height: 600px; }
+  .lifi-history-lead-image { min-height: 0; }
   .lifi-history-intro-copy { max-width: 700px; }
   .lifi-history-founders { grid-template-columns: 1fr; }
   .lifi-history-founders-copy > p:last-child { max-width: 650px; }
@@ -458,7 +458,7 @@ button { color: inherit; }
   .lifi-history-heading { margin-bottom: 38px; }
   .lifi-history-heading-meta { gap: 8px 0; flex-direction: column; }
   .lifi-history-heading-meta span + span::before { content: none; }
-  .lifi-history-lead-image { min-height: 470px; }
+  .lifi-history-lead-image { min-height: 0; }
   .lifi-history-founders { margin-top: 74px; padding: 48px 0; }
   .lifi-history-founders-lists { grid-template-columns: 1fr; gap: 34px; }
   .lifi-history-founders-lists h4 { min-height: 0; }
@@ -466,8 +466,8 @@ button { color: inherit; }
   .lifi-history-timeline article { padding: 0 0 38px 26px; }
   .lifi-history-timeline article::before { top: 3px; left: -7px; }
   .lifi-history-gallery { grid-template-columns: 1fr; margin-top: 58px; }
-  .lifi-history-gallery figure { min-height: 430px; }
-  .lifi-history-gallery figure:last-child { min-height: 330px; margin-top: 0; }
+  .lifi-history-gallery figure { min-height: 0; }
+  .lifi-history-gallery figure:last-child { min-height: 0; margin-top: 0; }
   .lifi-history-legacy { margin-top: 68px; text-align: left; }
   .lifi-history-legacy-columns { grid-template-columns: 1fr; gap: 32px; }
   .lobby-news-card { grid-template-columns: 1fr; }
@@ -521,11 +521,11 @@ button { color: inherit; }
   .competition-card-copy strong { font-size: 29px; }
   .competition-card-copy small { font-size: 11px; }
   .last-visit { top: 10px; right: 10px; }
-  .lifi-history-lead-image { min-height: 340px; }
-  .lifi-history-heading h2 { font-size: 45px; }
+  .lifi-history-lead-image { min-height: 0; }
+  .lifi-history-heading h2 { font-size: 36px; line-height: 1.1; }
   .lifi-history-year { font-size: 44px; }
-  .lifi-history-gallery figure { min-height: 360px; }
-  .lifi-history-gallery figure:last-child { min-height: 300px; }
+  .lifi-history-gallery figure { min-height: 0; }
+  .lifi-history-gallery figure:last-child { min-height: 0; }
   .hero { padding: 48px 20px; }
   .hero h1 { font-size: 44px; }
   .hero-copy > p:not(.eyebrow) { font-size: 15px; margin: 22px 0 28px; }
