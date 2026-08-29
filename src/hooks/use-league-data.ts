@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import fallbackFixtures from "@/data/league-fixtures.json";
 import { LFF_FIXTURES } from "@/data/lff-fixtures";
+import { CUP_FIXTURES } from "@/data/cup-fixtures";
 import { OFFICIAL_PLAYER_STATS } from "@/data/official-player-stats";
 import { OFFICIAL_ROSTER_PLAYERS, REMOVED_ROSTER_PLAYERS } from "@/data/official-roster-updates";
 import { SEEDED_TEAM_PHOTOS } from "@/data/seed-team-photos";
@@ -11,7 +12,7 @@ import { subscribeToLeagueData } from "@/lib/firebase/public-data";
 import { normalizeClubName } from "@/lib/text";
 import type { Match, Player, TeamPhoto } from "@/types/domain";
 
-const fallbackMatches = [...(fallbackFixtures as Match[]), ...LFF_FIXTURES];
+const fallbackMatches = [...(fallbackFixtures as Match[]), ...CUP_FIXTURES, ...LFF_FIXTURES];
 
 function matchIdentity(match: Match) {
   return [
@@ -63,7 +64,10 @@ export function mergeMatchesWithFallback(liveMatches: Match[]) {
       : match;
   });
   const additional = [...liveByIdentity.entries()]
-    .filter(([identity]) => !fallbackIdentities.has(identity))
+    .filter(([identity, matches]) =>
+      !fallbackIdentities.has(identity)
+      && preferredLiveMatch(matches).competition !== "cup"
+    )
     .map(([, matches]) => preferredLiveMatch(matches));
 
   return [...merged, ...additional];

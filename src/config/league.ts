@@ -11,6 +11,8 @@ export const CATEGORIES: readonly Category[] = [
   { id: "intermedia", name: "Intermedia", birthYears: "2009–2010" },
 ] as const;
 
+export const CUP_CATEGORIES: readonly Category[] = CATEGORIES.filter((category) => category.id !== "intermedia");
+
 export const LFF_CATEGORIES: readonly Category[] = [
   { id: "superior", name: "Superior", birthYears: "Categoría única" },
 ] as const;
@@ -45,7 +47,9 @@ export function clubsForCompetition(competition: import("../types/domain").Compe
 }
 
 export function categoriesForCompetition(competition: import("../types/domain").Competition) {
-  return competition === "lff" ? LFF_CATEGORIES : CATEGORIES;
+  if (competition === "lff") return LFF_CATEGORIES;
+  if (competition === "cup") return CUP_CATEGORIES;
+  return CATEGORIES;
 }
 
 export const CATEGORY_IDS = [...CATEGORIES, ...LFF_CATEGORIES].map((category) => category.id) as CategoryId[];
