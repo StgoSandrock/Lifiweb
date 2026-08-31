@@ -2,6 +2,15 @@ import type { TeamPhoto } from "@/types/domain";
 
 export const SEEDED_TEAM_PHOTOS: TeamPhoto[] = [
   {
+    id: "seed-israelita-infantil-equipo-2026",
+    competition: "league",
+    category: "infantil",
+    club: "Estadio Israelita",
+    url: "/team-galleries/league/infantil/israelita/equipo-infantil-2026.jpeg",
+    storagePath: "static/team-galleries/league/infantil/israelita/equipo-infantil-2026.jpeg",
+    order: 1,
+  },
+  {
     id: "seed-inter-intermedia-5038",
     competition: "league",
     category: "intermedia",
