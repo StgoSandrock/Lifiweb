@@ -35,6 +35,7 @@ export const CUP_CLUBS: readonly Club[] = [
   { id: "uss", name: "USS", aliases: ["Universidad San Sebastián", "Universidad San Sebastian"], logo: "/clubs/uss.jpeg" },
   { id: "diablos-rojos", name: "D Rojos", aliases: ["Diablos Rojos", "D. Rojos"], logo: "/clubs/diablos-rojos.jpeg" },
   { id: "alumni", name: "Alumni", aliases: ["Club Deportivo Alumni"], logo: "/clubs/alumni.jpeg" },
+  { id: "country-club-cup", name: "C Club", aliases: ["Country Club"], logo: "/clubs/country-club.png" },
 ] as const;
 
 export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>> = {
