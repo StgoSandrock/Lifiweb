@@ -13,6 +13,7 @@ const assets = {
   ultimate: require("../../assets/clubs/ultimate.png"),
   croata: require("../../assets/clubs/croata.avif"),
   inter: require("../../assets/clubs/inter.png"),
+  "futuro-albo": require("../../assets/clubs/futuro-albo.jpeg"),
 } as const;
 
 export function ClubCrest({ clubId, clubName, size = 42 }: { clubId?: string; clubName: string; size?: number }) {

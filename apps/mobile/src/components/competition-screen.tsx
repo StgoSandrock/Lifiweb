@@ -1,6 +1,6 @@
-import { categoriesForCompetition, CLUBS, SEASON } from "@shared/config/league";
+import { categoriesForCompetition, CLUBS, CUP_CLUBS_BY_CATEGORY, SEASON } from "@shared/config/league";
 import { calculateStandings } from "@shared/lib/standings";
-import { foldText } from "@shared/lib/text";
+import { foldText, getClub } from "@shared/lib/text";
 import type { CategoryId, Club, Competition } from "@shared/types/domain";
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
@@ -34,9 +34,13 @@ export function CompetitionScreen({ competition }: { competition: Competition })
   const competitionMatches = useMemo(() => matches.filter((match) => match.competition === competition), [matches, competition]);
   const clubs = useMemo<readonly Club[]>(() => {
     if (competition === "league") return CLUBS;
-    const names = [...new Set([...filteredMatches.flatMap((match) => [match.home, match.away]), ...filteredPlayers.map((player) => player.club)])].sort((a, b) => a.localeCompare(b, "es"));
-    return names.map((name) => CLUBS.find((club) => club.name === name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
-  }, [competition, filteredMatches, filteredPlayers]);
+    const names = [...new Set([
+      ...filteredMatches.flatMap((match) => [match.home, match.away]),
+      ...filteredPlayers.map((player) => player.club),
+      ...(CUP_CLUBS_BY_CATEGORY[category] ?? []).map((club) => club.name),
+    ])].sort((a, b) => a.localeCompare(b, "es"));
+    return names.map((name) => getClub(name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
+  }, [category, competition, filteredMatches, filteredPlayers]);
   const standings = useMemo(() => calculateStandings(filteredMatches, clubs), [filteredMatches, clubs]);
   const categories = categoriesForCompetition(competition);
   const categoryInfo = categories.find((item) => item.id === category);

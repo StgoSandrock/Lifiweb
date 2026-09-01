@@ -154,6 +154,26 @@ const MATCH_OVERRIDES: Record<
       { id: "italiano-karmenic-2", type: "goal", team: "Stadio Italiano", player: "Karmenic" },
     ],
   },
+  "lff-superior-r3-m3": {
+    home: "Club Deportivo Manquehue",
+    away: "Club Palestino A",
+    homeScore: 3,
+    awayScore: 1,
+    status: "played",
+    events: [],
+  },
+  "lff-superior-r3-m4": {
+    home: "Country Club A",
+    away: "Estadio Español",
+    homeScore: 3,
+    awayScore: 0,
+    status: "played",
+    events: [
+      { id: "countrya-fontecilla-r3-1", type: "goal", team: "Country Club A", player: "Fontecilla" },
+      { id: "countrya-briones-r3-1", type: "goal", team: "Country Club A", player: "Briones" },
+      { id: "countrya-briones-r3-2", type: "goal", team: "Country Club A", player: "Briones" },
+    ],
+  },
 };
 
 export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex) =>

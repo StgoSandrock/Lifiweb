@@ -30,6 +30,14 @@ export const CLUBS: readonly Club[] = [
   { id: "inter", name: "Inter", aliases: [], logo: "/clubs/inter.svg" },
 ] as const;
 
+export const CUP_CLUBS: readonly Club[] = [
+  { id: "futuro-albo", name: "Futuro Albo", aliases: ["F Albo", "F. Albo"], logo: "/clubs/futuro-albo.jpeg" },
+] as const;
+
+export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>> = {
+  mini: CUP_CLUBS,
+};
+
 export const LFF_CLUBS: readonly Club[] = [
   { id: "lff-palestino-a", name: "Club Palestino A", aliases: [], logo: "/clubs/palestino.svg" },
   { id: "lff-palestino-b", name: "Club Palestino B", aliases: [], logo: "/clubs/palestino.svg" },

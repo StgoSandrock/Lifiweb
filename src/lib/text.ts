@@ -1,4 +1,4 @@
-import { CLUBS, LFF_CLUBS } from "../config/league";
+import { CLUBS, CUP_CLUBS, LFF_CLUBS } from "../config/league";
 
 export function foldText(value = "") {
   return String(value)
@@ -10,7 +10,7 @@ export function foldText(value = "") {
 }
 
 const clubNames = new Map(
-  [...CLUBS, ...LFF_CLUBS].flatMap((club) => [club.name, ...club.aliases].map((name) => [foldText(name), club.name] as const)),
+  [...CLUBS, ...CUP_CLUBS, ...LFF_CLUBS].flatMap((club) => [club.name, ...club.aliases].map((name) => [foldText(name), club.name] as const)),
 );
 
 export function normalizeClubName(value = "") {
@@ -19,5 +19,5 @@ export function normalizeClubName(value = "") {
 
 export function getClub(value: string) {
   const name = normalizeClubName(value);
-  return [...CLUBS, ...LFF_CLUBS].find((club) => club.name === name);
+  return [...CLUBS, ...CUP_CLUBS, ...LFF_CLUBS].find((club) => club.name === name);
 }

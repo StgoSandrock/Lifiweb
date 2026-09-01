@@ -1,4 +1,4 @@
-import { CATEGORIES, CLUBS } from "@shared/config/league";
+import { CATEGORIES, CLUBS, CUP_CLUBS } from "@shared/config/league";
 import { foldText } from "@shared/lib/text";
 import type { CategoryId, Competition } from "@shared/types/domain";
 import { Ionicons } from "@expo/vector-icons";
@@ -22,7 +22,7 @@ export default function ClubScreen() {
     ...players.filter((player) => player.competition === competition).map((player) => player.club),
     ...matches.filter((match) => match.competition === competition).flatMap((match) => [match.home, match.away]),
   ])], [players, matches, competition]);
-  const canonical = CLUBS.find((club) => club.id === params.clubId);
+  const canonical = [...CLUBS, ...CUP_CLUBS].find((club) => club.id === params.clubId);
   const clubName = canonical?.name ?? names.find((name) => `cup-${foldText(name).replace(/\s+/g, "-")}` === params.clubId) ?? "Club";
   const roster = players.filter((player) => player.competition === competition && player.category === category && player.club === clubName).sort((a, b) => a.name.localeCompare(b.name, "es"));
   const categoryName = CATEGORIES.find((item) => item.id === category)?.name;
