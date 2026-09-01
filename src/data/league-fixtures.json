@@ -155,9 +155,9 @@
     "homeScore": 8,
     "awayScore": 0,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 4 de septiembre de 2026",
+    "venue": "San Carlos",
+    "time": "17:30"
   },
   {
     "id": "clausura-pre-peque-f3-p1",
@@ -875,9 +875,9 @@
     "homeScore": 9,
     "awayScore": 0,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 4 de septiembre de 2026",
+    "venue": "Chicureo",
+    "time": "17:45"
   },
   {
     "id": "clausura-peque-f3-p1",
@@ -1595,9 +1595,9 @@
     "homeScore": 8,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 4 de septiembre de 2026",
+    "venue": "Chicureo",
+    "time": "18:45"
   },
   {
     "id": "clausura-mini-f3-p1",
@@ -2315,9 +2315,9 @@
     "homeScore": 5,
     "awayScore": 0,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 4 de septiembre de 2026",
+    "venue": "Chicureo",
+    "time": "18:45"
   },
   {
     "id": "clausura-infantil-f3-p1",
@@ -3035,9 +3035,9 @@
     "homeScore": 7,
     "awayScore": 0,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 4 de septiembre de 2026",
+    "venue": "San Carlos",
+    "time": "18:30"
   },
   {
     "id": "clausura-intermedia-f3-p1",
