@@ -177,6 +177,7 @@ button { color: inherit; }
 .mark-shell { width: 52px; height: 52px; border: 1px solid var(--line); background: #fff; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; padding: 5px; flex: 0 0 auto; }
 .mark-shell.large { width: 88px; height: 88px; border-radius: 22px; padding: 8px; }
 .club-logo { max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+.club-logo--crop { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; object-position: center 66%; }
 .club-fallback { font-size: 12px; font-weight: 900; text-transform: uppercase; }
 .standings-table .points { color: var(--navy-950); font-size: 18px; font-weight: 900; background: var(--yellow-soft); }
 .scorers { background: var(--navy-900); color: #fff; border-radius: var(--radius); padding: 26px; position: sticky; top: 104px; }

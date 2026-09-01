@@ -25,17 +25,20 @@ export const CLUBS: readonly Club[] = [
   { id: "bianconero", name: "Bianconero", aliases: [], logo: "/clubs/bianconero.svg" },
   { id: "italiano", name: "Stadio Italiano", aliases: ["Stadio", "Italiano"], logo: "/clubs/italiano.svg" },
   { id: "lif", name: "LIF", aliases: ["L.I.F."], logo: "/clubs/lif.svg" },
-  { id: "ultimate", name: "Ultimate S.A.", aliases: ["Ultimate S.A", "Ultimate"], logo: "/clubs/ultimate.svg" },
+  { id: "ultimate", name: "Ultimate S.A.", aliases: ["Ultimate S.A", "Ultimate", "Ultimate Sports Academy"], logo: "/clubs/ultimate-sports-academy.jpeg" },
   { id: "croata", name: "Estadio Croata", aliases: ["Croata"], logo: "/clubs/croata.svg" },
   { id: "inter", name: "Inter", aliases: [], logo: "/clubs/inter.svg" },
 ] as const;
 
 export const CUP_CLUBS: readonly Club[] = [
   { id: "futuro-albo", name: "Futuro Albo", aliases: ["F Albo", "F. Albo"], logo: "/clubs/futuro-albo.jpeg" },
+  { id: "uss", name: "USS", aliases: ["Universidad San Sebastián", "Universidad San Sebastian"], logo: "/clubs/uss.jpeg" },
+  { id: "diablos-rojos", name: "D Rojos", aliases: ["Diablos Rojos", "D. Rojos"], logo: "/clubs/diablos-rojos.jpeg" },
+  { id: "alumni", name: "Alumni", aliases: ["Club Deportivo Alumni"], logo: "/clubs/alumni.jpeg" },
 ] as const;
 
 export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>> = {
-  mini: CUP_CLUBS,
+  mini: CUP_CLUBS.filter((club) => club.id === "futuro-albo"),
 };
 
 export const LFF_CLUBS: readonly Club[] = [
