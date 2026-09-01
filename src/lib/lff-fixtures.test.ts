@@ -83,4 +83,26 @@ describe("fixture oficial LFF", () => {
     expect(standings.find((standing) => standing.club.name === "Country Club B")?.points).toBe(3);
     expect(standings.find((standing) => standing.club.name === "Estadio Español")?.points).toBe(4);
   });
+
+  it("publica los resultados confirmados de la fecha 3", () => {
+    const manquehuePalestino = LFF_FIXTURES.find((match) => match.id === "lff-superior-r3-m3");
+    expect(manquehuePalestino).toMatchObject({
+      home: "Club Deportivo Manquehue",
+      away: "Club Palestino A",
+      homeScore: 3,
+      awayScore: 1,
+      status: "played",
+    });
+
+    const countryEspanol = LFF_FIXTURES.find((match) => match.id === "lff-superior-r3-m4");
+    expect(countryEspanol).toMatchObject({
+      home: "Country Club A",
+      away: "Estadio Español",
+      homeScore: 3,
+      awayScore: 0,
+      status: "played",
+    });
+    expect(countryEspanol?.events?.filter((event) => event.player === "Fontecilla")).toHaveLength(1);
+    expect(countryEspanol?.events?.filter((event) => event.player === "Briones")).toHaveLength(2);
+  });
 });

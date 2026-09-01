@@ -4,7 +4,7 @@ import { ArrowRight, BarChart3, CalendarRange, ChevronLeft, CircleAlert, LoaderC
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
-import { categoriesForCompetition, CLUBS, LFF_CLUBS, SEASON } from "@/config/league";
+import { categoriesForCompetition, CLUBS, CUP_CLUBS_BY_CATEGORY, LFF_CLUBS, SEASON } from "@/config/league";
 import { FixtureList } from "@/components/fixture-list";
 import { ClubMark } from "@/components/club-mark";
 import { StandingsTable } from "@/components/standings-table";
@@ -13,7 +13,7 @@ import { TeamGallery } from "@/components/team-gallery";
 import { LffHistory } from "@/components/lff-history";
 import { LifiHistory } from "@/components/lifi-history";
 import { calculateStandings } from "@/lib/standings";
-import { foldText } from "@/lib/text";
+import { foldText, getClub } from "@/lib/text";
 import { useLeagueData } from "@/hooks/use-league-data";
 import type { CategoryId, Club, Competition } from "@/types/domain";
 import { LFF_LOGO_DATA_URL } from "@/config/lff-logo";
@@ -32,9 +32,13 @@ export function LeagueApp({ competition }: { competition: Competition }) {
   const visibleClubs = useMemo(() => {
     if (competition === "league") return CLUBS;
     if (competition === "lff") return LFF_CLUBS;
-    const names = [...new Set([...filteredMatches.flatMap((match) => [match.home, match.away]), ...filteredPlayers.map((player) => player.club)])].sort((a, b) => a.localeCompare(b, "es"));
-    return names.map((name) => CLUBS.find((club) => club.name === name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
-  }, [competition, filteredMatches, filteredPlayers]);
+    const names = [...new Set([
+      ...filteredMatches.flatMap((match) => [match.home, match.away]),
+      ...filteredPlayers.map((player) => player.club),
+      ...(CUP_CLUBS_BY_CATEGORY[category] ?? []).map((club) => club.name),
+    ])].sort((a, b) => a.localeCompare(b, "es"));
+    return names.map((name) => getClub(name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
+  }, [category, competition, filteredMatches, filteredPlayers]);
   const standings = useMemo(() => calculateStandings(filteredMatches, visibleClubs), [filteredMatches, visibleClubs]);
   const scorers = useMemo(() => [...filteredPlayers].filter((player) => player.goals > 0).sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name, "es")).slice(0, 5), [filteredPlayers]);
   const competitionMatches = useMemo(() => matches.filter((match) => match.competition === competition), [matches, competition]);
