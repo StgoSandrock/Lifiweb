@@ -2184,9 +2184,9 @@
     "order": 2,
     "home": "Club Palestino",
     "away": "Club Manquehue",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
+    "homeScore": 1,
+    "awayScore": 4,
+    "status": "played",
     "date": null,
     "venue": null,
     "time": null
