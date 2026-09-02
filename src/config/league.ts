@@ -18,7 +18,7 @@ export const LFF_CATEGORIES: readonly Category[] = [
 ] as const;
 
 export const CLUBS: readonly Club[] = [
-  { id: "israelita", name: "Estadio Israelita", aliases: ["Israelita"], logo: "/clubs/israelita.svg" },
+  { id: "israelita", name: "Estadio Israelita", aliases: ["Israelita"], logo: "/clubs/israelita-maccabi.jpeg" },
   { id: "espanol", name: "Estadio Español", aliases: ["Estadio Espanol", "Español"], logo: "/clubs/espanol.svg" },
   { id: "manquehue", name: "Club Manquehue", aliases: ["Manquehue"], logo: "/clubs/manquehue.svg" },
   { id: "palestino", name: "Club Palestino", aliases: ["Palestino"], logo: "/clubs/palestino.svg" },
@@ -36,6 +36,7 @@ export const CUP_CLUBS: readonly Club[] = [
   { id: "diablos-rojos", name: "D Rojos", aliases: ["Diablos Rojos", "D. Rojos"], logo: "/clubs/diablos-rojos.jpeg" },
   { id: "alumni", name: "Alumni", aliases: ["Club Deportivo Alumni"], logo: "/clubs/alumni.jpeg" },
   { id: "country-club-cup", name: "C Club", aliases: ["Country Club"], logo: "/clubs/country-club.png" },
+  { id: "barnechea-cup", name: "Barnechea", aliases: [], logo: "/clubs/barnechea.jpeg" },
 ] as const;
 
 export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>> = {
