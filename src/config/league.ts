@@ -52,7 +52,7 @@ export const LFF_CLUBS: readonly Club[] = [
   { id: "lff-stadio-italiano", name: "Stadio Italiano", aliases: [], logo: "/clubs/italiano.svg" },
   { id: "lff-country-club-a", name: "Country Club A", aliases: [], logo: "/clubs/country-club.png" },
   { id: "lff-country-club-b", name: "Country Club B", aliases: [], logo: "/clubs/country-club.png" },
-  { id: "lff-sport-academy", name: "Sport Academy", aliases: [], logo: "" },
+  { id: "lff-sport-academy", name: "Sport Academy", aliases: [], logo: "/clubs/sport-academy.jpeg" },
 ] as const;
 
 export function clubsForCompetition(competition: import("../types/domain").Competition) {
