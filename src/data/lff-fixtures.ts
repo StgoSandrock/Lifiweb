@@ -223,7 +223,6 @@ export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex)
       venue: defaultVenueForHome(home),
       events: [],
       ...override,
-      venue: override.venue ?? defaultVenueForHome(home),
     };
   }),
 );
