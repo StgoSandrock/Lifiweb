@@ -191,9 +191,18 @@ const MATCH_OVERRIDES: Record<
   },
 };
 
+function defaultVenueForHome(home: string) {
+  if (home === "Club Palestino A" || home === "Club Palestino B") return "Palestino";
+  if (home === "Club Deportivo Manquehue") return "Manquehue";
+  if (home === "Stadio Italiano") return "Stadio Italiano";
+  return null;
+}
+
 export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex) =>
   matches.map(([sourceHome, sourceAway], order) => {
     const id = `lff-superior-r${roundIndex + 1}-m${order + 1}`;
+    const override = MATCH_OVERRIDES[id] ?? {};
+    const home = override.home ?? sourceAway;
 
     return {
       id,
@@ -202,7 +211,7 @@ export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex)
       category: "superior" as const,
       round: roundIndex + 1,
       order: order + 1,
-      home: sourceAway,
+      home,
       away: sourceHome,
       homeScore: null,
       awayScore: null,
@@ -211,9 +220,10 @@ export const LFF_FIXTURES: Match[] = SOURCE_ROUNDS.flatMap((matches, roundIndex)
       status: "scheduled" as const,
       date: null,
       time: null,
-      venue: null,
+      venue: defaultVenueForHome(home),
       events: [],
-      ...MATCH_OVERRIDES[id],
+      ...override,
+      venue: override.venue ?? defaultVenueForHome(home),
     };
   }),
 );
