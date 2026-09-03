@@ -154,6 +154,21 @@ const MATCH_OVERRIDES: Record<
       { id: "italiano-karmenic-2", type: "goal", team: "Stadio Italiano", player: "Karmenic" },
     ],
   },
+  "lff-superior-r3-m2": {
+    home: "Stadio Italiano",
+    away: "Club Palestino B",
+    homeScore: 4,
+    awayScore: 1,
+    status: "played",
+    date: "Miércoles 2 de septiembre",
+    events: [
+      { id: "italiano-ormeno-r3-1", type: "goal", team: "Stadio Italiano", player: "Ormeño" },
+      { id: "italiano-ormeno-r3-2", type: "goal", team: "Stadio Italiano", player: "Ormeño" },
+      { id: "italiano-kamelich-r3-1", type: "goal", team: "Stadio Italiano", player: "Kamelich" },
+      { id: "italiano-ramos-r3-1", type: "goal", team: "Stadio Italiano", player: "Ramos" },
+      { id: "palb-ortiz-r3-1", type: "goal", team: "Club Palestino B", player: "Ortiz" },
+    ],
+  },
   "lff-superior-r3-m3": {
     home: "Club Deportivo Manquehue",
     away: "Club Palestino A",
