@@ -154,6 +154,16 @@ const MATCH_OVERRIDES: Record<
       { id: "italiano-karmenic-2", type: "goal", team: "Stadio Italiano", player: "Karmenic" },
     ],
   },
+  "lff-superior-r3-m1": {
+    home: "Country Club B",
+    away: "Sport Academy",
+    homeScore: 1,
+    awayScore: 0,
+    status: "played",
+    events: [
+      { id: "countryb-zuniga-r3-1", type: "goal", team: "Country Club B", player: "Zuniga" },
+    ],
+  },
   "lff-superior-r3-m2": {
     home: "Stadio Italiano",
     away: "Club Palestino B",
