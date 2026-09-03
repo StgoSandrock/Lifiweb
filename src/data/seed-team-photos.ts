@@ -118,4 +118,13 @@ export const SEEDED_TEAM_PHOTOS: TeamPhoto[] = [
     storagePath: "static/team-galleries/lff/superior/palestino-a/equipo-2026.jpeg",
     order: 1,
   },
+  {
+    id: "seed-lif-peque-equipo-2026",
+    competition: "league",
+    category: "peque",
+    club: "LIF",
+    url: "/team-galleries/league/peque/lif/equipo-peque-2026.jpeg",
+    storagePath: "static/team-galleries/league/peque/lif/equipo-peque-2026.jpeg",
+    order: 1,
+  },
 ];
