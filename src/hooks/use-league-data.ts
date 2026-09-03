@@ -12,7 +12,20 @@ import { subscribeToLeagueData } from "@/lib/firebase/public-data";
 import { normalizeClubName } from "@/lib/text";
 import type { Match, Player, TeamPhoto } from "@/types/domain";
 
-const fallbackMatches = [...(fallbackFixtures as Match[]), ...CUP_FIXTURES, ...LFF_FIXTURES];
+function homeVenueForClub(home: string) {
+  const club = normalizeClubName(home);
+  if (club === "Club Palestino" || club === "Club Palestino A" || club === "Club Palestino B") return "Palestino";
+  if (club === "Club Manquehue" || club === "Club Deportivo Manquehue") return "Manquehue";
+  if (club === "Stadio Italiano") return "Stadio Italiano";
+  return null;
+}
+
+function withOfficialHomeVenue(match: Match): Match {
+  const venue = homeVenueForClub(match.home);
+  return venue ? { ...match, venue } : match;
+}
+
+const fallbackMatches = [...(fallbackFixtures as Match[]), ...CUP_FIXTURES, ...LFF_FIXTURES].map(withOfficialHomeVenue);
 
 function matchIdentity(match: Match) {
   return [
@@ -34,7 +47,7 @@ function preferredLiveMatch(matches: Match[], fallbackId?: string) {
 
 function withFallbackDetails(live: Match, fallback: Match): Match {
   const hasOfficialResult = fallback.status === "played";
-  return {
+  return withOfficialHomeVenue({
     ...fallback,
     ...live,
     status: hasOfficialResult ? fallback.status : live.status,
@@ -46,7 +59,7 @@ function withFallbackDetails(live: Match, fallback: Match): Match {
     homePenalties: fallback.homePenalties ?? live.homePenalties,
     awayPenalties: fallback.awayPenalties ?? live.awayPenalties,
     events: live.events?.length ? live.events : fallback.events,
-  };
+  });
 }
 
 export function mergeMatchesWithFallback(liveMatches: Match[]) {
@@ -68,7 +81,7 @@ export function mergeMatchesWithFallback(liveMatches: Match[]) {
       !fallbackIdentities.has(identity)
       && preferredLiveMatch(matches).competition !== "cup"
     )
-    .map(([, matches]) => preferredLiveMatch(matches));
+    .map(([, matches]) => withOfficialHomeVenue(preferredLiveMatch(matches)));
 
   return [...merged, ...additional];
 }
