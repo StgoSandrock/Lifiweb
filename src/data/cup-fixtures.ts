@@ -12,27 +12,37 @@ const WEEK_BY_ROUND: Readonly<Record<number, string>> = {
   "9": "Semana del 2 de noviembre de 2026"
 };
 
+const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> = {
+  "cup-2026-peque-f1-p5": [4, 0],
+  "cup-2026-mini-f5-p4": [1, 1],
+};
+
 function cupRound(
   category: CategoryId,
   roundNumber: number,
   pairs: readonly (readonly [string, string])[],
 ): Match[] {
-  return pairs.map(([home, away], index) => ({
-    id: "cup-2026-" + category + "-f" + roundNumber + "-p" + (index + 1),
-    tournament: "clausura",
-    competition: "cup",
-    category,
-    round: roundNumber,
-    order: index + 1,
-    home,
-    away,
-    homeScore: null,
-    awayScore: null,
-    status: "scheduled",
-    date: WEEK_BY_ROUND[roundNumber] ?? null,
-    time: null,
-    venue: null,
-  }));
+  return pairs.map(([home, away], index) => {
+    const id = "cup-2026-" + category + "-f" + roundNumber + "-p" + (index + 1);
+    const result = CUP_RESULT_OVERRIDES[id];
+
+    return {
+      id,
+      tournament: "clausura",
+      competition: "cup",
+      category,
+      round: roundNumber,
+      order: index + 1,
+      home,
+      away,
+      homeScore: result?.[0] ?? null,
+      awayScore: result?.[1] ?? null,
+      status: result ? "played" : "scheduled",
+      date: WEEK_BY_ROUND[roundNumber] ?? null,
+      time: null,
+      venue: null,
+    };
+  });
 }
 
 export const CUP_FIXTURES: Match[] = [
