@@ -127,4 +127,22 @@ export const SEEDED_TEAM_PHOTOS: TeamPhoto[] = [
     storagePath: "static/team-galleries/league/peque/lif/equipo-peque-2026.jpeg",
     order: 1,
   },
+  {
+    id: "seed-israelita-pre-peque-equipo-2026",
+    competition: "league",
+    category: "pre-peque",
+    club: "Estadio Israelita",
+    url: "/team-galleries/israelita/pre-peque/equipo-2026.jpeg",
+    storagePath: "static/team-galleries/israelita/pre-peque/equipo-2026.jpeg",
+    order: 1,
+  },
+  {
+    id: "seed-israelita-peque-equipo-2026",
+    competition: "league",
+    category: "peque",
+    club: "Estadio Israelita",
+    url: "/team-galleries/israelita/peque/equipo-2026.jpeg",
+    storagePath: "static/team-galleries/israelita/peque/equipo-2026.jpeg",
+    order: 1,
+  },
 ];
