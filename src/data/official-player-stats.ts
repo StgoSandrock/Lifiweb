@@ -52,6 +52,13 @@ const OFFICIAL_STATS: OfficialStat[] = [
   { name: "Benjamín Urrutia", club: "Estadio Croata", category: "intermedia", goals: 1 },
   { name: "Jose Antonio Garreton Gorostegui", club: "Club Manquehue", category: "intermedia", goals: 2 },
   { name: "Lorenzo Quaas", club: "Club Manquehue", category: "intermedia", goals: 1 },
+  { name: "Lucas Guenú", club: "Estadio Español", category: "pre-peque", goals: 1 },
+  { name: "Raimundo Lira Peon-Veiga", club: "Estadio Español", category: "pre-peque", goals: 1 },
+  { name: "Facundo Tapia", club: "Club Palestino", category: "pre-peque", goals: 1 },
+  { name: "Santiago Ugarte Urrutia", club: "Estadio Español", category: "infantil", goals: 1 },
+  { name: "Rafael Miranda Rosales", club: "Estadio Español", category: "infantil", goals: 1 },
+  { name: "Lucas Lertora Saenz", club: "Estadio Español", category: "infantil", goals: 1 },
+  { name: "Mateo Aitken", club: "Club Palestino", category: "infantil", goals: 2 },
 ];
 
 export const OFFICIAL_PLAYER_STATS: Player[] = OFFICIAL_STATS.map((stat, index) => ({
