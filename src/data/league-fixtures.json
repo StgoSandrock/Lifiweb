@@ -392,11 +392,11 @@
     "order": 5,
     "home": "Estadio Español",
     "away": "Club Palestino",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
+    "homeScore": 3,
+    "awayScore": 1,
+    "status": "played",
     "date": null,
-    "venue": null,
+    "venue": "Estadio Español",
     "time": null
   },
   {
@@ -1112,11 +1112,11 @@
     "order": 5,
     "home": "Estadio Español",
     "away": "Club Palestino",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
+    "homeScore": 4,
+    "awayScore": 1,
+    "status": "played",
     "date": null,
-    "venue": null,
+    "venue": "Estadio Español",
     "time": null
   },
   {
@@ -2552,11 +2552,11 @@
     "order": 5,
     "home": "Estadio Español",
     "away": "Club Palestino",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
+    "homeScore": 3,
+    "awayScore": 2,
+    "status": "played",
     "date": null,
-    "venue": null,
+    "venue": "Estadio Español",
     "time": null
   },
   {
