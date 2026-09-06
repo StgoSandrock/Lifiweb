@@ -10,7 +10,7 @@ type OfficialStat = {
 };
 
 const OFFICIAL_STATS: OfficialStat[] = [
-  { name: "Gaspar Silva", club: "Estadio Español", category: "pre-peque", goals: 1 },
+  { name: "Gaspar Silva", club: "Estadio Español", category: "pre-peque", goals: 2 },
   { name: "Iñaki Pavlovic Varela", club: "Estadio Español", category: "pre-peque", goals: 3 },
   { name: "Martin Espejo Del Canto", club: "Estadio Español", category: "pre-peque", goals: 1 },
   { name: "Agustín Molina", club: "Estadio Español", category: "pre-peque", goals: 1 },
