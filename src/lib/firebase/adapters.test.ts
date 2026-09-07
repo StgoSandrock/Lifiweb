@@ -21,7 +21,7 @@ describe("adaptador de partidos LIFI Cup", () => {
       round: 99,
       roundLabel: "Fecha por definir",
       home: "Barnechea",
-      away: "Universidad San Sebastián",
+      away: "USS",
       status: "scheduled",
     });
   });

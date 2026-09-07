@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { CUP_FIXTURES } from "@/data/cup-fixtures";
 import fixtures from "@/data/league-fixtures.json";
 import { groupMatchesByRound, sortMatches } from "@/lib/fixtures";
 import type { Match } from "@/types/domain";
@@ -31,5 +32,44 @@ describe("fixture Clausura", () => {
       expect(new Set(appearances).size).toBe(10);
       expect(appearances).toHaveLength(10);
     }
+  });
+
+  it("publica los marcadores de la planilla consolidada de la fecha 5", () => {
+    const confirmed = new Map([
+      ["clausura-pre-peque-f5-p2", [5, 0]],
+      ["clausura-pre-peque-f5-p4", [2, 6]],
+      ["clausura-pre-peque-f5-p5", [4, 1]],
+      ["clausura-peque-f5-p1", [0, 2]],
+      ["clausura-peque-f5-p2", [2, 1]],
+      ["clausura-peque-f5-p5", [3, 1]],
+      ["clausura-mini-f5-p1", [13, 0]],
+      ["clausura-mini-f5-p4", [4, 6]],
+      ["clausura-infantil-f5-p1", [2, 2]],
+      ["clausura-infantil-f5-p3", [1, 1]],
+      ["clausura-intermedia-f5-p4", [0, 1]],
+    ]);
+
+    for (const [id, [homeScore, awayScore]] of confirmed) {
+      expect(matches.find((match) => match.id === id)).toMatchObject({ homeScore, awayScore, status: "played" });
+    }
+  });
+});
+
+describe("fixture LIFI Cup", () => {
+  it("publica únicamente los resultados confirmados de la primera semana", () => {
+    const confirmed = new Map([
+      ["cup-2026-pre-peque-f1-p3", [3, 2]],
+      ["cup-2026-peque-f1-p1", [2, 2]],
+      ["cup-2026-peque-f1-p5", [4, 0]],
+      ["cup-2026-mini-f1-p1", [2, 1]],
+      ["cup-2026-mini-f1-p3", [3, 1]],
+      ["cup-2026-mini-f1-p4", [1, 2]],
+    ]);
+
+    for (const [id, [homeScore, awayScore]] of confirmed) {
+      expect(CUP_FIXTURES.find((match) => match.id === id)).toMatchObject({ homeScore, awayScore, status: "played" });
+    }
+    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-peque-f1-p3")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
+    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-infantil-f1-p2")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
   });
 });

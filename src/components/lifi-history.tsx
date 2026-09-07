@@ -42,6 +42,54 @@ const footballFigures = [
   "Cate Ibarra",
 ];
 
+const leagueGalleryPhotos = [
+  {
+    src: "/team-galleries/league/pre-peque/lif/equipo-2026.jpeg",
+    alt: "Planteles Pre-Peque e Infantil de LIF reunidos en la cancha",
+    caption: "LIF · Pre-Peque e Infantil",
+  },
+  {
+    src: "/news/bienvenida-inter-lifi.jpeg",
+    alt: "Inter y Club Manquehue juntos después de un encuentro de categoría Intermedia",
+    caption: "Inter y Club Manquehue · Intermedia",
+  },
+  {
+    src: "/team-galleries/league/peque/lif/equipo-peque-2026.jpeg",
+    alt: "Plantel Peque de LIF reunido en la cancha",
+    caption: "LIF · Peque",
+  },
+  {
+    src: "/team-galleries/israelita/pre-peque/equipo-2026.jpeg",
+    alt: "Plantel Pre-Peque de Estadio Israelita",
+    caption: "Estadio Israelita · Pre-Peque",
+  },
+  {
+    src: "/team-galleries/israelita/peque/equipo-2026.jpeg",
+    alt: "Plantel Peque de Estadio Israelita",
+    caption: "Estadio Israelita · Peque",
+  },
+  {
+    src: "/team-galleries/league/mini/stadio-italiano/equipo-mini-2026.jpeg",
+    alt: "Plantel Mini de Stadio Italiano",
+    caption: "Stadio Italiano · Mini",
+  },
+  {
+    src: "/team-galleries/league/infantil/stadio-italiano/equipo-infantil-2026.jpeg",
+    alt: "Plantel Infantil de Stadio Italiano",
+    caption: "Stadio Italiano · Infantil",
+  },
+  {
+    src: "/team-galleries/league/mini/ultimate/equipo-mini-2026.jpeg",
+    alt: "Plantel Mini de Ultimate Sports Academy",
+    caption: "Ultimate Sports Academy · Mini",
+  },
+  {
+    src: "/team-galleries/league/pre-peque/manquehue/img-5044.jpeg",
+    alt: "Plantel Pre-Peque de Club Manquehue",
+    caption: "Club Manquehue · Pre-Peque",
+  },
+];
+
 export function LifiHistory() {
   return (
     <section className="lifi-history" id="historia" aria-labelledby="lifi-history-title">
@@ -173,6 +221,29 @@ export function LifiHistory() {
               <h4>Entrenadores y figuras del fútbol profesional</h4>
               <p>{footballFigures.join(", ")}.</p>
             </div>
+          </div>
+        </div>
+
+        <div className="league-gallery" id="galeria" aria-labelledby="league-gallery-title">
+          <header className="league-gallery-heading">
+            <div>
+              <p>Galería de la Liga</p>
+              <h3 id="league-gallery-title">La temporada 2026 en imágenes</h3>
+            </div>
+            <p>Equipos y encuentros de las distintas categorías de LIFI.</p>
+          </header>
+          <div className="league-gallery-grid">
+            {leagueGalleryPhotos.map((photo, index) => (
+              <figure className={index === 0 ? "featured" : undefined} key={photo.src}>
+                <Image
+                  src={photo.src}
+                  alt={photo.alt}
+                  fill
+                  sizes={index === 0 ? "(max-width: 768px) 100vw, 66vw" : "(max-width: 768px) 50vw, 33vw"}
+                />
+                <figcaption>{photo.caption}</figcaption>
+              </figure>
+            ))}
           </div>
         </div>
       </div>

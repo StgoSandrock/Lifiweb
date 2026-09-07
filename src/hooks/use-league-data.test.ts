@@ -30,7 +30,8 @@ describe("mergeMatchesWithFallback", () => {
       && match.away === "Club Manquehue"
     );
 
-    expect(palestinoManquehue).toEqual([played]);
+    expect(palestinoManquehue).toHaveLength(1);
+    expect(palestinoManquehue[0]).toMatchObject({ ...played, venue: "Palestino" });
   });
 
   it("does not merge Club Palestino A with Club Palestino B", () => {
@@ -70,7 +71,9 @@ describe("mergeMatchesWithFallback", () => {
     ];
 
     const merged = mergeMatchesWithFallback(matches);
-    expect(merged).toEqual(expect.arrayContaining(matches));
+    for (const match of matches) {
+      expect(merged.find(({ id }) => id === match.id)).toMatchObject({ ...match, venue: "Palestino" });
+    }
     expect(merged.filter((match) => matches.some(({ id }) => id === match.id))).toHaveLength(2);
   });
 
@@ -147,5 +150,13 @@ describe("mergeMatchesWithFallback", () => {
     expect(players.find((player) => player.name === "Tomás Ojeda")).toMatchObject({ club: "Club Manquehue", goals: 1 });
     expect(players.find((player) => player.name === "Santiago Parada")).toMatchObject({ club: "Club Manquehue", goals: 1 });
     expect(players.find((player) => player.name === "Clemente Vergara")).toMatchObject({ club: "Club Manquehue", goals: 1 });
+  });
+
+  it("publishes the confirmed Bianconero versus Ultimate scorers", () => {
+    const players = mergePlayersWithOfficialStats([]);
+
+    expect(players.find((player) => player.name === "Matias Hillmer")).toMatchObject({ club: "Ultimate S.A", category: "mini", goals: 3 });
+    expect(players.find((player) => player.name === "Fabian Gonzalez")).toMatchObject({ club: "Bianconero", category: "pre-peque", goals: 2 });
+    expect(players.find((player) => player.name === "Pedro Pablo Torres")).toMatchObject({ club: "Ultimate S.A", category: "pre-peque", goals: 1 });
   });
 });
