@@ -59,6 +59,16 @@ const OFFICIAL_STATS: OfficialStat[] = [
   { name: "Rafael Miranda Rosales", club: "Estadio Español", category: "infantil", goals: 1 },
   { name: "Lucas Lertora Saenz", club: "Estadio Español", category: "infantil", goals: 1 },
   { name: "Mateo Aitken", club: "Club Palestino", category: "infantil", goals: 2 },
+  { name: "Joaquin Andres Rodriguez Lizarraga", club: "Bianconero", category: "mini", goals: 1 },
+  { name: "Bruno Vasquez Yi", club: "Bianconero", category: "mini", goals: 1 },
+  { name: "Diego Jodeck Henriquez", club: "Bianconero", category: "mini", goals: 1 },
+  { name: "Matias Hillmer", club: "Ultimate S.A", category: "mini", goals: 3 },
+  { name: "Agustín Diaz", club: "Ultimate S.A", category: "mini", goals: 1 },
+  { name: "Lucas Pimstein", club: "Ultimate S.A", category: "mini", goals: 1 },
+  { name: "Fabian Gonzalez", club: "Bianconero", category: "pre-peque", goals: 2 },
+  { name: "Maximiliano Plaza", club: "Bianconero", category: "pre-peque", goals: 1 },
+  { name: "Pedro Pablo Torres", club: "Ultimate S.A", category: "pre-peque", goals: 1 },
+  { name: "Beltran Zurbuchen", club: "Ultimate S.A", category: "pre-peque", goals: 1 },
 ];
 
 export const OFFICIAL_PLAYER_STATS: Player[] = OFFICIAL_STATS.map((stat, index) => ({

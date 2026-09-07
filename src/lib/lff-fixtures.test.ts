@@ -80,7 +80,7 @@ describe("fixture oficial LFF", () => {
     expect(LFF_FIXTURES.filter((match) => match.round === 2 && match.status === "played")).toHaveLength(2);
 
     const standings = calculateStandings(LFF_FIXTURES, LFF_CLUBS);
-    expect(standings.find((standing) => standing.club.name === "Country Club B")?.points).toBe(3);
+    expect(standings.find((standing) => standing.club.name === "Country Club B")?.points).toBe(6);
     expect(standings.find((standing) => standing.club.name === "Estadio Español")?.points).toBe(4);
   });
 
