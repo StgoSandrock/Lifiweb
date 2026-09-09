@@ -58,10 +58,12 @@ describe("fixture Clausura", () => {
 describe("fixture LIFI Cup", () => {
   it("publica únicamente los resultados confirmados de la primera semana", () => {
     const confirmed = new Map([
-      ["cup-2026-pre-peque-f1-p3", [3, 2]],\n      ["cup-2026-pre-peque-f1-p4", [3, 4]],
+      ["cup-2026-pre-peque-f1-p3", [3, 2]],
+      ["cup-2026-pre-peque-f1-p4", [3, 4]],
       ["cup-2026-peque-f1-p1", [2, 2]],
       ["cup-2026-peque-f1-p5", [4, 0]],
-      ["cup-2026-mini-f1-p1", [2, 1]],\n      ["cup-2026-mini-f1-p2", [2, 4]],
+      ["cup-2026-mini-f1-p1", [2, 1]],
+      ["cup-2026-mini-f1-p2", [2, 4]],
       ["cup-2026-mini-f1-p3", [3, 1]],
       ["cup-2026-mini-f1-p4", [1, 2]],
     ]);
@@ -69,7 +71,11 @@ describe("fixture LIFI Cup", () => {
     for (const [id, [homeScore, awayScore]] of confirmed) {
       expect(CUP_FIXTURES.find((match) => match.id === id)).toMatchObject({ homeScore, awayScore, status: "played" });
     }
-    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-mini-f1-p2")).toMatchObject({\n      home: "Barnechea",\n      away: "Alumni",\n    });\n    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-peque-f1-p3")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
+    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-mini-f1-p2")).toMatchObject({
+      home: "Barnechea",
+      away: "Alumni",
+    });
+    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-peque-f1-p3")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
     expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-infantil-f1-p2")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
   });
 });
