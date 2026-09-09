@@ -13,10 +13,12 @@ const WEEK_BY_ROUND: Readonly<Record<number, string>> = {
 };
 
 const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> = {
-  "cup-2026-pre-peque-f1-p3": [3, 2],\n  "cup-2026-pre-peque-f1-p4": [3, 4],
+  "cup-2026-pre-peque-f1-p3": [3, 2],
+  "cup-2026-pre-peque-f1-p4": [3, 4],
   "cup-2026-peque-f1-p1": [2, 2],
   "cup-2026-peque-f1-p5": [4, 0],
-  "cup-2026-mini-f1-p1": [2, 1],\n  "cup-2026-mini-f1-p2": [2, 4],
+  "cup-2026-mini-f1-p1": [2, 1],
+  "cup-2026-mini-f1-p2": [2, 4],
   "cup-2026-mini-f1-p3": [3, 1],
   "cup-2026-mini-f1-p4": [1, 2],
   "cup-2026-mini-f5-p4": [1, 1],
