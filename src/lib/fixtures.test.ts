@@ -36,11 +36,12 @@ describe("fixture Clausura", () => {
 
   it("publica los marcadores de la planilla consolidada de la fecha 5", () => {
     const confirmed = new Map([
-      ["clausura-pre-peque-f5-p2", [5, 0]],
+      ["clausura-pre-peque-f1-p4", [1, 2]],
+      ["clausura-pre-peque-f5-p2", [2, 1]],
       ["clausura-pre-peque-f5-p4", [2, 6]],
       ["clausura-pre-peque-f5-p5", [4, 1]],
       ["clausura-peque-f5-p1", [2, 0]],
-      ["clausura-peque-f5-p2", [2, 1]],
+      ["clausura-peque-f5-p2", [5, 0]],
       ["clausura-peque-f5-p5", [3, 1]],
       ["clausura-mini-f5-p1", [13, 0]],
       ["clausura-mini-f5-p4", [4, 6]],
