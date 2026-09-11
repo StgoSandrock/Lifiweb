@@ -79,4 +79,14 @@ describe("fixture LIFI Cup", () => {
     expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-peque-f1-p3")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
     expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-infantil-f1-p2")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
   });
+
+  it("publica el triunfo de Manquehue sobre Barnechea en Infantil", () => {
+    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-infantil-f2-p2")).toMatchObject({
+      home: "Barnechea",
+      away: "Club Manquehue",
+      homeScore: 2,
+      awayScore: 5,
+      status: "played",
+    });
+  });
 });
