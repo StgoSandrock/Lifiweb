@@ -199,6 +199,20 @@ const MATCH_OVERRIDES: Record<
       { id: "countrya-briones-r3-2", type: "goal", team: "Country Club A", player: "Briones" },
     ],
   },
+  "lff-superior-r4-m4": {
+    home: "Stadio Italiano",
+    away: "Equipo Médico",
+    homeScore: 4,
+    awayScore: 0,
+    status: "played",
+    venue: "Stadio Italiano",
+    events: [
+      { id: "italiano-ramerish-r4-1", type: "goal", team: "Stadio Italiano", player: "Ramerish" },
+      { id: "italiano-ramerish-r4-2", type: "goal", team: "Stadio Italiano", player: "Ramerish" },
+      { id: "italiano-doffman-r4-1", type: "goal", team: "Stadio Italiano", player: "Doffman" },
+      { id: "italiano-serr-r4-1", type: "goal", team: "Stadio Italiano", player: "Serr" },
+    ],
+  },
 };
 
 function defaultVenueForHome(home: string) {

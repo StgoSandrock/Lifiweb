@@ -105,4 +105,22 @@ describe("fixture oficial LFF", () => {
     expect(countryEspanol?.events?.filter((event) => event.player === "Fontecilla")).toHaveLength(1);
     expect(countryEspanol?.events?.filter((event) => event.player === "Briones")).toHaveLength(2);
   });
+
+  it("publica el triunfo de Stadio Italiano sobre Equipo Médico en la fecha 4", () => {
+    const italianoMedico = LFF_FIXTURES.find((match) => match.id === "lff-superior-r4-m4");
+
+    expect(italianoMedico).toMatchObject({
+      home: "Stadio Italiano",
+      away: "Equipo Médico",
+      homeScore: 4,
+      awayScore: 0,
+      status: "played",
+      venue: "Stadio Italiano",
+    });
+    expect(italianoMedico?.events?.filter((event) => event.player === "Ramerish")).toHaveLength(2);
+    expect(italianoMedico?.events).toEqual(expect.arrayContaining([
+      expect.objectContaining({ team: "Stadio Italiano", player: "Doffman" }),
+      expect.objectContaining({ team: "Stadio Italiano", player: "Serr" }),
+    ]));
+  });
 });
