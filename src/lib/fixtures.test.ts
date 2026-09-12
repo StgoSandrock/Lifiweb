@@ -54,6 +54,33 @@ describe("fixture Clausura", () => {
       expect(matches.find((match) => match.id === id)).toMatchObject({ homeScore, awayScore, status: "played" });
     }
   });
+
+  it("publica los resultados de LIF contra Bianconero y mantiene Infantil pendiente", () => {
+    const confirmed = new Map([
+      ["clausura-pre-peque-f8-p5", [0, 3]],
+      ["clausura-peque-f8-p5", [2, 4]],
+      ["clausura-mini-f8-p5", [1, 2]],
+      ["clausura-intermedia-f8-p5", [0, 7]],
+    ]);
+
+    for (const [id, [homeScore, awayScore]] of confirmed) {
+      expect(matches.find((match) => match.id === id)).toMatchObject({
+        home: "LIF",
+        away: "Bianconero",
+        homeScore,
+        awayScore,
+        status: "played",
+      });
+    }
+
+    expect(matches.find((match) => match.id === "clausura-infantil-f8-p5")).toMatchObject({
+      home: "LIF",
+      away: "Bianconero",
+      homeScore: null,
+      awayScore: null,
+      status: "scheduled",
+    });
+  });
 });
 
 describe("fixture LIFI Cup", () => {
