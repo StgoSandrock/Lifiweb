@@ -81,6 +81,28 @@ describe("fixture Clausura", () => {
       status: "scheduled",
     });
   });
+
+  it("publica los cinco resultados de Palestino contra Ultimate con localía y fecha correctas", () => {
+    const confirmed = new Map([
+      ["clausura-pre-peque-f8-p2", [10, 2, "Sábado 12 de septiembre de 2026"]],
+      ["clausura-peque-f8-p2", [3, 2, "Sábado 12 de septiembre de 2026"]],
+      ["clausura-mini-f8-p2", [2, 3, "Viernes 11 de septiembre de 2026"]],
+      ["clausura-infantil-f8-p2", [1, 3, "Viernes 11 de septiembre de 2026"]],
+      ["clausura-intermedia-f8-p2", [0, 7, "Viernes 11 de septiembre de 2026"]],
+    ]);
+
+    for (const [id, [homeScore, awayScore, date]] of confirmed) {
+      expect(matches.find((match) => match.id === id)).toMatchObject({
+        home: "Club Palestino",
+        away: "Ultimate S.A",
+        homeScore,
+        awayScore,
+        status: "played",
+        date,
+        venue: "Palestino",
+      });
+    }
+  });
 });
 
 describe("fixture LIFI Cup", () => {
