@@ -211,6 +211,23 @@ const MATCH_OVERRIDES: Record<
       { id: "manquehue-martinez-r4-1", type: "goal", team: "Club Deportivo Manquehue", player: "Catalina Martínez" },
     ],
   },
+  "lff-superior-r4-m2": {
+    home: "Sport Academy",
+    away: "Estadio Español",
+    homeScore: 0,
+    awayScore: 3,
+    status: "played",
+    events: [],
+  },
+  "lff-superior-r4-m3": {
+    home: "Club Palestino B",
+    away: "Club Palestino A",
+    homeScore: 2,
+    awayScore: 1,
+    status: "played",
+    venue: "Palestino",
+    events: [],
+  },
   "lff-superior-r4-m4": {
     home: "Stadio Italiano",
     away: "Equipo Médico",
@@ -224,6 +241,14 @@ const MATCH_OVERRIDES: Record<
       { id: "italiano-doffman-r4-1", type: "goal", team: "Stadio Italiano", player: "Doffman" },
       { id: "italiano-serr-r4-1", type: "goal", team: "Stadio Italiano", player: "Serr" },
     ],
+  },
+  "lff-superior-r7-m2": {
+    home: "Country Club A",
+    away: "Club Palestino A",
+    homeScore: 3,
+    awayScore: 1,
+    status: "played",
+    events: [],
   },
 };
 
