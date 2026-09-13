@@ -199,6 +199,18 @@ const MATCH_OVERRIDES: Record<
       { id: "countrya-briones-r3-2", type: "goal", team: "Country Club A", player: "Briones" },
     ],
   },
+  "lff-superior-r4-m1": {
+    home: "Club Deportivo Manquehue",
+    away: "Country Club B",
+    homeScore: 2,
+    awayScore: 0,
+    status: "played",
+    venue: "Manquehue",
+    events: [
+      { id: "manquehue-bellota-r4-1", type: "goal", team: "Club Deportivo Manquehue", player: "Martina Bellota" },
+      { id: "manquehue-martinez-r4-1", type: "goal", team: "Club Deportivo Manquehue", player: "Catalina Martínez" },
+    ],
+  },
   "lff-superior-r4-m4": {
     home: "Stadio Italiano",
     away: "Equipo Médico",
