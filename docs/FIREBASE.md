@@ -7,8 +7,10 @@ Desde una terminal con acceso administrativo al proyecto `lifiwebapp`:
 ```bash
 npx firebase-tools login
 npx firebase-tools use lifiwebapp
-npx firebase-tools deploy --only firestore:rules
+npx firebase-tools deploy --only firestore:rules,storage --project lifiwebapp
 ```
+
+Es importante desplegar **Firestore y Cloud Storage**. El panel Staff guarda los metadatos de las galerías en Firestore y los archivos de imagen en Firebase Storage; desplegar solamente `firestore:rules` deja la subida de fotos sin las reglas necesarias.
 
 Después ejecuta `pnpm qa:security`. La salida correcta es:
 
