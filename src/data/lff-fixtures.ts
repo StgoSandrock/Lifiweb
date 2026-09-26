@@ -242,6 +242,15 @@ const MATCH_OVERRIDES: Record<
       { id: "italiano-serr-r4-1", type: "goal", team: "Stadio Italiano", player: "Serr" },
     ],
   },
+  "lff-superior-r5-m1": {
+    home: "Club Palestino B",
+    away: "Country Club B",
+    homeScore: 0,
+    awayScore: 1,
+    status: "played",
+    venue: "Palestino",
+    events: [],
+  },
   "lff-superior-r5-m3": {
     home: "Stadio Italiano",
     away: "Country Club A",
