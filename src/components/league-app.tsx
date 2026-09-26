@@ -21,7 +21,7 @@ import { LFF_LOGO_DATA_URL } from "@/config/lff-logo";
 type View = "standings" | "fixture" | "clubs";
 
 export function LeagueApp({ competition }: { competition: Competition }) {
-  const { matches, players, photos, status, error } = useLeagueData();
+  const { matches, players, photos, teams, status, error } = useLeagueData();
   const [category, setCategory] = useState<CategoryId>(() => competition === "lff" ? "superior" : "pre-peque");
   const [view, setView] = useState<View>("standings");
   const [selectedClub, setSelectedClub] = useState<string | null>(null);
@@ -30,6 +30,8 @@ export function LeagueApp({ competition }: { competition: Competition }) {
   const filteredPhotos = useMemo(() => photos.filter((photo) => photo.competition === competition && photo.category === category).sort((a, b) => a.order - b.order), [photos, competition, category]);
   const categories = categoriesForCompetition(competition);
   const visibleClubs = useMemo(() => {
+    const managed = teams.filter((team) => team.competition === competition && team.category === category && team.active).sort((a, b) => a.order - b.order || a.name.localeCompare(b.name, "es"));
+    if (managed.length) return managed;
     if (competition === "league") return CLUBS;
     if (competition === "lff") return LFF_CLUBS;
     const names = [...new Set([
@@ -38,12 +40,14 @@ export function LeagueApp({ competition }: { competition: Competition }) {
       ...(CUP_CLUBS_BY_CATEGORY[category] ?? []).map((club) => club.name),
     ])].sort((a, b) => a.localeCompare(b, "es"));
     return names.map((name) => getClub(name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
-  }, [category, competition, filteredMatches, filteredPlayers]);
+  }, [competition, category, filteredMatches, filteredPlayers, teams]);
   const standings = useMemo(() => calculateStandings(filteredMatches, visibleClubs), [filteredMatches, visibleClubs]);
   const scorers = useMemo(() => [...filteredPlayers].filter((player) => player.goals > 0).sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name, "es")).slice(0, 5), [filteredPlayers]);
   const competitionMatches = useMemo(() => matches.filter((match) => match.competition === competition), [matches, competition]);
   const roundCount = new Set(competitionMatches.filter((match) => !match.roundLabel).map((match) => match.round)).size;
   const categoryCount = new Set(competitionMatches.map((match) => match.category)).size;
+  const competitionTeamCount = new Set(teams.filter((team) => team.competition === competition && team.active).map((team) => team.name)).size || (competition === "cup" ? new Set(Object.values(CUP_CLUBS_BY_CATEGORY).flat().map((club) => club.name)).size : 0);
+  const managedCategoryCount = new Set(teams.filter((team) => team.competition === competition && team.active).map((team) => team.category)).size || (competition === "cup" ? Object.values(CUP_CLUBS_BY_CATEGORY).filter((clubs) => clubs?.length).length : categoryCount);
   const copy = competition === "league"
     ? { eyebrow: `Temporada ${SEASON} · Torneo Clausura`, title: "LIFI", accent: "Liga", name: "Liga LIFI", description: "Fixture, posiciones, planteles e historia oficial de la Liga de Fútbol Infantil.", label: "Liga · Clausura" }
     : competition === "cup"
@@ -73,7 +77,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
           <div className="hero-scoreboard" aria-label={`Resumen de ${copy.name}`}>
             <div className="scoreboard-top"><span>{copy.label}</span><span className={status === "live" ? "live-dot" : "sync-dot"}>{status === "live" ? "Actualizado" : "Sincronizando"}</span></div>
             <strong>{competition === "league" ? 9 : roundCount || "—"}</strong><p>{competition === "league" ? "fechas por categoría" : "fechas publicadas"}</p>
-            <div className="scoreboard-stats"><span><b>{competition === "league" ? 10 : new Set(competitionMatches.flatMap((match) => [match.home, match.away])).size || "—"}</b> equipos</span><span><b>{competition === "league" ? 5 : categoryCount || "—"}</b> {categoryCount === 1 ? "categoría" : "categorías"}</span><span><b>{competition === "league" ? 225 : competitionMatches.length || "—"}</b> partidos</span></div>
+            <div className="scoreboard-stats"><span><b>{competition === "league" ? 10 : competitionTeamCount || "—"}</b> equipos</span><span><b>{competition === "league" ? 5 : managedCategoryCount || "—"}</b> {managedCategoryCount === 1 ? "categoría" : "categorías"}</span><span><b>{competition === "league" ? 225 : competitionMatches.length || "—"}</b> partidos</span></div>
           </div>
         </section>
 
@@ -118,10 +122,11 @@ function ClubRosters({ clubs, players, photos, selectedClub, onSelect }: { clubs
   if (selectedClub) {
     const roster = players.filter((player) => player.club === selectedClub).sort((a, b) => a.name.localeCompare(b.name, "es"));
     const teamPhotos = photos.filter((photo) => photo.club === selectedClub);
-    return <div className="roster-view"><button className="back-button" type="button" onClick={() => onSelect(null)}><ChevronLeft /> Volver a equipos</button><div className="roster-hero"><span className="mark-shell large"><ClubMark name={selectedClub} size={78} /></span><div><p>Equipo de la categoría</p><h3>{selectedClub}</h3><span>{roster.length} jugadores registrados · {teamPhotos.length} fotos</span></div></div><TeamGallery club={selectedClub} photos={teamPhotos} />{roster.length ? <div className="roster-grid">{roster.map((player) => <article key={player.id}><div className="player-number">{player.name.split(" ").map((part) => part[0]).slice(0, 2).join("")}</div><div><h4>{player.name}</h4><p>{player.position}</p></div><dl><div><dt>PJ</dt><dd>{player.appearances}</dd></div><div><dt>G</dt><dd>{player.goals}</dd></div><div><dt>A</dt><dd>{player.assists}</dd></div></dl></article>)}</div> : <div className="empty-state"><UsersRound /><h3>Plantel por publicar</h3><p>No hay una nómina pública cargada para este equipo y categoría.</p></div>}</div>;
+    const club = clubs.find((item) => item.name === selectedClub);
+    return <div className="roster-view"><button className="back-button" type="button" onClick={() => onSelect(null)}><ChevronLeft /> Volver a equipos</button><div className="roster-hero"><span className="mark-shell large"><ClubMark name={selectedClub} club={club} size={78} /></span><div><p>Equipo de la categoría</p><h3>{selectedClub}</h3><span>{roster.length} jugadores registrados · {teamPhotos.length} fotos</span></div></div><TeamGallery club={selectedClub} photos={teamPhotos} />{roster.length ? <div className="roster-grid">{roster.map((player) => <article key={player.id}><div className="player-number">{player.name.split(" ").map((part) => part[0]).slice(0, 2).join("")}</div><div><h4>{player.name}</h4><p>{player.position}</p></div><dl><div><dt>PJ</dt><dd>{player.appearances}</dd></div><div><dt>G</dt><dd>{player.goals}</dd></div><div><dt>A</dt><dd>{player.assists}</dd></div></dl></article>)}</div> : <div className="empty-state"><UsersRound /><h3>Plantel por publicar</h3><p>No hay una nómina pública cargada para este equipo y categoría.</p></div>}</div>;
   }
   if (!clubs.length) return <div className="empty-state"><UsersRound /><h3>Clubes por publicar</h3><p>No hay clubes confirmados para esta categoría.</p></div>;
-  return <div className="club-grid">{clubs.map((club) => { const count = players.filter((player) => player.club === club.name).length; const photoCount = photos.filter((photo) => photo.club === club.name).length; return <button type="button" key={club.id} onClick={() => onSelect(club.name)}><span className="mark-shell large"><ClubMark name={club.name} size={70} /></span><span><strong>{club.name}</strong><small>{count ? `${count} jugadores` : "Plantel por publicar"}{photoCount ? ` · ${photoCount} fotos` : ""}</small></span><ArrowRight /></button>; })}</div>;
+  return <div className="club-grid">{clubs.map((club) => { const count = players.filter((player) => player.club === club.name).length; const photoCount = photos.filter((photo) => photo.club === club.name).length; return <button type="button" key={club.id} onClick={() => onSelect(club.name)}><span className="mark-shell large"><ClubMark name={club.name} club={club} size={70} /></span><span><strong>{club.name}</strong><small>{count ? `${count} jugadores` : "Plantel por publicar"}{photoCount ? ` · ${photoCount} fotos` : ""}</small></span><ArrowRight /></button>; })}</div>;
 }
 
 function ImageLogo() {

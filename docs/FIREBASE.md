@@ -10,6 +10,9 @@ npx firebase-tools use lifiwebapp
 npx firebase-tools deploy --only firestore:rules
 ```
 
+El flujo completo de resultados, migración gradual, auditoría y recuperación está documentado en
+[`RESULTADOS.md`](./RESULTADOS.md).
+
 Después ejecuta `pnpm qa:security`. La salida correcta es:
 
 ```json

@@ -39,10 +39,6 @@ export const CUP_CLUBS: readonly Club[] = [
   { id: "barnechea-cup", name: "Barnechea", aliases: [], logo: "/clubs/barnechea.jpeg" },
 ] as const;
 
-export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>> = {
-  mini: CUP_CLUBS.filter((club) => club.id === "futuro-albo"),
-};
-
 export const LFF_CLUBS: readonly Club[] = [
   { id: "lff-palestino-a", name: "Club Palestino A", aliases: [], logo: "/clubs/palestino.svg" },
   { id: "lff-palestino-b", name: "Club Palestino B", aliases: [], logo: "/clubs/palestino.svg" },
@@ -54,6 +50,47 @@ export const LFF_CLUBS: readonly Club[] = [
   { id: "lff-country-club-b", name: "Country Club B", aliases: [], logo: "/clubs/country-club.png" },
   { id: "lff-sport-academy", name: "Sport Academy", aliases: [], logo: "/clubs/sport-academy.jpeg" },
 ] as const;
+
+const cupClub = (id: string, name: string, logo = ""): Club => ({ id, name, aliases: [], logo });
+
+export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>> = {
+  "pre-peque": [
+    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg"),
+    cupClub("cup-diablos-rojos", "Diablos Rojos"),
+    cupClub("cup-barnechea", "Barnechea"),
+    cupClub("cup-israelita", "Estadio Israelita", "/clubs/israelita.svg"),
+    cupClub("cup-country-club", "Country Club", "/clubs/country-club.png"),
+    cupClub("cup-alumni", "Alumni"),
+    cupClub("cup-sirio", "Sirio"),
+    cupClub("cup-palestino", "Club Palestino", "/clubs/palestino.svg"),
+  ],
+  peque: [
+    cupClub("cup-uss", "USS"),
+    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg"),
+    cupClub("cup-alumni", "Alumni"),
+    cupClub("cup-espanol", "Estadio Español", "/clubs/espanol.svg"),
+    cupClub("cup-israelita", "Estadio Israelita", "/clubs/israelita.svg"),
+    cupClub("cup-palestino", "Club Palestino", "/clubs/palestino.svg"),
+    cupClub("cup-barnechea", "Barnechea"),
+    cupClub("cup-diablos-rojos", "Diablos Rojos"),
+    cupClub("cup-sirio", "Sirio"),
+    cupClub("cup-country-club", "Country Club", "/clubs/country-club.png"),
+    cupClub("cup-italiano", "Stadio Italiano", "/clubs/italiano.svg"),
+    cupClub("cup-futuro-albo", "Futuro Albo", "/clubs/futuro-albo.jpeg"),
+  ],
+  mini: [
+    cupClub("cup-uss", "USS"),
+    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg"),
+    cupClub("cup-alumni", "Alumni"),
+    cupClub("cup-palestino", "Club Palestino", "/clubs/palestino.svg"),
+    cupClub("cup-sirio", "Sirio"),
+    cupClub("cup-barnechea", "Barnechea"),
+    cupClub("cup-country-club", "Country Club", "/clubs/country-club.png"),
+    cupClub("cup-prince-of-wales", "Prince of Wales"),
+    cupClub("cup-futuro-albo", "Futuro Albo", "/clubs/futuro-albo.jpeg"),
+    cupClub("cup-ultimate", "Ultimate S.A.", "/clubs/ultimate.svg"),
+  ],
+};
 
 export function clubsForCompetition(competition: import("../types/domain").Competition) {
   return competition === "lff" ? LFF_CLUBS : CLUBS;

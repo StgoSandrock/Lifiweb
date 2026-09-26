@@ -39,10 +39,10 @@ describe("fixture Clausura", () => {
       ["clausura-pre-peque-f1-p4", [1, 2]],
       ["clausura-pre-peque-f5-p2", [2, 1]],
       ["clausura-pre-peque-f5-p4", [2, 6]],
-      ["clausura-pre-peque-f5-p5", [4, 1]],
+      ["clausura-pre-peque-f5-p5", [3, 1]],
       ["clausura-peque-f5-p1", [2, 0]],
       ["clausura-peque-f5-p2", [5, 0]],
-      ["clausura-peque-f5-p5", [3, 1]],
+      ["clausura-peque-f5-p5", [4, 1]],
       ["clausura-mini-f5-p1", [13, 0]],
       ["clausura-mini-f5-p4", [4, 6]],
       ["clausura-infantil-f5-p1", [2, 2]],
@@ -125,7 +125,7 @@ describe("fixture LIFI Cup", () => {
       home: "Barnechea",
       away: "Alumni",
     });
-    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-peque-f1-p3")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
+    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-peque-f1-p3")).toMatchObject({ status: "played", homeScore: 3, awayScore: 2 });
     expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-infantil-f1-p2")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
   });
 

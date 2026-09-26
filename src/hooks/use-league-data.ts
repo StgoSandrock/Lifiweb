@@ -8,9 +8,10 @@ import { OFFICIAL_PLAYER_STATS } from "@/data/official-player-stats";
 import { OFFICIAL_ROSTER_PLAYERS, REMOVED_ROSTER_PLAYERS } from "@/data/official-roster-updates";
 import { SEEDED_TEAM_PHOTOS } from "@/data/seed-team-photos";
 import { fromFirestorePlayer } from "@/lib/firebase/adapters";
+import { derivePlayerGoals } from "@/lib/goal-events";
 import { subscribeToLeagueData } from "@/lib/firebase/public-data";
 import { normalizeClubName } from "@/lib/text";
-import type { Match, Player, TeamPhoto } from "@/types/domain";
+import type { Match, Player, TeamPhoto, TeamRegistration } from "@/types/domain";
 
 function homeVenueForClub(home: string) {
   const club = normalizeClubName(home);
@@ -95,18 +96,14 @@ function preferredLiveMatch(matches: Match[], fallbackId?: string) {
 }
 
 function withFallbackDetails(live: Match, fallback: Match): Match {
-  const hasOfficialResult = fallback.status === "played";
   return withOfficialHomeVenue({
     ...fallback,
     ...live,
-    status: hasOfficialResult ? fallback.status : live.status,
-    homeScore: hasOfficialResult ? fallback.homeScore : live.homeScore,
-    awayScore: hasOfficialResult ? fallback.awayScore : live.awayScore,
     date: live.date ?? fallback.date,
     time: live.time ?? fallback.time,
     venue: live.venue ?? fallback.venue,
-    homePenalties: fallback.homePenalties ?? live.homePenalties,
-    awayPenalties: fallback.awayPenalties ?? live.awayPenalties,
+    homePenalties: live.homePenalties ?? fallback.homePenalties,
+    awayPenalties: live.awayPenalties ?? fallback.awayPenalties,
     events: live.events?.length ? live.events : fallback.events,
   });
 }
@@ -126,13 +123,10 @@ export function mergeMatchesWithFallback(liveMatches: Match[]) {
       : match;
   });
   const additional = [...liveByIdentity.entries()]
-    .filter(([identity, matches]) =>
-      !fallbackIdentities.has(identity)
-      && preferredLiveMatch(matches).competition !== "cup"
-    )
+    .filter(([identity]) => !fallbackIdentities.has(identity))
     .map(([, matches]) => withOfficialHomeVenue(preferredLiveMatch(matches)));
 
-  return [...merged, ...additional].map(withOfficialMatchOverride);
+  return [...merged, ...additional];
 }
 
 function playerIdentity(player: Player) {
@@ -164,8 +158,9 @@ export function mergePlayersWithOfficialStats(livePlayers: Player[]) {
 
 export function useLeagueData() {
   const [matches, setMatches] = useState<Match[]>(fallbackMatchesForDisplay);
-  const [players, setPlayers] = useState<Player[]>([]);
+  const [rawPlayers, setRawPlayers] = useState<Player[]>([]);
   const [photos, setPhotos] = useState<TeamPhoto[]>(SEEDED_TEAM_PHOTOS);
+  const [teams, setTeams] = useState<TeamRegistration[]>([]);
   const [status, setStatus] = useState<"loading" | "live" | "fallback">("loading");
   const [error, setError] = useState<string | null>(null);
 
@@ -176,7 +171,7 @@ export function useLeagueData() {
       setError(null);
     },
     players: (nextPlayers) => {
-      setPlayers(mergePlayersWithOfficialStats(nextPlayers));
+      setRawPlayers(mergePlayersWithOfficialStats(nextPlayers));
       setStatus("live");
       setError(null);
     },
@@ -186,10 +181,15 @@ export function useLeagueData() {
       setStatus("live");
       setError(null);
     },
+    teams: (nextTeams) => {
+      setTeams(nextTeams);
+      setStatus("live");
+      setError(null);
+    },
     error: async () => {
       const fallbackPlayers = await import("@/data/legacy-players.json");
       setMatches(fallbackMatchesForDisplay);
-      setPlayers(mergePlayersWithOfficialStats(fallbackPlayers.default.flatMap((player, index) => {
+      setRawPlayers(mergePlayersWithOfficialStats(fallbackPlayers.default.flatMap((player, index) => {
         const mapped = fromFirestorePlayer(String(player.id ?? `fallback-${index}`), player);
         return mapped ? [mapped] : [];
       })));
@@ -198,5 +198,6 @@ export function useLeagueData() {
     },
   }), []);
 
-  return useMemo(() => ({ matches, players, photos, status, error }), [matches, players, photos, status, error]);
+  const players = useMemo(() => derivePlayerGoals(rawPlayers, matches), [rawPlayers, matches]);
+  return useMemo(() => ({ matches, players, photos, teams, status, error }), [matches, players, photos, teams, status, error]);
 }

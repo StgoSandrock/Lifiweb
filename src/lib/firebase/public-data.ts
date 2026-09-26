@@ -1,9 +1,9 @@
 import { collection, onSnapshot, type Unsubscribe } from "firebase/firestore";
 import { firebaseArtifactId, firebaseDb } from "@/lib/firebase/client";
-import { fromFirestoreMatch, fromFirestorePlayer, fromFirestoreTeamPhoto } from "@/lib/firebase/adapters";
-import type { Match, Player, TeamPhoto } from "@/types/domain";
+import { fromFirestoreMatch, fromFirestorePlayer, fromFirestoreTeam, fromFirestoreTeamPhoto } from "@/lib/firebase/adapters";
+import type { Match, Player, TeamPhoto, TeamRegistration } from "@/types/domain";
 
-function publicCollection(name: "jugadores" | "partidos" | "teamPhotos") {
+function publicCollection(name: "jugadores" | "partidos" | "teamPhotos" | "teams") {
   return collection(firebaseDb, "artifacts", firebaseArtifactId, "public", "data", name);
 }
 
@@ -11,6 +11,7 @@ export function subscribeToLeagueData(callbacks: {
   matches: (matches: Match[]) => void;
   players: (players: Player[]) => void;
   photos: (photos: TeamPhoto[]) => void;
+  teams: (teams: TeamRegistration[]) => void;
   error: (error: Error) => void;
 }): Unsubscribe {
   const unsubscribeMatches = onSnapshot(publicCollection("partidos"), (snapshot) => {
@@ -31,9 +32,16 @@ export function subscribeToLeagueData(callbacks: {
       return photo ? [photo] : [];
     }));
   }, callbacks.error);
+  const unsubscribeTeams = onSnapshot(publicCollection("teams"), (snapshot) => {
+    callbacks.teams(snapshot.docs.flatMap((item) => {
+      const team = fromFirestoreTeam(item.id, item.data());
+      return team ? [team] : [];
+    }));
+  }, callbacks.error);
   return () => {
     unsubscribeMatches();
     unsubscribePlayers();
     unsubscribePhotos();
+    unsubscribeTeams();
   };
 }

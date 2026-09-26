@@ -2,12 +2,27 @@ export type Competition = "league" | "cup" | "lff";
 export type CategoryId = "pre-peque" | "peque" | "mini" | "infantil" | "intermedia" | "superior";
 export type MatchStatus = "scheduled" | "played" | "postponed" | "cancelled";
 export type MatchEventType = "goal" | "yellow-card" | "red-card";
+export type GoalTeam = "home" | "away";
+
+export interface GoalEvent {
+  id: string;
+  team: GoalTeam;
+  playerId: string | null;
+  playerName: string | null;
+}
 
 export interface Club {
   id: string;
   name: string;
   aliases: readonly string[];
   logo: string;
+}
+
+export interface TeamRegistration extends Club {
+  competition: Competition;
+  category: CategoryId;
+  active: boolean;
+  order: number;
 }
 
 export interface Category {
@@ -67,6 +82,9 @@ export interface Match {
   time: string | null;
   venue: string | null;
   events?: MatchEvent[];
+  goalEvents?: GoalEvent[];
+  usesGoalEvents?: boolean;
+  version?: number;
 }
 
 export interface Standing {

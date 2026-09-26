@@ -17,7 +17,7 @@ export function StandingsTable({ standings, onClub }: { standings: Standing[]; o
             <td data-label="Pos.">{index + 1}</td>
             <th scope="row">
               <button className="club-cell" type="button" onClick={() => onClub(row.club.name)}>
-                <span className="mark-shell"><ClubMark name={row.club.name} size={42} /></span>
+                <span className="mark-shell"><ClubMark name={row.club.name} club={row.club} size={42} /></span>
                 <span>{row.club.name}</span>
               </button>
             </th>

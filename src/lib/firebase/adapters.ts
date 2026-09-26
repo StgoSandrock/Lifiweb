@@ -1,4 +1,4 @@
-import type { CategoryId, Competition, Match, MatchStatus, Player, TeamPhoto } from "../../types/domain";
+import type { CategoryId, Competition, GoalEvent, Match, MatchEvent, MatchEventType, MatchStatus, Player, TeamPhoto, TeamRegistration } from "../../types/domain";
 import { CATEGORY_IDS } from "../../config/league";
 import { normalizeClubName } from "../text";
 
@@ -24,6 +24,33 @@ const competition = (raw: Raw, legacyCupField: "isCup" | "cupPlayer"): Competiti
   return raw[legacyCupField] === true ? "cup" : "league";
 };
 
+function goalEvents(value: unknown): GoalEvent[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const rawEvent = item as Raw;
+    const id = text(rawEvent.id);
+    const team = rawEvent.team;
+    if (!id || (team !== "home" && team !== "away")) return [];
+    const playerId = text(rawEvent.playerId) || null;
+    return [{ id, team, playerId, playerName: playerId ? text(rawEvent.playerName) || null : null }];
+  });
+}
+
+function matchEvents(value: unknown): MatchEvent[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+    const rawEvent = item as Raw;
+    const id = text(rawEvent.id);
+    const type = rawEvent.type as MatchEventType;
+    const team = text(rawEvent.team);
+    const player = text(rawEvent.player);
+    if (!id || !team || !["goal", "yellow-card", "red-card"].includes(type)) return [];
+    return [{ id, type, team, player, minute: rawEvent.minute == null ? null : nonNegative(rawEvent.minute) }];
+  });
+}
+
 export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
   const matchCategory = category(raw.category);
   const home = normalizeClubName(text(raw.local ?? raw.home));
@@ -42,6 +69,7 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
     : raw.status === "postponed" || raw.status === "cancelled"
       ? raw.status
       : "scheduled";
+  const storedGoalEvents = goalEvents(raw.goalEvents);
   return {
     id,
     tournament: "clausura",
@@ -60,6 +88,10 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
     date: nullableDetail(raw.fechaCompleta ?? raw.date),
     time: nullableDetail(raw.hora ?? raw.time),
     venue: nullableDetail(raw.cancha ?? raw.venue),
+    events: matchEvents(raw.events),
+    goalEvents: storedGoalEvents,
+    usesGoalEvents: Array.isArray(raw.goalEvents),
+    version: nonNegative(raw.version),
   };
 }
 
@@ -91,4 +123,21 @@ export function fromFirestoreTeamPhoto(id: string, raw: Raw): TeamPhoto | null {
   const storagePath = text(raw.storagePath);
   if (!photoCategory || (photoCompetition !== "league" && photoCompetition !== "cup" && photoCompetition !== "lff") || !club || !url || !storagePath) return null;
   return { id, category: photoCategory, competition: photoCompetition, club, url, storagePath, order: nonNegative(raw.order) };
+}
+
+export function fromFirestoreTeam(id: string, raw: Raw): TeamRegistration | null {
+  const teamCategory = category(raw.category);
+  const teamCompetition = raw.competition;
+  const name = text(raw.name);
+  if (!teamCategory || (teamCompetition !== "league" && teamCompetition !== "cup" && teamCompetition !== "lff") || !name) return null;
+  return {
+    id,
+    name,
+    aliases: Array.isArray(raw.aliases) ? raw.aliases.filter((item): item is string => typeof item === "string") : [],
+    logo: text(raw.logo),
+    competition: teamCompetition,
+    category: teamCategory,
+    active: raw.active !== false,
+    order: nonNegative(raw.order),
+  };
 }

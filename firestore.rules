@@ -52,6 +52,11 @@ service cloud.firestore {
         && (data.golesV == null || isNonNegativeInt(data.golesV))
         && (data.status != 'played' || (isNonNegativeInt(data.golesL) && isNonNegativeInt(data.golesV)))
         && (data.status == 'played' || (data.golesL == null && data.golesV == null))
+        && data.goalEvents is list
+        && data.goalEvents.size() <= 198
+        && (data.status == 'played' || data.goalEvents.size() == 0)
+        && (data.status != 'played' || data.goalEvents.size() == data.golesL + data.golesV)
+        && isNonNegativeInt(data.version)
         && data.updatedBy == request.auth.uid;
     }
 
@@ -63,7 +68,10 @@ service cloud.firestore {
 
     match /artifacts/{artifactId}/public/data/partidos/{matchId} {
       allow read: if true;
-      allow create, update: if isStaff() && validMatch(request.resource.data);
+      allow create: if isStaff() && validMatch(request.resource.data) && request.resource.data.version == 0;
+      allow update: if isStaff()
+        && validMatch(request.resource.data)
+        && request.resource.data.version == (('version' in resource.data) ? resource.data.version + 1 : 1);
       allow delete: if isStaff();
     }
 
@@ -81,9 +89,32 @@ service cloud.firestore {
       allow delete: if isStaff();
     }
 
+    match /artifacts/{artifactId}/public/data/teams/{teamId} {
+      allow read: if true;
+      allow create, update: if isStaff()
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 80
+        && request.resource.data.competition in ['league', 'cup', 'lff']
+        && validCategory(request.resource.data.category)
+        && request.resource.data.active is bool
+        && isNonNegativeInt(request.resource.data.order)
+        && request.resource.data.updatedBy == request.auth.uid;
+      allow delete: if isStaff();
+    }
+
     match /artifacts/{artifactId}/public/data/{document=**} {
       allow read: if true;
       allow write: if false;
+    }
+
+    match /artifacts/{artifactId}/private/data/matchAudits/{auditId} {
+      allow read: if isStaff();
+      allow create: if isStaff()
+        && request.resource.data.matchId is string
+        && request.resource.data.action == 'result-updated'
+        && request.resource.data.createdBy == request.auth.uid;
+      allow update, delete: if false;
     }
 
     match /staffRoles/{userId} {
