@@ -34,10 +34,11 @@ export function LeagueApp({ competition }: { competition: Competition }) {
     if (managed.length) return managed;
     if (competition === "league") return CLUBS;
     if (competition === "lff") return LFF_CLUBS;
+    const registered = CUP_CLUBS_BY_CATEGORY[category];
+    if (registered?.length) return registered;
     const names = [...new Set([
       ...filteredMatches.flatMap((match) => [match.home, match.away]),
       ...filteredPlayers.map((player) => player.club),
-      ...(CUP_CLUBS_BY_CATEGORY[category] ?? []).map((club) => club.name),
     ])].sort((a, b) => a.localeCompare(b, "es"));
     return names.map((name) => getClub(name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
   }, [competition, category, filteredMatches, filteredPlayers, teams]);
