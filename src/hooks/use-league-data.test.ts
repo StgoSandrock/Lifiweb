@@ -34,6 +34,79 @@ describe("mergeMatchesWithFallback", () => {
     expect(palestinoManquehue[0]).toMatchObject({ ...played, venue: "Palestino" });
   });
 
+  it("deduplicates a reverse live fixture and keeps the confirmed official result", () => {
+    const staleReverse: Match = {
+      id: "firestore-reverse-copy",
+      tournament: "clausura",
+      competition: "league",
+      category: "pre-peque",
+      round: 8,
+      order: 2,
+      home: "Ultimate S.A",
+      away: "Club Palestino",
+      homeScore: null,
+      awayScore: null,
+      status: "scheduled",
+      date: null,
+      time: null,
+      venue: null,
+    };
+
+    const merged = mergeMatchesWithFallback([staleReverse]);
+    const fixture = merged.filter((match) =>
+      match.competition === "league"
+      && match.category === "pre-peque"
+      && match.round === 8
+      && [match.home, match.away].includes("Club Palestino")
+      && [match.home, match.away].includes("Ultimate S.A")
+    );
+
+    expect(fixture).toHaveLength(1);
+    expect(fixture[0]).toMatchObject({
+      home: "Club Palestino",
+      away: "Ultimate S.A",
+      homeScore: 10,
+      awayScore: 2,
+      status: "played",
+    });
+  });
+
+  it("does not let a stale live score replace a confirmed static score", () => {
+    const staleResult: Match = {
+      id: "firestore-stale-score",
+      tournament: "clausura",
+      competition: "league",
+      category: "mini",
+      round: 5,
+      order: 1,
+      home: "Estadio Israelita",
+      away: "Estadio Croata",
+      homeScore: 0,
+      awayScore: 13,
+      status: "played",
+      date: null,
+      time: null,
+      venue: null,
+    };
+
+    const merged = mergeMatchesWithFallback([staleResult]);
+    const fixture = merged.find((match) =>
+      match.competition === "league"
+      && match.category === "mini"
+      && match.round === 5
+      && [match.home, match.away].includes("Estadio Croata")
+      && [match.home, match.away].includes("Estadio Israelita")
+    );
+
+    expect(fixture).toMatchObject({
+      home: "Estadio Croata",
+      away: "Estadio Israelita",
+      homeScore: 14,
+      awayScore: 0,
+      status: "played",
+    });
+  });
+
   it("does not merge Club Palestino A with Club Palestino B", () => {
     const matches: Match[] = [
       {
@@ -77,7 +150,7 @@ describe("mergeMatchesWithFallback", () => {
     expect(merged.filter((match) => matches.some(({ id }) => id === match.id))).toHaveLength(2);
   });
 
-  it("preserves official penalty details when the live result omits them", () => {
+  it("preserves the confirmed official score and penalty details over stale live data", () => {
     const merged = mergeMatchesWithFallback([{
       id: "live-palestino-a",
       tournament: "clausura",
@@ -98,8 +171,8 @@ describe("mergeMatchesWithFallback", () => {
     expect(merged.find((match) => match.id === "live-palestino-a")).toMatchObject({
       homePenalties: 3,
       awayPenalties: 2,
-      homeScore: 4,
-      awayScore: 3,
+      homeScore: 0,
+      awayScore: 0,
       date: "Jueves 20 de agosto",
     });
   });
