@@ -38,12 +38,12 @@ describe("fixture Clausura", () => {
     const confirmed = new Map([
       ["clausura-pre-peque-f1-p4", [1, 2]],
       ["clausura-pre-peque-f5-p2", [2, 1]],
-      ["clausura-pre-peque-f5-p4", [2, 6]],
+      ["clausura-pre-peque-f5-p4", [3, 6]],
       ["clausura-pre-peque-f5-p5", [3, 1]],
       ["clausura-peque-f5-p1", [2, 0]],
       ["clausura-peque-f5-p2", [5, 0]],
       ["clausura-peque-f5-p5", [4, 1]],
-      ["clausura-mini-f5-p1", [13, 0]],
+      ["clausura-mini-f5-p1", [14, 0]],
       ["clausura-mini-f5-p4", [4, 6]],
       ["clausura-infantil-f5-p1", [2, 2]],
       ["clausura-infantil-f5-p3", [1, 1]],
@@ -100,6 +100,28 @@ describe("fixture Clausura", () => {
         status: "played",
         date,
         venue: "Palestino",
+      });
+    }
+  });
+
+  it("publica los cinco resultados de Español contra Inter sin crear otro cruce", () => {
+    const confirmed = new Map([
+      ["clausura-pre-peque-f8-p3", [7, 0]],
+      ["clausura-peque-f8-p3", [9, 0]],
+      ["clausura-mini-f8-p3", [3, 3]],
+      ["clausura-infantil-f8-p3", [4, 0]],
+      ["clausura-intermedia-f8-p3", [7, 3]],
+    ]);
+
+    for (const [id, [homeScore, awayScore]] of confirmed) {
+      expect(matches.find((match) => match.id === id)).toMatchObject({
+        home: "Estadio Español",
+        away: "Inter",
+        homeScore,
+        awayScore,
+        status: "played",
+        date: "Sábado 12 de septiembre de 2026",
+        venue: "Estadio Español",
       });
     }
   });
