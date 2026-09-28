@@ -51,22 +51,23 @@ export const LFF_CLUBS: readonly Club[] = [
   { id: "lff-sport-academy", name: "Sport Academy", aliases: [], logo: "/clubs/sport-academy.jpeg" },
 ] as const;
 
-const cupClub = (id: string, name: string, logo = ""): Club => ({ id, name, aliases: [], logo });
+const cupClub = (id: string, name: string, logo = "", aliases: readonly string[] = []): Club => ({ id, name, aliases, logo });
 
 export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>> = {
   "pre-peque": [
-    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg"),
+    cupClub("cup-uss", "USS", "/clubs/uss.jpeg"),
+    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg", ["Club Manquehue", "Manquehue"]),
     cupClub("cup-diablos-rojos", "Diablos Rojos"),
     cupClub("cup-barnechea", "Barnechea"),
     cupClub("cup-israelita", "Estadio Israelita", "/clubs/israelita.svg"),
     cupClub("cup-country-club", "Country Club", "/clubs/country-club.png"),
     cupClub("cup-alumni", "Alumni"),
-    cupClub("cup-sirio", "Sirio"),
+    cupClub("cup-futuro-albo", "Futuro Albo", "/clubs/futuro-albo.jpeg", ["F Albo", "F. Albo"]),
     cupClub("cup-palestino", "Club Palestino", "/clubs/palestino.svg"),
   ],
   peque: [
     cupClub("cup-uss", "USS"),
-    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg"),
+    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg", ["Club Manquehue", "Manquehue"]),
     cupClub("cup-alumni", "Alumni"),
     cupClub("cup-espanol", "Estadio Español", "/clubs/espanol.svg"),
     cupClub("cup-israelita", "Estadio Israelita", "/clubs/israelita.svg"),
@@ -80,7 +81,7 @@ export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>>
   ],
   mini: [
     cupClub("cup-uss", "USS"),
-    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg"),
+    cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg", ["Club Manquehue", "Manquehue"]),
     cupClub("cup-alumni", "Alumni"),
     cupClub("cup-palestino", "Club Palestino", "/clubs/palestino.svg"),
     cupClub("cup-sirio", "Sirio"),

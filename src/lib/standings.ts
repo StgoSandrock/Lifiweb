@@ -11,7 +11,7 @@ function validPlayedMatch(match: Match) {
 }
 
 export function calculateStandings(matches: readonly Match[], clubs: readonly Club[] = CLUBS): Standing[] {
-  const rows = new Map(clubs.map((club) => [club.name, {
+  const standings = clubs.map((club) => ({
     club,
     played: 0,
     won: 0,
@@ -21,7 +21,13 @@ export function calculateStandings(matches: readonly Match[], clubs: readonly Cl
     goalsAgainst: 0,
     goalDifference: 0,
     points: 0,
-  } satisfies Standing]));
+  } satisfies Standing));
+  const rows = new Map<string, Standing>();
+  for (const standing of standings) {
+    for (const name of [standing.club.name, ...standing.club.aliases]) {
+      rows.set(normalizeClubName(name), standing);
+    }
+  }
 
   for (const match of matches.filter(validPlayedMatch)) {
     const home = rows.get(normalizeClubName(match.home));
@@ -58,7 +64,7 @@ export function calculateStandings(matches: readonly Match[], clubs: readonly Cl
     away.goalDifference = away.goalsFor - away.goalsAgainst;
   }
 
-  return [...rows.values()].sort((a, b) =>
+  return standings.sort((a, b) =>
     b.points - a.points
     || b.goalDifference - a.goalDifference
     || b.goalsFor - a.goalsFor
