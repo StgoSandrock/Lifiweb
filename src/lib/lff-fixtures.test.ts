@@ -77,7 +77,24 @@ describe("fixture oficial LFF", () => {
     });
     expect(manquehueItaliano?.events?.filter((event) => event.player === "Zach")).toHaveLength(2);
     expect(manquehueItaliano?.events?.filter((event) => event.player === "Karmenic")).toHaveLength(2);
-    expect(LFF_FIXTURES.filter((match) => match.round === 2 && match.status === "played")).toHaveLength(2);
+    const palestinoSport = LFF_FIXTURES.find((match) => match.id === "lff-superior-r2-m4");
+    expect(palestinoSport).toMatchObject({
+      home: "Club Palestino A",
+      away: "Sport Academy",
+      homeScore: 4,
+      awayScore: 2,
+      status: "played",
+      venue: "Palestino",
+    });
+    expect(palestinoSport?.events).toEqual(expect.arrayContaining([
+      expect.objectContaining({ team: "Club Palestino A", player: "Jara" }),
+      expect.objectContaining({ team: "Club Palestino A", player: "Insulsa" }),
+      expect.objectContaining({ team: "Club Palestino A", player: "Eriguren" }),
+      expect.objectContaining({ team: "Club Palestino A", player: "Saglie" }),
+      expect.objectContaining({ team: "Sport Academy", player: "Román" }),
+      expect.objectContaining({ team: "Sport Academy", player: "Simes" }),
+    ]));
+    expect(LFF_FIXTURES.filter((match) => match.round === 2 && match.status === "played")).toHaveLength(3);
 
     const standings = calculateStandings(LFF_FIXTURES, LFF_CLUBS);
     expect(standings.find((standing) => standing.club.name === "Country Club B")?.points).toBe(9);

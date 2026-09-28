@@ -26,64 +26,15 @@ function withOfficialHomeVenue(match: Match): Match {
   return venue ? { ...match, venue } : match;
 }
 
-const OFFICIAL_MATCH_OVERRIDES: Readonly<Record<string, Partial<Match>>> = {
-  "clausura-pre-peque-f8-p3": {
-    home: "Estadio Español",
-    away: "Inter",
-    homeScore: 7,
-    awayScore: 0,
-    status: "played",
-    venue: "Estadio Español",
-  },
-  "clausura-peque-f8-p3": {
-    home: "Estadio Español",
-    away: "Inter",
-    homeScore: 9,
-    awayScore: 0,
-    status: "played",
-    venue: "Estadio Español",
-  },
-  "clausura-mini-f8-p3": {
-    home: "Estadio Español",
-    away: "Inter",
-    homeScore: 3,
-    awayScore: 3,
-    status: "played",
-    venue: "Estadio Español",
-  },
-  "clausura-infantil-f8-p3": {
-    home: "Estadio Español",
-    away: "Inter",
-    homeScore: 4,
-    awayScore: 0,
-    status: "played",
-    venue: "Estadio Español",
-  },
-  "clausura-intermedia-f8-p3": {
-    home: "Estadio Español",
-    away: "Inter",
-    homeScore: 7,
-    awayScore: 3,
-    status: "played",
-    venue: "Estadio Español",
-  },
-};
-
-function withOfficialMatchOverride(match: Match): Match {
-  const override = OFFICIAL_MATCH_OVERRIDES[match.id];
-  return override ? { ...match, ...override } : match;
-}
-
 const fallbackMatches = [...(fallbackFixtures as Match[]), ...CUP_FIXTURES, ...LFF_FIXTURES].map(withOfficialHomeVenue);
-const fallbackMatchesForDisplay = fallbackMatches.map(withOfficialMatchOverride);
 
 function matchIdentity(match: Match) {
+  const clubs = [normalizeClubName(match.home), normalizeClubName(match.away)].sort();
   return [
     match.competition,
     match.category,
     match.round,
-    normalizeClubName(match.home),
-    normalizeClubName(match.away),
+    ...clubs,
   ].join("|");
 }
 
@@ -96,6 +47,17 @@ function preferredLiveMatch(matches: Match[], fallbackId?: string) {
 }
 
 function withFallbackDetails(live: Match, fallback: Match): Match {
+  if (fallback.status === "played") {
+    return withOfficialHomeVenue({
+      ...fallback,
+      id: live.id,
+      date: fallback.date ?? live.date,
+      time: fallback.time ?? live.time,
+      venue: fallback.venue ?? live.venue,
+      events: fallback.events?.length ? fallback.events : live.events,
+    });
+  }
+
   return withOfficialHomeVenue({
     ...fallback,
     ...live,
@@ -157,7 +119,7 @@ export function mergePlayersWithOfficialStats(livePlayers: Player[]) {
 }
 
 export function useLeagueData() {
-  const [matches, setMatches] = useState<Match[]>(fallbackMatchesForDisplay);
+  const [matches, setMatches] = useState<Match[]>(fallbackMatches);
   const [rawPlayers, setRawPlayers] = useState<Player[]>([]);
   const [photos, setPhotos] = useState<TeamPhoto[]>(SEEDED_TEAM_PHOTOS);
   const [teams, setTeams] = useState<TeamRegistration[]>([]);
@@ -188,7 +150,7 @@ export function useLeagueData() {
     },
     error: async () => {
       const fallbackPlayers = await import("@/data/legacy-players.json");
-      setMatches(fallbackMatchesForDisplay);
+      setMatches(fallbackMatches);
       setRawPlayers(mergePlayersWithOfficialStats(fallbackPlayers.default.flatMap((player, index) => {
         const mapped = fromFirestorePlayer(String(player.id ?? `fallback-${index}`), player);
         return mapped ? [mapped] : [];
