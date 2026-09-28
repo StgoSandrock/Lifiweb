@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CLUBS } from "@/config/league";
+import { CLUBS, CUP_CLUBS_BY_CATEGORY } from "@/config/league";
+import { CUP_FIXTURES } from "@/data/cup-fixtures";
 import { calculateStandings } from "@/lib/standings";
 import type { Match } from "@/types/domain";
 
@@ -65,5 +66,17 @@ describe("calculateStandings", () => {
       match({ id: "b", home: "Bianconero", away: "Estadio Croata", status: "played", homeScore: 3, awayScore: 1 }),
     ];
     expect(calculateStandings(matches).filter((item) => item.points === 3).map((item) => item.club.name)).toEqual(["Bianconero", "Inter"]);
+  });
+
+  it("cuenta resultados Cup aunque el fixture use nombres abreviados", () => {
+    const standings = calculateStandings(
+      CUP_FIXTURES.filter((fixture) => fixture.category === "pre-peque"),
+      CUP_CLUBS_BY_CATEGORY["pre-peque"],
+    );
+
+    expect(standings.find((item) => item.club.name === "Club Deportivo Manquehue")).toMatchObject({ played: 3, points: 9 });
+    expect(standings.find((item) => item.club.name === "Futuro Albo")).toMatchObject({ played: 1, points: 3, goalsFor: 5, goalsAgainst: 3 });
+    expect(standings.find((item) => item.club.name === "Country Club")).toMatchObject({ played: 2, points: 0 });
+    expect(standings.find((item) => item.club.name === "Diablos Rojos")).toMatchObject({ played: 2, points: 6 });
   });
 });
