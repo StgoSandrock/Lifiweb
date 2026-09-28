@@ -154,6 +154,22 @@ const MATCH_OVERRIDES: Record<
       { id: "italiano-karmenic-2", type: "goal", team: "Stadio Italiano", player: "Karmenic" },
     ],
   },
+  "lff-superior-r2-m4": {
+    home: "Club Palestino A",
+    away: "Sport Academy",
+    homeScore: 4,
+    awayScore: 2,
+    status: "played",
+    venue: "Palestino",
+    events: [
+      { id: "pala-jara-r2-1", type: "goal", team: "Club Palestino A", player: "Jara" },
+      { id: "pala-insulsa-r2-1", type: "goal", team: "Club Palestino A", player: "Insulsa" },
+      { id: "pala-eriguren-r2-1", type: "goal", team: "Club Palestino A", player: "Eriguren" },
+      { id: "pala-saglie-r2-1", type: "goal", team: "Club Palestino A", player: "Saglie" },
+      { id: "sport-roman-r2-1", type: "goal", team: "Sport Academy", player: "Román" },
+      { id: "sport-simes-r2-1", type: "goal", team: "Sport Academy", player: "Simes" },
+    ],
+  },
   "lff-superior-r3-m1": {
     home: "Country Club B",
     away: "Sport Academy",
