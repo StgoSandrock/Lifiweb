@@ -4,7 +4,9 @@ import { getClub, normalizeClubName } from "@/lib/text";
 
 describe("clubes LIFI Cup", () => {
   it("mantiene la nómina oficial por categoría sin mezclar torneos", () => {
-    expect(CUP_CLUBS_BY_CATEGORY["pre-peque"]).toHaveLength(8);
+    expect(CUP_CLUBS_BY_CATEGORY["pre-peque"]).toHaveLength(9);
+    expect(CUP_CLUBS_BY_CATEGORY["pre-peque"]?.map((club) => club.name)).toEqual(expect.arrayContaining(["USS", "Futuro Albo"]));
+    expect(CUP_CLUBS_BY_CATEGORY["pre-peque"]?.map((club) => club.name)).not.toContain("Sirio");
     expect(CUP_CLUBS_BY_CATEGORY.peque).toHaveLength(12);
     expect(CUP_CLUBS_BY_CATEGORY.mini).toHaveLength(10);
   });
