@@ -35,7 +35,6 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
   "cup-2026-peque-f2-p5": [0, 2],
   "cup-2026-peque-f3-p1": [7, 2],
   "cup-2026-peque-f3-p3": [6, 3],
-  "cup-2026-peque-f5-p1": [0, 0],
   "cup-2026-peque-f3-p5": [1, 0],
   "cup-2026-peque-f4-p1": [2, 12],
   "cup-2026-peque-f4-p2": [1, 0],
