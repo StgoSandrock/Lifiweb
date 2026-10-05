@@ -23,7 +23,7 @@ function homeVenueForClub(home: string) {
 
 function withOfficialHomeVenue(match: Match): Match {
   const venue = homeVenueForClub(match.home);
-  return venue ? { ...match, venue } : match;
+  return venue && !match.venue ? { ...match, venue } : match;
 }
 
 const fallbackMatches = [...(fallbackFixtures as Match[]), ...CUP_FIXTURES, ...LFF_FIXTURES].map(withOfficialHomeVenue);
@@ -47,17 +47,6 @@ function preferredLiveMatch(matches: Match[], fallbackId?: string) {
 }
 
 function withFallbackDetails(live: Match, fallback: Match): Match {
-  if (fallback.status === "played") {
-    return withOfficialHomeVenue({
-      ...fallback,
-      id: live.id,
-      date: fallback.date ?? live.date,
-      time: fallback.time ?? live.time,
-      venue: fallback.venue ?? live.venue,
-      events: fallback.events?.length ? fallback.events : live.events,
-    });
-  }
-
   return withOfficialHomeVenue({
     ...fallback,
     ...live,
