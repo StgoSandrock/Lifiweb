@@ -85,6 +85,7 @@ export interface Match {
   goalEvents?: GoalEvent[];
   usesGoalEvents?: boolean;
   version?: number;
+  updatedBy?: string;
 }
 
 export interface Standing {
