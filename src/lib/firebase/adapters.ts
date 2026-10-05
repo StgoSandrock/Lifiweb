@@ -92,6 +92,7 @@ export function fromFirestoreMatch(id: string, raw: Raw): Match | null {
     goalEvents: storedGoalEvents,
     usesGoalEvents: Array.isArray(raw.goalEvents),
     version: nonNegative(raw.version),
+    updatedBy: text(raw.updatedBy) || undefined,
   };
 }
 
