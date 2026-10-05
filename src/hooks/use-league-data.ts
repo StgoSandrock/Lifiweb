@@ -47,6 +47,17 @@ function preferredLiveMatch(matches: Match[], fallbackId?: string) {
 }
 
 function withFallbackDetails(live: Match, fallback: Match): Match {
+  if (fallback.status === "played" && !live.updatedBy) {
+    return withOfficialHomeVenue({
+      ...fallback,
+      id: live.id,
+      date: fallback.date ?? live.date,
+      time: fallback.time ?? live.time,
+      venue: fallback.venue ?? live.venue,
+      events: fallback.events?.length ? fallback.events : live.events,
+    });
+  }
+
   return withOfficialHomeVenue({
     ...fallback,
     ...live,
