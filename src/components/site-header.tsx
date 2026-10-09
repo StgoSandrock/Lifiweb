@@ -36,6 +36,7 @@ export function SiteHeader({ competition, onNavigate }: { competition?: Competit
         {competition === "league" && <a href="/liga#galeria" onClick={() => setOpen(false)}>Galería</a>}
         <a href={`${basePath}#clubes`} onClick={() => navigate("clubs")}>{competition === "lff" ? "Equipos" : "Clubes"}</a>
         <Link className="staff-link" href="/staff"><ShieldCheck size={17} /> Staff</Link>
+        <Link href="/gestion">Gestión de ligas</Link>
       </nav>
     </header>
   );

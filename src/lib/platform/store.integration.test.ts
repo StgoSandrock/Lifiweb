@@ -1,0 +1,43 @@
+import { describe, expect, it, vi } from "vitest";
+import { connectAuthEmulator, signInWithEmailAndPassword } from "firebase/auth";
+import { connectFirestoreEmulator, doc, getDoc } from "firebase/firestore";
+import { archiveSchema } from "./model";
+
+describe.skipIf(!process.env.FIRESTORE_EMULATOR_HOST)("platform persistence on local emulators", () => {
+  it("creates a league, exports and restores a draft with identical data and rejects stale writes", async () => {
+    vi.stubEnv("NEXT_PUBLIC_FIREBASE_PROJECT_ID", "demo-lifi-platform");
+    vi.stubEnv("NEXT_PUBLIC_FIREBASE_API_KEY", "demo-key");
+    const { firebaseAuth, firebaseDb } = await import("@/lib/firebase/client");
+    connectAuthEmulator(firebaseAuth,"http://127.0.0.1:9099",{disableWarnings:true});
+    connectFirestoreEmulator(firebaseDb,"127.0.0.1",8085);
+    const email=`test-${crypto.randomUUID()}@example.com`, password="LocalOnlyTest2026!";
+    const endpoint="http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/accounts";
+    const signup=await fetch(`${endpoint}:signUp?key=demo-key`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password,returnSecureToken:true})});
+    const account=await signup.json();
+    const update=await fetch(`${endpoint}:update?key=demo-key`,{method:"POST",headers:{"Content-Type":"application/json",Authorization:"Bearer owner"},body:JSON.stringify({localId:account.localId,emailVerified:true,customAttributes:JSON.stringify({staff:true})})});
+    expect(update.ok).toBe(true);
+    const {user}=await signInWithEmailAndPassword(firebaseAuth,email,password);
+    const store=await import("./store");
+    const org=`test-${crypto.randomUUID()}`;
+    await store.createOrganization({id:org,name:"Liga de prueba",contactEmail:email,color:"#126551",ownerUid:user.uid});
+    await store.saveEntity(org,"seasons",{id:"season-2027",name:"Apertura 2027",archived:false},null);
+    const tournament={id:"test-cup",seasonId:"season-2027",name:"Copa de prueba",categories:["Mini"],winPoints:3,drawPoints:1,lossPoints:0,published:true};
+    await store.saveEntity(org,"tournaments",tournament,null);
+    for(const id of ["team-north","team-south"])await store.saveEntity(org,"teams",{id,name:id,category:"Mini",deleted:false},null,tournament.id);
+    const match={id:"test-match",category:"Mini",home:"team-north",away:"team-south",round:1,date:"2027-03-01",time:"12:00",venue:"Cancha",status:"played",homeScore:2,awayScore:1,deleted:false};
+    await store.saveEntity(org,"matches",match,null,tournament.id);
+    await store.saveEntity(org,"players",{id:"private-player",name:"Jugador privado",teamId:"team-north",category:"Mini",published:false,deleted:false},null,tournament.id);
+    const archive=archiveSchema.parse(await store.getArchive(org,tournament.id));
+    expect(archive.matches).toEqual([match]);
+    const restoredId=await store.importArchive(org,archive);
+    const restored=await store.getArchive(org,restoredId);
+    expect(restored.tournament.published).toBe(false);
+    expect(restored.matches).toEqual(archive.matches);
+    expect(restored.players).toEqual(archive.players);
+    expect(restored.teams).toEqual(archive.teams);
+    await store.saveEntity(org,"matches",{...match,homeScore:3},0,tournament.id);
+    await expect(store.saveEntity(org,"matches",match,0,tournament.id)).rejects.toThrow("Otra persona");
+    expect((await getDoc(doc(firebaseDb,store.entityPath(org,"matches",tournament.id),match.id))).data()?.homeScore).toBe(3);
+    vi.unstubAllEnvs();
+  },30000);
+});

@@ -1,0 +1,222 @@
+.platform {
+  --league-color: #126551;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+  color: #102c3e;
+}
+.platform a {
+  color: var(--league-color);
+  font-weight: 650;
+}
+.platform-hero {
+  margin: 30px 0;
+  background: #092b39;
+  color: white;
+  border-radius: 18px;
+  padding: 44px;
+  max-width: 100%;
+}
+.platform-hero p:first-child {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #aee3d3;
+  font-size: 12px;
+  font-weight: 700;
+}
+.platform-hero h1 {
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.1;
+  margin: 14px 0;
+}
+.platform-hero p {
+  max-width: 650px;
+}
+.platform-card {
+  background: #fff;
+  border: 1px solid #d9e3e8;
+  border-radius: 14px;
+  padding: 24px;
+  margin: 20px 0;
+  min-width: 0;
+}
+.platform-card h2 {
+  font-size: 21px;
+  margin-top: 0;
+}
+.platform p {
+  line-height: 1.65;
+}
+.platform label {
+  display: grid;
+  gap: 7px;
+  margin: 14px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.platform input,
+.platform select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #afc2ca;
+  border-radius: 8px;
+  padding: 10px;
+  background: white;
+  color: #102c3e;
+  font: inherit;
+}
+.platform input[type="color"] {
+  padding: 4px;
+}
+.platform button {
+  background: var(--league-color);
+  color: white;
+  padding: 11px 18px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+  min-height: 44px;
+}
+.platform button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+.platform .subtle {
+  background: #edf4f2;
+  color: #155343;
+}
+.platform :focus-visible {
+  outline: 3px solid #edaa43;
+  outline-offset: 3px;
+}
+.platform fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+.platform-actions,
+.platform-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+.platform-heading {
+  justify-content: space-between;
+}
+.platform-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 20px;
+  align-items: start;
+}
+.platform-grid .platform-card {
+  margin: 0;
+}
+.platform-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #dde7ec;
+}
+.platform-row small {
+  display: block;
+  margin-top: 8px;
+  color: #526b76;
+}
+.platform-row span {
+  overflow-wrap: anywhere;
+}
+.platform-list {
+  margin: 18px 0;
+}
+.platform-list article {
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #dde7ec;
+  border-radius: 10px;
+  margin: 12px 0;
+}
+.platform-list h3 {
+  line-height: 1.5;
+}
+.platform-list strong {
+  padding: 0 8px;
+}
+.platform-table {
+  overflow: auto;
+  max-height: 480px;
+  background: white;
+  border: 1px solid #d9e3e8;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+.platform table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  text-align: left;
+}
+.platform th,
+.platform td {
+  padding: 14px;
+  border-bottom: 1px solid #e3ebef;
+  white-space: nowrap;
+}
+.platform thead {
+  background: #eaf3f0;
+}
+.platform-error {
+  padding: 14px;
+  border-left: 4px solid #b32a27;
+  background: #fff0ef;
+  color: #8a2120;
+  overflow-wrap: anywhere;
+}
+.platform summary {
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 0;
+}
+.platform label.platform-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-weight: 400;
+}
+.platform-check input {
+  width: 20px;
+  min-height: 20px;
+}
+.platform footer {
+  margin-top: 40px;
+  border-top: 1px solid #d9e3e8;
+  padding-top: 16px;
+}
+@media (max-width: 600px) {
+  .platform {
+    padding: 18px 14px 50px;
+  }
+  .platform-hero {
+    padding: 26px 20px;
+  }
+  .platform-card {
+    padding: 18px;
+  }
+  .platform-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .platform-actions {
+    gap: 8px;
+  }
+  .platform-actions button {
+    flex-grow: 1;
+  }
+}

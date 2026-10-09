@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { CLUBS, CUP_CLUBS_BY_CATEGORY } from "@/config/league";
-import { CUP_FIXTURES } from "@/data/cup-fixtures";
 import { calculateStandings } from "@/lib/standings";
 import type { Match } from "@/types/domain";
 
@@ -70,13 +69,17 @@ describe("calculateStandings", () => {
 
   it("cuenta resultados Cup aunque el fixture use nombres abreviados", () => {
     const standings = calculateStandings(
-      CUP_FIXTURES.filter((fixture) => fixture.category === "pre-peque"),
+      [
+        match({competition:"cup",home:"Manquehue",away:"Country Club",status:"played",homeScore:3,awayScore:0}),
+        match({competition:"cup",home:"F Albo",away:"Country Club",status:"played",homeScore:5,awayScore:3}),
+        match({competition:"cup",home:"Diablos Rojos",away:"USS",status:"played",homeScore:2,awayScore:0}),
+      ],
       CUP_CLUBS_BY_CATEGORY["pre-peque"],
     );
 
-    expect(standings.find((item) => item.club.name === "Club Deportivo Manquehue")).toMatchObject({ played: 3, points: 9 });
+    expect(standings.find((item) => item.club.name === "Club Deportivo Manquehue")).toMatchObject({ played: 1, points: 3 });
     expect(standings.find((item) => item.club.name === "Futuro Albo")).toMatchObject({ played: 1, points: 3, goalsFor: 5, goalsAgainst: 3 });
     expect(standings.find((item) => item.club.name === "Country Club")).toMatchObject({ played: 2, points: 0 });
-    expect(standings.find((item) => item.club.name === "Diablos Rojos")).toMatchObject({ played: 2, points: 6 });
+    expect(standings.find((item) => item.club.name === "Diablos Rojos")).toMatchObject({ played: 1, points: 3 });
   });
 });

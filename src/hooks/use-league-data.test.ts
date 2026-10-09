@@ -3,6 +3,10 @@ import { mergeMatchesWithFallback, mergePlayersWithOfficialStats } from "./use-l
 import type { Match } from "@/types/domain";
 
 describe("mergeMatchesWithFallback", () => {
+  it("does not resurrect a withdrawn bundled fixture", () => {
+    const original = mergeMatchesWithFallback([])[0];
+    expect(mergeMatchesWithFallback([], [original.id]).some(m => m.id === original.id)).toBe(false);
+  });
   it("deduplicates a live fixture with a different id and keeps the played result", () => {
     const played: Match = {
       id: "firestore-copy",
