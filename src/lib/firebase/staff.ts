@@ -2,6 +2,7 @@ import {
   onIdTokenChanged,
   signInWithEmailAndPassword,
   signOut,
+  sendPasswordResetEmail,
   type User,
 } from "firebase/auth";
 import {
@@ -26,7 +27,7 @@ function dataCollection(name: "jugadores" | "partidos" | "teamPhotos" | "teams")
 }
 
 export async function isStaffUser(user: User | null) {
-  if (!user || user.isAnonymous) return false;
+  if (!user || user.isAnonymous || !user.emailVerified) return false;
   const token = await user.getIdTokenResult(true);
   if (token.claims.staff === true || token.claims.admin === true) return true;
   const role = await getDoc(doc(firebaseDb, "staffRoles", user.uid));
@@ -43,6 +44,7 @@ export async function signInStaff(email: string, password: string) {
 }
 
 export const signOutStaff = () => signOut(firebaseAuth);
+export const resetStaffPassword = (email: string) => sendPasswordResetEmail(firebaseAuth, email.trim());
 export const observeStaffUser = (callback: (user: User | null) => void) => onIdTokenChanged(firebaseAuth, callback);
 
 export async function saveMatch(input: Match, user: User) {
@@ -127,7 +129,7 @@ export async function saveMatchResult(input: { match: Match; goalEvents: GoalEve
 }
 export async function deleteMatch(matchId: string, user: User) {
   if (!(await isStaffUser(user))) throw new Error("Sesión Staff no autorizada.");
-  await deleteDoc(doc(dataCollection("partidos"), matchId));
+  await setDoc(doc(dataCollection("partidos"), matchId), { deleted: true, deletedAt: serverTimestamp(), updatedBy: user.uid }, { merge: true });
 }
 
 export async function saveTeam(input: Omit<TeamRegistration, "id"> & { id?: string }, user: User, logoFile?: File | null) {
@@ -193,7 +195,7 @@ export async function savePlayer(input: Omit<Player, "id"> & { id?: string }, us
 
 export async function deletePlayer(playerId: string, user: User) {
   if (!(await isStaffUser(user))) throw new Error("Sesión Staff no autorizada.");
-  await deleteDoc(doc(dataCollection("jugadores"), playerId));
+  await setDoc(doc(dataCollection("jugadores"), playerId), { deleted: true, deletedAt: serverTimestamp(), updatedBy: user.uid }, { merge: true });
 }
 
 function safeSegment(value: string) {

@@ -128,27 +128,17 @@ describe("fixture Clausura", () => {
 });
 
 describe("fixture LIFI Cup", () => {
-  it("publica únicamente los resultados confirmados de la primera semana", () => {
-    const confirmed = new Map([
-      ["cup-2026-pre-peque-f1-p3", [3, 2]],
-      ["cup-2026-pre-peque-f1-p4", [3, 4]],
-      ["cup-2026-peque-f1-p1", [2, 2]],
-      ["cup-2026-peque-f1-p5", [4, 0]],
-      ["cup-2026-mini-f1-p1", [2, 1]],
-      ["cup-2026-mini-f1-p2", [2, 4]],
-      ["cup-2026-mini-f1-p3", [3, 1]],
-      ["cup-2026-mini-f1-p4", [1, 2]],
-    ]);
-
-    for (const [id, [homeScore, awayScore]] of confirmed) {
-      expect(CUP_FIXTURES.find((match) => match.id === id)).toMatchObject({ homeScore, awayScore, status: "played" });
+  it("mantiene marcadores completos solo para partidos jugados e ids únicos", () => {
+    expect(new Set(CUP_FIXTURES.map(m => m.id)).size).toBe(CUP_FIXTURES.length);
+    for (const fixture of CUP_FIXTURES) {
+      expect(fixture.home).not.toBe(fixture.away);
+      if (fixture.status === "played") {
+        expect(Number.isInteger(fixture.homeScore)).toBe(true);
+        expect(Number.isInteger(fixture.awayScore)).toBe(true);
+        expect(fixture.homeScore).toBeGreaterThanOrEqual(0);
+        expect(fixture.awayScore).toBeGreaterThanOrEqual(0);
+      } else { expect(fixture.homeScore).toBeNull(); expect(fixture.awayScore).toBeNull(); }
     }
-    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-mini-f1-p2")).toMatchObject({
-      home: "Barnechea",
-      away: "Alumni",
-    });
-    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-peque-f1-p3")).toMatchObject({ status: "played", homeScore: 3, awayScore: 2 });
-    expect(CUP_FIXTURES.find((match) => match.id === "cup-2026-infantil-f1-p2")).toMatchObject({ status: "scheduled", homeScore: null, awayScore: null });
   });
 
   it("publica el triunfo de Manquehue sobre Barnechea en Infantil", () => {

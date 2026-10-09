@@ -1,6 +1,6 @@
 import { getApp, getApps, initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
@@ -17,3 +17,13 @@ export const firebaseDb = getFirestore(firebaseApp);
 export const firebaseAuth = getAuth(firebaseApp);
 export const firebaseStorage = getStorage(firebaseApp);
 export const firebaseArtifactId = process.env.NEXT_PUBLIC_FIREBASE_ARTIFACT_ID ?? "lifi-2026-prod";
+
+// Explicit opt-in for local integration tests. Never enabled in production builds.
+if (process.env.NODE_ENV === "development" && process.env.NEXT_PUBLIC_FIREBASE_EMULATORS === "true" && firebaseConfig.projectId.startsWith("demo-")) {
+  const state = globalThis as typeof globalThis & { lifiEmulatorsConnected?: boolean };
+  if (!state.lifiEmulatorsConnected) {
+    connectAuthEmulator(firebaseAuth, "http://127.0.0.1:9099", { disableWarnings: true });
+    connectFirestoreEmulator(firebaseDb, "127.0.0.1", 8085);
+    state.lifiEmulatorsConnected = true;
+  }
+}
