@@ -40,6 +40,7 @@ const SOURCE_ROUNDS: ReadonlyArray<ReadonlyArray<readonly [string, string]>> = [
   [
     ["Club Deportivo Manquehue", "Club Palestino B"],
     ["Country Club A", "Club Palestino A"],
+    ["Sport Academy", "Equipo Médico"],
   ],
   [
     ["Club Deportivo Manquehue", "Equipo Médico"],
@@ -289,6 +290,23 @@ const MATCH_OVERRIDES: Record<
     homeScore: 3,
     awayScore: 1,
     status: "played",
+    events: [],
+  },
+  "lff-superior-r7-m3": {
+    home: "Equipo Médico",
+    away: "Sport Academy",
+    homeScore: 1,
+    awayScore: 1,
+    status: "played",
+    events: [],
+  },
+  "lff-superior-r8-m2": {
+    home: "Stadio Italiano",
+    away: "Estadio Español",
+    homeScore: 1,
+    awayScore: 0,
+    status: "played",
+    venue: "Stadio Italiano",
     events: [],
   },
 };
