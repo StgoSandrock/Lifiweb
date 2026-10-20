@@ -13,6 +13,7 @@ import { TeamGallery } from "@/components/team-gallery";
 import { LffHistory } from "@/components/lff-history";
 import { LifiHistory } from "@/components/lifi-history";
 import { calculateStandings } from "@/lib/standings";
+import { LFF_OFFICIAL_STANDINGS } from "@/data/lff-standings";
 import { foldText, getClub } from "@/lib/text";
 import { useLeagueData } from "@/hooks/use-league-data";
 import type { CategoryId, Club, Competition } from "@/types/domain";
@@ -42,7 +43,7 @@ export function LeagueApp({ competition }: { competition: Competition }) {
     ])].sort((a, b) => a.localeCompare(b, "es"));
     return names.map((name) => getClub(name) ?? { id: `cup-${foldText(name).replace(/\s+/g, "-")}`, name, aliases: [], logo: "" });
   }, [competition, category, filteredMatches, filteredPlayers, teams]);
-  const standings = useMemo(() => calculateStandings(filteredMatches, visibleClubs), [filteredMatches, visibleClubs]);
+  const standings = useMemo(() => competition === "lff" ? LFF_OFFICIAL_STANDINGS : calculateStandings(filteredMatches, visibleClubs), [competition, filteredMatches, visibleClubs]);
   const scorers = useMemo(() => [...filteredPlayers].filter((player) => player.goals > 0).sort((a, b) => b.goals - a.goals || a.name.localeCompare(b.name, "es")).slice(0, 5), [filteredPlayers]);
   const competitionMatches = useMemo(() => matches.filter((match) => match.competition === competition), [matches, competition]);
   const roundCount = new Set(competitionMatches.filter((match) => !match.roundLabel).map((match) => match.round)).size;
