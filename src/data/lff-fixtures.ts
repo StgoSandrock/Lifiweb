@@ -284,6 +284,22 @@ const MATCH_OVERRIDES: Record<
     status: "played",
     events: [],
   },
+  "lff-superior-r6-m1": {
+    home: "Club Deportivo Manquehue",
+    away: "Estadio Español",
+    homeScore: 1,
+    awayScore: 2,
+    status: "played",
+    events: [],
+  },
+  "lff-superior-r6-m2": {
+    home: "Sport Academy",
+    away: "Club Palestino B",
+    homeScore: 1,
+    awayScore: 2,
+    status: "played",
+    events: [],
+  },
   "lff-superior-r7-m2": {
     home: "Country Club A",
     away: "Club Palestino A",
