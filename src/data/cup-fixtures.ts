@@ -13,7 +13,7 @@ const WEEK_BY_ROUND: Readonly<Record<number, string>> = {
 };
 
 const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> = {
-  // PRE PEQUE — resultados visibles en la planilla entregada
+  // PRE PEQUE
   "cup-2026-pre-peque-f1-p1": [0, 8],
   "cup-2026-pre-peque-f1-p3": [3, 2],
   "cup-2026-pre-peque-f1-p4": [3, 4],
@@ -22,36 +22,38 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
   "cup-2026-pre-peque-f3-p1": [3, 5],
   "cup-2026-pre-peque-f3-p2": [6, 0],
   "cup-2026-pre-peque-f3-p3": [3, 2],
+  "cup-2026-pre-peque-f4-p1": [0, 16],
   "cup-2026-pre-peque-f4-p3": [1, 2],
   "cup-2026-pre-peque-f7-p1": [6, 3],
   "cup-2026-pre-peque-f8-p2": [7, 3],
-
-  // PEQUE — resultados visibles en la planilla entregada
+  // PEQUE
   "cup-2026-peque-f1-p1": [2, 2],
   "cup-2026-peque-f1-p2": [4, 2],
   "cup-2026-peque-f1-p3": [3, 2],
   "cup-2026-peque-f2-p2": [4, 0],
   "cup-2026-peque-f2-p4": [4, 2],
   "cup-2026-peque-f2-p5": [0, 2],
-  "cup-2026-peque-f3-p1": [7, 2],
+  "cup-2026-peque-f3-p1": [8, 2],
+  "cup-2026-peque-f3-p2": [1, 1],
   "cup-2026-peque-f3-p3": [6, 3],
   "cup-2026-peque-f3-p5": [1, 0],
-  "cup-2026-peque-f4-p1": [2, 12],
-  "cup-2026-peque-f4-p2": [1, 0],
-  "cup-2026-peque-f4-p3": [0, 1],
+  "cup-2026-peque-f4-p1": [12, 2],
+  "cup-2026-peque-f4-p2": [0, 1],
+  "cup-2026-peque-f4-p3": [1, 0],
   "cup-2026-peque-f4-p4": [6, 2],
   "cup-2026-peque-f4-p5": [4, 1],
   "cup-2026-peque-f7-p3": [1, 0],
   "cup-2026-peque-f8-p1": [12, 2],
   "cup-2026-peque-f8-p2": [2, 3],
-
-  // MINI — resultados visibles en la planilla entregada
+  // MINI
   "cup-2026-mini-f1-p3": [3, 2],
+  "cup-2026-mini-f1-p4": [1, 2],
   "cup-2026-mini-f2-p2": [3, 3],
   "cup-2026-mini-f2-p3": [2, 0],
   "cup-2026-mini-f2-p4": [1, 0],
   "cup-2026-mini-f3-p1": [1, 1],
   "cup-2026-mini-f3-p4": [2, 0],
+  "cup-2026-mini-f4-p1": [11, 3],
   "cup-2026-mini-f4-p2": [3, 1],
   "cup-2026-mini-f4-p3": [2, 1],
   "cup-2026-mini-f5-p2": [3, 11],
@@ -61,14 +63,13 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
   "cup-2026-mini-f8-p1": [4, 2],
   "cup-2026-mini-f9-p3": [0, 9],
   "cup-2026-mini-f9-p4": [1, 3],
-
-  // INFANTIL — resultados visibles en la planilla entregada
+  // INFANTIL
   "cup-2026-infantil-f1-p1": [1, 1],
   "cup-2026-infantil-f1-p2": [3, 0],
   "cup-2026-infantil-f2-p1": [0, 1],
   "cup-2026-infantil-f2-p2": [5, 2],
   "cup-2026-infantil-f3-p2": [0, 1],
-  "cup-2026-infantil-f4-p1": [1, 1],
+  "cup-2026-infantil-f4-p1": [3, 1],
   "cup-2026-infantil-f4-p2": [0, 3],
   "cup-2026-infantil-f6-p2": [1, 0],
 };
