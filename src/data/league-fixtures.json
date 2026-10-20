@@ -251,9 +251,9 @@
     "homeScore": 9,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Sábado 17 de octubre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "17:30"
   },
   {
     "id": "clausura-pre-peque-f4-p2",
@@ -667,9 +667,9 @@
     "homeScore": 3,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Sábado 17 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "10:00"
   },
   {
     "id": "clausura-pre-peque-f9-p3",
@@ -683,9 +683,9 @@
     "homeScore": 2,
     "awayScore": 4,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Sábado 17 de octubre de 2026",
+    "venue": "Club Deportivo Manquehue",
+    "time": "12:30"
   },
   {
     "id": "clausura-pre-peque-f9-p4",
@@ -971,9 +971,9 @@
     "homeScore": 0,
     "awayScore": 3,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 16 de octubre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "17:30"
   },
   {
     "id": "clausura-peque-f4-p2",
@@ -1387,9 +1387,9 @@
     "homeScore": 6,
     "awayScore": 2,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Sábado 17 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "11:00"
   },
   {
     "id": "clausura-peque-f9-p3",
@@ -1403,9 +1403,9 @@
     "homeScore": 2,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Sábado 17 de octubre de 2026",
+    "venue": "Club Deportivo Manquehue",
+    "time": "11:30"
   },
   {
     "id": "clausura-peque-f9-p4",
@@ -1691,9 +1691,9 @@
     "homeScore": 3,
     "awayScore": 3,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 16 de octubre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "18:30"
   },
   {
     "id": "clausura-mini-f4-p2",
@@ -2107,9 +2107,9 @@
     "homeScore": 5,
     "awayScore": 2,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Sábado 17 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "12:00"
   },
   {
     "id": "clausura-mini-f9-p3",
@@ -2123,9 +2123,9 @@
     "homeScore": 2,
     "awayScore": 2,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Sábado 17 de octubre de 2026",
+    "venue": "Club Deportivo Manquehue",
+    "time": "13:30"
   },
   {
     "id": "clausura-mini-f9-p4",
@@ -2347,9 +2347,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Martes 20 de octubre de 2026",
+    "venue": "Club Deportivo Manquehue",
+    "time": "18:00"
   },
   {
     "id": "clausura-infantil-f3-p3",
@@ -2411,9 +2411,9 @@
     "homeScore": 5,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Jueves 15 de octubre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "18:30"
   },
   {
     "id": "clausura-infantil-f4-p2",
@@ -2827,9 +2827,9 @@
     "homeScore": 3,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 16 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "17:15"
   },
   {
     "id": "clausura-infantil-f9-p3",
@@ -2843,9 +2843,9 @@
     "homeScore": 1,
     "awayScore": 3,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 16 de octubre de 2026",
+    "venue": "Club Deportivo Manquehue",
+    "time": "17:30"
   },
   {
     "id": "clausura-infantil-f9-p4",
@@ -3067,9 +3067,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Martes 20 de octubre de 2026",
+    "venue": "Club Deportivo Manquehue",
+    "time": "19:00"
   },
   {
     "id": "clausura-intermedia-f3-p3",
@@ -3131,8 +3131,8 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
+    "date": "Lunes 19 de octubre de 2026",
+    "venue": "Estadio Israelita",
     "time": null
   },
   {
@@ -3547,9 +3547,9 @@
     "homeScore": 2,
     "awayScore": 5,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 16 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "18:30"
   },
   {
     "id": "clausura-intermedia-f9-p3",
@@ -3563,9 +3563,9 @@
     "homeScore": 3,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 16 de octubre de 2026",
+    "venue": "Club Deportivo Manquehue",
+    "time": "18:30"
   },
   {
     "id": "clausura-intermedia-f9-p4",
