@@ -82,7 +82,8 @@ export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>>
   mini: [
     cupClub("cup-uss", "USS"),
     cupClub("cup-cdm", "Club Deportivo Manquehue", "/clubs/manquehue.svg", ["Club Manquehue", "Manquehue"]),
-    cupClub("cup-alumni", "Alumni"),
+    cupClub("cup-alumni-a", "Alumni A", "/clubs/alumni.jpeg", ["Alumni"]),
+    cupClub("cup-alumni-b", "Alumni B", "/clubs/alumni.jpeg", ["Alumni 2"]),
     cupClub("cup-palestino", "Club Palestino", "/clubs/palestino.svg"),
     cupClub("cup-sirio", "Sirio"),
     cupClub("cup-barnechea", "Barnechea"),
