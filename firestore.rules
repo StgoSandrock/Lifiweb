@@ -5,8 +5,8 @@ service cloud.firestore {
       return request.auth != null
         && request.auth.token.email_verified == true
         && (
-          request.auth.token.staff == true
-          || request.auth.token.admin == true
+          request.auth.token.get('staff', false) == true
+          || request.auth.token.get('admin', false) == true
           || get(/databases/$(database)/documents/staffRoles/$(request.auth.uid)).data.active == true
         );
     }
@@ -62,12 +62,16 @@ service cloud.firestore {
 
     match /artifacts/{artifactId}/public/data/jugadores/{playerId} {
       allow read: if true;
+      allow create: if isStaff() && request.resource.data.keys().hasOnly(['deleted','deletedAt','updatedBy']) && request.resource.data.deleted == true && request.resource.data.deletedAt == request.time && request.resource.data.updatedBy == request.auth.uid;
+      allow update: if isStaff() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted','deletedAt','updatedBy']) && request.resource.data.deleted == true && request.resource.data.deletedAt == request.time && request.resource.data.updatedBy == request.auth.uid;
       allow create, update: if isStaff() && validPlayer(request.resource.data);
       allow delete: if isStaff();
     }
 
     match /artifacts/{artifactId}/public/data/partidos/{matchId} {
       allow read: if true;
+      allow create: if isStaff() && request.resource.data.keys().hasOnly(['deleted','deletedAt','updatedBy']) && request.resource.data.deleted == true && request.resource.data.deletedAt == request.time && request.resource.data.updatedBy == request.auth.uid;
+      allow update: if isStaff() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['deleted','deletedAt','updatedBy']) && request.resource.data.deleted == true && request.resource.data.deletedAt == request.time && request.resource.data.updatedBy == request.auth.uid;
       allow create: if isStaff() && validMatch(request.resource.data) && request.resource.data.version == 0;
       allow update: if isStaff()
         && validMatch(request.resource.data)
@@ -115,6 +119,144 @@ service cloud.firestore {
         && request.resource.data.action == 'result-updated'
         && request.resource.data.createdBy == request.auth.uid;
       allow update, delete: if false;
+    }
+
+    // New leagues are isolated from the legacy LIFI artifact and from each other.
+    match /organizations/{org} {
+      function verified() { return request.auth != null && request.auth.token.email_verified == true; }
+      function owner() { return verified() && get(/databases/$(database)/documents/organizations/$(org)).data.ownerUid == request.auth.uid; }
+      function member() { return get(/databases/$(database)/documents/organizations/$(org)/members/$(request.auth.token.email.lower())).data; }
+      function active() { return verified() && member().active == true; }
+      function admin() { return owner() || (active() && member().role == 'admin'); }
+      function editor() { return admin() || (active() && member().role == 'editor'); }
+      function club(team) { return active() && member().role == 'club' && member().teamId == team; }
+      function tournament(tid) { return get(/databases/$(database)/documents/organizations/$(org)/tournaments/$(tid)).data; }
+      function publicTournament(tid) { return tournament(tid).published == true; }
+      function name(value) { return value is string && value.size() >= 2 && value.size() <= 100; }
+      function slug(value) { return value is string && value.matches('^[a-z0-9][a-z0-9-]{2,59}$'); }
+      function meta(keys, id) {
+        let d = request.resource.data;
+        return d.keys().hasOnly(keys.concat(['id', 'version', 'updatedBy', 'updatedAt', 'auditId']))
+          && d.id == id && slug(id) && d.version is int && d.updatedBy == request.auth.uid
+          && d.updatedAt == request.time && d.auditId is string;
+      }
+      function audited(path) {
+        let a = getAfter(/databases/$(database)/documents/organizations/$(org)/audits/$(request.resource.data.auditId)).data;
+        return a.path == path && a.actor == request.auth.uid && a.at == request.time
+          && a.version == request.resource.data.version && a.next == request.resource.data;
+      }
+      function fresh() { return request.resource.data.version == 0; }
+      function incremented() { return request.resource.data.version == resource.data.version + 1; }
+      function openSeason(tid) { return get(/databases/$(database)/documents/organizations/$(org)/seasons/$(tournament(tid).seasonId)).data.archived == false; }
+
+      allow get: if true;
+      allow list: if false;
+      allow create: if isStaff() && slug(org) && request.resource.data.id == org
+        && request.resource.data.keys().hasOnly(['id','name','contactEmail','color','logoUrl','ownerUid','createdAt'])
+        && name(request.resource.data.name) && request.resource.data.contactEmail is string
+        && request.resource.data.contactEmail.size() <= 254
+        && request.resource.data.color.matches('^#[0-9a-fA-F]{6}$')
+        && (request.resource.data.get('logoUrl', '') == '' || (request.resource.data.logoUrl is string && request.resource.data.logoUrl.size() <= 2048 && request.resource.data.logoUrl.matches('^https://.*')))
+        && request.resource.data.ownerUid == request.auth.uid && request.resource.data.createdAt == request.time;
+      allow update: if admin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['name','contactEmail','color','logoUrl'])
+        && name(request.resource.data.name) && request.resource.data.contactEmail is string && request.resource.data.contactEmail.size() <= 254
+        && request.resource.data.color.matches('^#[0-9a-fA-F]{6}$')
+        && request.resource.data.logoUrl is string && request.resource.data.logoUrl.size() <= 2048
+        && (request.resource.data.logoUrl == '' || request.resource.data.logoUrl.matches('^https://.*'));
+      allow delete: if false;
+
+      match /members/{email} {
+        allow get: if admin() || (verified() && request.auth.token.email.lower() == email);
+        allow list: if admin();
+        allow create, update: if verified()
+          && ((admin() && email != request.auth.token.email.lower())
+            || (!exists(/databases/$(database)/documents/organizations/$(org))
+              && getAfter(/databases/$(database)/documents/organizations/$(org)).data.ownerUid == request.auth.uid
+              && email == request.auth.token.email.lower() && request.resource.data.role == 'admin' && request.resource.data.active == true))
+          && request.resource.data.keys().hasOnly(['email','role','teamId','active'])
+          && request.resource.data.email == email && email.size() <= 254
+          && request.resource.data.role in ['admin','editor','club']
+          && request.resource.data.active is bool && request.resource.data.teamId is string
+          && (request.resource.data.role != 'club' || slug(request.resource.data.teamId));
+        allow delete: if false;
+      }
+      match /seasons/{id} {
+        function valid() { return meta(['name','archived'], id) && name(request.resource.data.name) && request.resource.data.archived is bool && audited('organizations/' + org + '/seasons/' + id); }
+        allow read: if true;
+        allow create: if admin() && valid() && fresh();
+        allow update: if admin() && valid() && incremented();
+        allow delete: if false;
+      }
+      match /tournaments/{tid} {
+        function valid() {
+          let d = request.resource.data;
+          return meta(['name','seasonId','categories','winPoints','drawPoints','lossPoints','published'], tid)
+            && name(d.name) && slug(d.seasonId)
+            && exists(/databases/$(database)/documents/organizations/$(org)/seasons/$(d.seasonId))
+            && d.categories is list && d.categories.size() >= 1 && d.categories.size() <= 20
+            && d.categories.toSet().size() == d.categories.size()
+            && d.winPoints is int && d.winPoints >= 0 && d.winPoints <= 10
+            && d.drawPoints is int && d.drawPoints >= 0 && d.drawPoints <= 10
+            && d.lossPoints is int && d.lossPoints >= 0 && d.lossPoints <= 10 && d.published is bool
+            && audited('organizations/' + org + '/tournaments/' + tid);
+        }
+        allow read: if resource.data.published == true || active() || owner();
+        allow create: if admin() && valid() && fresh();
+        allow update: if admin() && valid() && incremented()
+          && request.resource.data.seasonId == resource.data.seasonId
+          && request.resource.data.categories == resource.data.categories;
+        allow delete: if false;
+
+        match /teams/{id} {
+          function valid() { let d = request.resource.data; return meta(['name','category','deleted'], id) && name(d.name) && d.category in tournament(tid).categories && d.deleted is bool && audited('organizations/' + org + '/tournaments/' + tid + '/teams/' + id); }
+          allow read: if publicTournament(tid) || active() || owner();
+          allow create: if admin() && openSeason(tid) && valid() && fresh();
+          allow update: if admin() && openSeason(tid) && valid() && incremented() && request.resource.data.category == resource.data.category;
+          allow delete: if false;
+        }
+        match /matches/{id} {
+          function valid() {
+            let d = request.resource.data;
+            let h = get(/databases/$(database)/documents/organizations/$(org)/tournaments/$(tid)/teams/$(d.home)).data;
+            let a = get(/databases/$(database)/documents/organizations/$(org)/tournaments/$(tid)/teams/$(d.away)).data;
+            return meta(['category','home','away','round','date','time','venue','status','homeScore','awayScore','deleted'], id)
+              && d.category in tournament(tid).categories && d.home != d.away
+              && h.category == d.category && a.category == d.category && (d.deleted == true || (h.deleted == false && a.deleted == false))
+              && d.round is int && d.round > 0 && d.round <= 999 && d.deleted is bool
+              && d.date is string && (d.date == '' || d.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$'))
+              && d.time is string && (d.time == '' || d.time.matches('^([01][0-9]|2[0-3]):[0-5][0-9]$'))
+              && d.venue is string && d.venue.size() <= 120
+              && d.status in ['scheduled','played','postponed','cancelled']
+              && ((d.status == 'played' && d.homeScore is int && d.homeScore >= 0 && d.homeScore <= 99 && d.awayScore is int && d.awayScore >= 0 && d.awayScore <= 99)
+                || (d.status != 'played' && d.homeScore == null && d.awayScore == null))
+              && audited('organizations/' + org + '/tournaments/' + tid + '/matches/' + id);
+          }
+          allow read: if publicTournament(tid) || active() || owner();
+          allow create: if editor() && openSeason(tid) && valid() && fresh();
+          allow update: if editor() && openSeason(tid) && valid() && incremented();
+          allow delete: if false;
+        }
+        match /players/{id} {
+          function valid() { let d = request.resource.data; return meta(['name','teamId','category','published','deleted'], id) && name(d.name) && d.published is bool && d.deleted is bool && d.category in tournament(tid).categories && get(/databases/$(database)/documents/organizations/$(org)/tournaments/$(tid)/teams/$(d.teamId)).data.category == d.category && audited('organizations/' + org + '/tournaments/' + tid + '/players/' + id); }
+          allow read: if (publicTournament(tid) && resource.data.published == true) || admin() || (active() && member().role == 'editor') || club(resource.data.teamId);
+          allow create: if (admin() || club(request.resource.data.teamId)) && openSeason(tid) && valid() && fresh();
+          allow update: if (admin() || (club(resource.data.teamId) && club(request.resource.data.teamId))) && openSeason(tid) && valid() && incremented();
+          allow delete: if false;
+        }
+      }
+      match /audits/{id} {
+        allow read: if admin();
+        allow create: if (active() || owner())
+          && request.resource.data.keys().hasOnly(['path','action','version','actor','at','previous','next'])
+          && request.resource.data.action == 'saved' && request.resource.data.actor == request.auth.uid && request.resource.data.at == request.time
+          && request.resource.data.path.matches('^organizations/' + org + '/(seasons|tournaments)/.*$')
+          && getAfter(path('/databases/' + database + '/documents/' + request.resource.data.path)).data == request.resource.data.next
+          && request.resource.data.next.auditId == id
+          && request.resource.data.version == request.resource.data.next.version
+          && ((!exists(path('/databases/' + database + '/documents/' + request.resource.data.path)) && request.resource.data.previous == null)
+            || get(path('/databases/' + database + '/documents/' + request.resource.data.path)).data == request.resource.data.previous);
+        allow update, delete: if false;
+      }
     }
 
     match /staffRoles/{userId} {

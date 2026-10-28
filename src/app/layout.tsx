@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { SiteAnalytics } from "@/components/analytics";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://lifi.cl";
 
@@ -23,5 +24,5 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: "#071a35", width: "device-width", initialScale: 1 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="es"><body>{children}</body></html>;
+  return <html lang="es"><body>{children}<SiteAnalytics /></body></html>;
 }

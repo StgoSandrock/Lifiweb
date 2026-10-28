@@ -10,6 +10,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "test:rules": "firebase emulators:exec --only auth,firestore --project demo-lifi-platform \"node scripts/test-platform-rules.mjs && vitest run src/lib/platform/store.integration.test.ts\"",
+    "ops:check": "node scripts/check-production.mjs",
     "audit:firestore": "node scripts/audit-firestore.mjs",
     "qa:security": "node scripts/test-public-write.mjs",
     "mobile:assets": "node scripts/generate-mobile-assets.mjs",
@@ -25,6 +27,7 @@
   },
   "packageManager": "pnpm@11.9.0",
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "firebase": "^12.17.0",
     "lucide-react": "^1.28.0",
     "next": "^16.2.12",
@@ -33,12 +36,15 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^6.0.0",
     "@types/node": "^26.1.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.2.12",
+    "firebase-tools": "^15.32.1",
+    "prettier": "^3.9.9",
     "sharp": "^0.34.5",
     "typescript": "^6.0.3",
     "vitest": "^4.1.10"

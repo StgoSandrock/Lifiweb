@@ -70,7 +70,7 @@ function withFallbackDetails(live: Match, fallback: Match): Match {
   });
 }
 
-export function mergeMatchesWithFallback(liveMatches: Match[]) {
+export function mergeMatchesWithFallback(liveMatches: Match[], deletedIds: string[] = [], deletedMatches: Match[] = []) {
   const liveByIdentity = new Map<string, Match[]>();
   for (const match of liveMatches) {
     const identity = matchIdentity(match);
@@ -88,14 +88,15 @@ export function mergeMatchesWithFallback(liveMatches: Match[]) {
     .filter(([identity]) => !fallbackIdentities.has(identity))
     .map(([, matches]) => withOfficialHomeVenue(preferredLiveMatch(matches)));
 
-  return [...merged, ...additional];
+  const withdrawn = new Set(deletedMatches.map(matchIdentity));
+  return [...merged, ...additional].filter(match => !deletedIds.includes(match.id) && !withdrawn.has(matchIdentity(match)));
 }
 
 function playerIdentity(player: Player) {
   return [player.competition, player.category, normalizeClubName(player.club), player.name.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()].join("|");
 }
 
-export function mergePlayersWithOfficialStats(livePlayers: Player[]) {
+export function mergePlayersWithOfficialStats(livePlayers: Player[], deletedIds: string[] = [], deletedPlayers: Player[] = []) {
   const merged = new Map(livePlayers
     .filter((player) => !REMOVED_ROSTER_PLAYERS.has(playerIdentity(player)))
     .map((player) => [playerIdentity(player), player]));
@@ -115,7 +116,8 @@ export function mergePlayersWithOfficialStats(livePlayers: Player[]) {
       redCards: Math.max(live.redCards, official.redCards),
     } : official);
   }
-  return [...merged.values()];
+  const removedIdentities = new Set(deletedPlayers.map(playerIdentity));
+  return [...merged.values()].filter(p => !deletedIds.includes(p.id) && !removedIdentities.has(playerIdentity(p)));
 }
 
 export function useLeagueData() {
@@ -126,39 +128,45 @@ export function useLeagueData() {
   const [status, setStatus] = useState<"loading" | "live" | "fallback">("loading");
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => subscribeToLeagueData({
-    matches: (nextMatches) => {
-      setMatches(mergeMatchesWithFallback(nextMatches));
-      setStatus("live");
-      setError(null);
+  useEffect(() => {
+    const received = new Set<string>();
+    let failed = false, disposed = false;
+    const connected = (name: string) => { received.add(name); if (!failed && received.size === 4) { setStatus("live"); setError(null); } };
+    const unsubscribe = subscribeToLeagueData({
+    matches: (nextMatches, deletedIds, deletedMatches) => {
+      setMatches(mergeMatchesWithFallback(nextMatches, deletedIds, deletedMatches));
+      connected("matches");
     },
-    players: (nextPlayers) => {
-      setRawPlayers(mergePlayersWithOfficialStats(nextPlayers));
-      setStatus("live");
-      setError(null);
+    players: (nextPlayers, deletedIds, deletedPlayers) => {
+      setRawPlayers(mergePlayersWithOfficialStats(nextPlayers, deletedIds, deletedPlayers));
+      connected("players");
     },
     photos: (nextPhotos) => {
       const seededIds = new Set(SEEDED_TEAM_PHOTOS.map((photo) => photo.id));
       setPhotos([...SEEDED_TEAM_PHOTOS, ...nextPhotos.filter((photo) => !seededIds.has(photo.id))]);
-      setStatus("live");
-      setError(null);
+      connected("photos");
     },
     teams: (nextTeams) => {
       setTeams(nextTeams);
-      setStatus("live");
-      setError(null);
+      connected("teams");
     },
     error: async () => {
-      const fallbackPlayers = await import("@/data/legacy-players.json");
-      setMatches(fallbackMatches);
-      setRawPlayers(mergePlayersWithOfficialStats(fallbackPlayers.default.flatMap((player, index) => {
-        const mapped = fromFirestorePlayer(String(player.id ?? `fallback-${index}`), player);
-        return mapped ? [mapped] : [];
-      })));
+      failed = true;
       setStatus("fallback");
-      setError("No pudimos conectar con Firebase. Mostramos el último respaldo disponible.");
+      setError("Conexión incompleta con Firebase. La edición está deshabilitada; los datos pueden estar desactualizados.");
+      // Never replace a received live snapshot (including withdrawals) with older bundled data.
+      if (!received.has("players")) {
+        const fallbackPlayers = await import("@/data/legacy-players.json");
+        if (disposed || received.has("players")) return;
+        setRawPlayers(mergePlayersWithOfficialStats(fallbackPlayers.default.flatMap((player, index) => {
+          const mapped = fromFirestorePlayer(String(player.id ?? `fallback-${index}`), player);
+          return mapped ? [mapped] : [];
+        })));
+      }
     },
-  }), []);
+  });
+    return () => { disposed = true; unsubscribe(); };
+  }, []);
 
   const players = useMemo(() => derivePlayerGoals(rawPlayers, matches), [rawPlayers, matches]);
   return useMemo(() => ({ matches, players, photos, teams, status, error }), [matches, players, photos, teams, status, error]);
