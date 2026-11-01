@@ -283,9 +283,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 13 de noviembre de 2026",
+    "venue": "Club Manquehue",
+    "time": "18:30"
   },
   {
     "id": "clausura-pre-peque-f4-p4",
@@ -699,9 +699,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Martes 27 de octubre de 2026",
+    "venue": "LAF",
+    "time": "17:30"
   },
   {
     "id": "clausura-pre-peque-f9-p5",
@@ -1003,9 +1003,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 13 de noviembre de 2026",
+    "venue": "Club Manquehue",
+    "time": "18:30"
   },
   {
     "id": "clausura-peque-f4-p4",
@@ -1014,14 +1014,14 @@
     "category": "peque",
     "round": 4,
     "order": 4,
-    "home": "Ultimate S.A",
-    "away": "Estadio Español",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "home": "Estadio Español",
+    "away": "Ultimate S.A",
+    "homeScore": 3,
+    "awayScore": 1,
+    "status": "played",
+    "date": "Martes 27 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "18:20"
   },
   {
     "id": "clausura-peque-f4-p5",
@@ -1126,14 +1126,14 @@
     "category": "peque",
     "round": 6,
     "order": 1,
-    "home": "Inter",
-    "away": "Estadio Israelita",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "home": "Estadio Israelita",
+    "away": "Inter",
+    "homeScore": 4,
+    "awayScore": 1,
+    "status": "played",
+    "date": "Viernes 30 de octubre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "17:30"
   },
   {
     "id": "clausura-peque-f6-p2",
@@ -1419,9 +1419,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Martes 27 de octubre de 2026",
+    "venue": "LAF",
+    "time": "17:30"
   },
   {
     "id": "clausura-peque-f9-p5",
@@ -1723,9 +1723,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 13 de noviembre de 2026",
+    "venue": "Club Manquehue",
+    "time": "17:30"
   },
   {
     "id": "clausura-mini-f4-p4",
@@ -1734,14 +1734,14 @@
     "category": "mini",
     "round": 4,
     "order": 4,
-    "home": "Ultimate S.A",
-    "away": "Estadio Español",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "home": "Estadio Español",
+    "away": "Ultimate S.A",
+    "homeScore": 8,
+    "awayScore": 1,
+    "status": "played",
+    "date": "Martes 27 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "19:20"
   },
   {
     "id": "clausura-mini-f4-p5",
@@ -1846,14 +1846,14 @@
     "category": "mini",
     "round": 6,
     "order": 1,
-    "home": "Inter",
-    "away": "Estadio Israelita",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "home": "Estadio Israelita",
+    "away": "Inter",
+    "homeScore": 2,
+    "awayScore": 3,
+    "status": "played",
+    "date": "Viernes 30 de octubre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "18:30"
   },
   {
     "id": "clausura-mini-f6-p2",
@@ -2139,9 +2139,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Martes 27 de octubre de 2026",
+    "venue": "LAF",
+    "time": "17:30"
   },
   {
     "id": "clausura-mini-f9-p5",
@@ -2440,12 +2440,12 @@
     "order": 3,
     "home": "Club Manquehue",
     "away": "Inter",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 7,
+    "awayScore": 1,
+    "status": "played",
+    "date": "Jueves 29 de octubre de 2026",
+    "venue": "Club Manquehue",
+    "time": "18:00"
   },
   {
     "id": "clausura-infantil-f4-p4",
@@ -2859,9 +2859,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Martes 27 de octubre de 2026",
+    "venue": "LAF",
+    "time": "18:30"
   },
   {
     "id": "clausura-infantil-f9-p5",
@@ -3160,12 +3160,12 @@
     "order": 3,
     "home": "Club Manquehue",
     "away": "Inter",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 8,
+    "awayScore": 0,
+    "status": "played",
+    "date": "Jueves 29 de octubre de 2026",
+    "venue": "Club Manquehue",
+    "time": "19:00"
   },
   {
     "id": "clausura-intermedia-f4-p4",
@@ -3174,14 +3174,14 @@
     "category": "intermedia",
     "round": 4,
     "order": 4,
-    "home": "Ultimate S.A",
-    "away": "Estadio Español",
+    "home": "Estadio Español",
+    "away": "Ultimate S.A",
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Miércoles 28 de octubre de 2026",
+    "venue": "Estadio Español",
+    "time": "17:30"
   },
   {
     "id": "clausura-intermedia-f4-p5",
@@ -3448,12 +3448,12 @@
     "order": 1,
     "home": "Stadio Italiano",
     "away": "Estadio Israelita",
-    "homeScore": 4,
+    "homeScore": 1,
     "awayScore": 0,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Jueves 29 de octubre de 2026",
+    "venue": "Stadio Italiano",
+    "time": "18:30"
   },
   {
     "id": "clausura-intermedia-f8-p2",
@@ -3579,9 +3579,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Martes 27 de octubre de 2026",
+    "venue": "LAF",
+    "time": "18:30"
   },
   {
     "id": "clausura-intermedia-f9-p5",
