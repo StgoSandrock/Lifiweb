@@ -29,6 +29,8 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
     "cup-2026-pre-peque-f6-p3": [1, 4],
   "cup-2026-pre-peque-f4-p2": [5, 1],
   "cup-2026-pre-peque-f5-p3": [3, 4],
+  "cup-2026-pre-peque-f6-p1": [4, 3],
+  "cup-2026-pre-peque-f6-p2": [8, 3],
   // PEQUE
   "cup-2026-peque-f1-p1": [2, 2],
   "cup-2026-peque-f1-p2": [4, 2],
@@ -47,11 +49,14 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
   "cup-2026-peque-f4-p5": [4, 1],
   "cup-2026-peque-f7-p3": [0, 6],
   "cup-2026-peque-f8-p1": [12, 2],
-  "cup-2026-peque-f8-p2": [2, 3],
+  "cup-2026-peque-f8-p2": [8, 0],
     "cup-2026-peque-f5-p3": [3, 3],
     "cup-2026-peque-f6-p1": [2, 10],
   "cup-2026-peque-f2-p1": [5, 0],
   "cup-2026-peque-f6-p5": [4, 3],
+  "cup-2026-peque-f8-p3": [6, 1],
+  "cup-2026-peque-f6-p2": [6, 3],
+  "cup-2026-peque-f8-p4": [3, 0],
   // MINI
   "cup-2026-mini-f1-p3": [3, 2],
   "cup-2026-mini-f1-p4": [1, 2],
@@ -73,6 +78,7 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
     "cup-2026-mini-f2-p1": [2, 2],
   "cup-2026-mini-f5-p1": [5, 0],
   "cup-2026-mini-f7-p3": [0, 4],
+  "cup-2026-mini-f7-p2": [5, 1],
   // INFANTIL
   "cup-2026-infantil-f1-p1": [1, 1],
   "cup-2026-infantil-f1-p2": [3, 0],
@@ -122,6 +128,56 @@ const CUP_MATCH_DETAILS: Readonly<Record<string, Partial<Pick<Match, "date" | "t
     date: "Viernes 16 de octubre de 2026",
     time: "18:15",
     venue: "USS",
+  },
+  "cup-2026-peque-f8-p3": {
+    date: "Jueves 29 de octubre de 2026",
+    time: "17:00",
+    venue: "Stadio Italiano",
+  },
+  "cup-2026-pre-peque-f1-p2": {
+    date: "Jueves 29 de octubre de 2026",
+    time: "17:15",
+    venue: "Estadio Israelita",
+  },
+  "cup-2026-pre-peque-f6-p1": {
+    date: "Miércoles 28 de octubre de 2026",
+    time: "17:00",
+    venue: "Barnechea",
+  },
+  "cup-2026-mini-f7-p2": {
+    date: "Miércoles 28 de octubre de 2026",
+    time: "17:00",
+    venue: "Barnechea",
+  },
+  "cup-2026-peque-f6-p2": {
+    date: "Sábado 31 de octubre de 2026",
+    time: "10:00",
+    venue: "Country Club",
+  },
+  "cup-2026-mini-f3-p2": {
+    date: "Viernes 30 de octubre de 2026",
+    time: "17:30",
+    venue: "San Carlos",
+  },
+  "cup-2026-peque-f8-p2": {
+    date: "Viernes 30 de octubre de 2026",
+    time: "16:30",
+    venue: "Estadio Israelita",
+  },
+  "cup-2026-pre-peque-f6-p2": {
+    date: "Viernes 30 de octubre de 2026",
+    time: "17:00",
+    venue: "Club Deportivo Manquehue",
+  },
+  "cup-2026-peque-f8-p4": {
+    date: "Viernes 30 de octubre de 2026",
+    time: "17:00",
+    venue: "Club Deportivo Manquehue",
+  },
+  "cup-2026-infantil-f3-p1": {
+    date: "Viernes 30 de octubre de 2026",
+    time: "18:00",
+    venue: "Club Deportivo Manquehue",
   },
 };
 
@@ -175,11 +231,11 @@ export const CUP_FIXTURES: Match[] = [
   ...cupRound("peque", 9, [["Barnechea","Alumni"],["D Rojos","Estadio Español"],["Club Palestino","Club Manquehue"],["USS","Stadio Italiano"],["C Club","Estadio Israelita"]]),
   ...cupRound("mini", 1, [["Alumni B","USS"],["Barnechea","Club Manquehue"],["Club Palestino","Ultimate S.A."],["C Club","D Rojos"]]),
   ...cupRound("mini", 2, [["USS","Alumni A"],["Alumni B","Ultimate S.A."],["Barnechea","D Rojos"],["Club Palestino","C Club"]]),
-  ...cupRound("mini", 3, [["Alumni A","Club Manquehue"],["USS","Ultimate S.A."],["Alumni B","C Club"],["Barnechea","Club Palestino"]]),
+  ...cupRound("mini", 3, [["Alumni A","Club Manquehue"],["Ultimate S.A.","USS"],["Alumni B","C Club"],["Barnechea","Club Palestino"]]),
   ...cupRound("mini", 4, [["Alumni A","Ultimate S.A."],["Club Manquehue","D Rojos"],["USS","C Club"],["Alumni B","Barnechea"]]),
   ...cupRound("mini", 5, [["Alumni A","D Rojos"],["Ultimate S.A.","C Club"],["Club Manquehue","Club Palestino"],["USS","Barnechea"]]),
   ...cupRound("mini", 6, [["Alumni A","C Club"],["D Rojos","Club Palestino"],["Ultimate S.A.","Barnechea"],["Club Manquehue","Alumni B"]]),
-  ...cupRound("mini", 7, [["Alumni A","Club Palestino"],["C Club","Barnechea"],["D Rojos","Alumni B"],["Club Manquehue","USS"]]),
+  ...cupRound("mini", 7, [["Alumni A","Club Palestino"],["Barnechea","C Club"],["D Rojos","Alumni B"],["Club Manquehue","USS"]]),
   ...cupRound("mini", 8, [["Alumni A","Barnechea"],["Club Palestino","Alumni B"],["D Rojos","USS"],["Ultimate S.A.","Club Manquehue"]]),
   ...cupRound("mini", 9, [["Alumni A","Alumni B"],["Club Palestino","USS"],["C Club","Club Manquehue"],["Ultimate S.A.","D Rojos"]]),
   ...cupRound("infantil", 1, [["Barnechea","D Rojos"],["Club Manquehue","USS"]]),
