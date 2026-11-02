@@ -2728,12 +2728,12 @@
     "order": 1,
     "home": "Stadio Italiano",
     "away": "Estadio Israelita",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 1,
+    "awayScore": 0,
+    "status": "played",
+    "date": "Jueves 29 de octubre de 2026",
+    "venue": "Stadio Italiano",
+    "time": "18:30"
   },
   {
     "id": "clausura-infantil-f8-p2",
@@ -3448,12 +3448,12 @@
     "order": 1,
     "home": "Stadio Italiano",
     "away": "Estadio Israelita",
-    "homeScore": 1,
+    "homeScore": 4,
     "awayScore": 0,
     "status": "played",
-    "date": "Jueves 29 de octubre de 2026",
-    "venue": "Stadio Italiano",
-    "time": "18:30"
+    "date": null,
+    "venue": null,
+    "time": null
   },
   {
     "id": "clausura-intermedia-f8-p2",
