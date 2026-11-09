@@ -31,12 +31,12 @@ function standing(
 
 export const LFF_OFFICIAL_STANDINGS: Standing[] = [
   standing("Club Palestino B", 7, 6, 0, 1, 25, 9, 18),
+  standing("Club Deportivo Manquehue", 7, 4, 1, 2, 19, 14, 13),
   standing("Country Club A", 5, 4, 0, 1, 19, 5, 12),
   standing("Stadio Italiano", 6, 4, 0, 2, 20, 11, 12),
-  standing("Club Deportivo Manquehue", 7, 4, 1, 2, 19, 14, 13),
-  standing("Estadio Español", 6, 3, 1, 2, 8, 14, 10),
   standing("Equipo Médico", 6, 2, 2, 2, 8, 10, 10),
+  standing("Estadio Español", 6, 3, 1, 2, 8, 14, 10),
   standing("Country Club B", 6, 1, 2, 3, 3, 11, 6),
   standing("Club Palestino A", 7, 0, 2, 5, 7, 13, 4),
   standing("Sport Academy", 8, 0, 2, 6, 5, 24, 2),
-];
+]
