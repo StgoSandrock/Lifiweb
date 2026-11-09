@@ -389,8 +389,16 @@ const MATCH_OVERRIDES: Record<
     away: "Sport Academy",
     homeScore: 1,
     awayScore: 1,
+    homePenalties: 1,
+    awayPenalties: 0,
     status: "played",
-    events: [],
+    date: "Lunes 2 de noviembre de 2026",
+    time: "20:30",
+    venue: "E. CORFO",
+    events: [
+      { id: "med-perez-r7-1", type: "goal", team: "Equipo Médico", player: "Perez" },
+      { id: "sport-ly-r7-1", type: "goal", team: "Sport Academy", player: "Ly" },
+    ],
   },
   "lff-superior-r8-m2": {
     home: "Stadio Italiano",
@@ -433,11 +441,21 @@ const MATCH_OVERRIDES: Record<
   "lff-superior-r5-m2": {
     home: "Club Deportivo Manquehue",
     away: "Sport Academy",
-    status: "postponed",
-    date: "Lunes 26 de octubre de 2026",
+    homeScore: 5,
+    awayScore: 2,
+    status: "played",
+    date: "Lunes 2 de noviembre de 2026",
     time: "20:00",
     venue: "Manquehue",
-    events: [],
+    events: [
+      { id: "sport-pardo-r5-1", type: "goal", team: "Sport Academy", player: "Pardo" },
+      { id: "sport-diaz-r5-1", type: "goal", team: "Sport Academy", player: "Diaz" },
+      { id: "manq-martinez-r5-1", type: "goal", team: "Club Deportivo Manquehue", player: "Martinez" },
+      { id: "manq-monsalves-r5-1", type: "goal", team: "Club Deportivo Manquehue", player: "Monsalves" },
+      { id: "manq-villota-r5-1", type: "goal", team: "Club Deportivo Manquehue", player: "Villota" },
+      { id: "manq-durarde-r5-1", type: "goal", team: "Club Deportivo Manquehue", player: "Durarde" },
+      { id: "manq-durarde-r5-2", type: "goal", team: "Club Deportivo Manquehue", player: "Durarde" },
+    ],
   },
 };
 
