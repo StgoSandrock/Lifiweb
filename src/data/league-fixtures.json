@@ -3368,9 +3368,9 @@
     "order": 1,
     "home": "Estadio Israelita",
     "away": "Ultimate S.A",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
+    "homeScore": 2,
+    "awayScore": 1,
+    "status": "played",
     "date": null,
     "venue": null,
     "time": null
