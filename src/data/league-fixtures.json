@@ -472,12 +472,12 @@
     "order": 5,
     "home": "Club Manquehue",
     "away": "Estadio Español",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 3,
+    "awayScore": 3,
+    "status": "played",
+    "date": "Viernes 20 de noviembre de 2026",
+    "venue": "Club Manquehue",
+    "time": "18:30"
   },
   {
     "id": "clausura-pre-peque-f7-p1",
@@ -488,12 +488,12 @@
     "order": 1,
     "home": "Estadio Israelita",
     "away": "Ultimate S.A",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 3,
+    "awayScore": 2,
+    "status": "played",
+    "date": "Jueves 19 de noviembre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "17:30"
   },
   {
     "id": "clausura-pre-peque-f7-p2",
@@ -504,12 +504,12 @@
     "order": 2,
     "home": "Inter",
     "away": "Stadio Italiano",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 1,
+    "awayScore": 11,
+    "status": "played",
+    "date": "Sábado 21 de noviembre de 2026",
+    "venue": "Stadio Italiano",
+    "time": "09:00"
   },
   {
     "id": "clausura-pre-peque-f7-p3",
@@ -1192,12 +1192,12 @@
     "order": 5,
     "home": "Club Manquehue",
     "away": "Estadio Español",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 1,
+    "awayScore": 3,
+    "status": "played",
+    "date": "Viernes 20 de noviembre de 2026",
+    "venue": "Club Manquehue",
+    "time": "18:30"
   },
   {
     "id": "clausura-peque-f7-p1",
@@ -1211,9 +1211,9 @@
     "homeScore": null,
     "awayScore": null,
     "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Viernes 20 de noviembre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "17:30"
   },
   {
     "id": "clausura-peque-f7-p2",
@@ -1224,12 +1224,12 @@
     "order": 2,
     "home": "Inter",
     "away": "Stadio Italiano",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 0,
+    "awayScore": 10,
+    "status": "played",
+    "date": "Sábado 21 de noviembre de 2026",
+    "venue": "Stadio Italiano",
+    "time": "09:00"
   },
   {
     "id": "clausura-peque-f7-p3",
@@ -1912,12 +1912,12 @@
     "order": 5,
     "home": "Club Manquehue",
     "away": "Estadio Español",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 2,
+    "awayScore": 2,
+    "status": "played",
+    "date": "Viernes 20 de noviembre de 2026",
+    "venue": "Club Manquehue",
+    "time": "17:30"
   },
   {
     "id": "clausura-mini-f7-p1",
@@ -1944,12 +1944,12 @@
     "order": 2,
     "home": "Inter",
     "away": "Stadio Italiano",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 1,
+    "awayScore": 2,
+    "status": "played",
+    "date": "Sábado 21 de noviembre de 2026",
+    "venue": "Stadio Italiano",
+    "time": "11:45"
   },
   {
     "id": "clausura-mini-f7-p3",
@@ -2664,12 +2664,12 @@
     "order": 2,
     "home": "Inter",
     "away": "Stadio Italiano",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 1,
+    "awayScore": 1,
+    "status": "played",
+    "date": "Miércoles 18 de noviembre de 2026",
+    "venue": "Stadio Italiano",
+    "time": "18:45"
   },
   {
     "id": "clausura-infantil-f7-p3",
@@ -2792,12 +2792,12 @@
     "order": 5,
     "home": "LIF",
     "away": "Bianconero",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 1,
+    "awayScore": 6,
+    "status": "played",
+    "date": "Martes 17 de noviembre de 2026",
+    "venue": "LIF",
+    "time": "18:00"
   },
   {
     "id": "clausura-infantil-f9-p1",
@@ -3371,9 +3371,9 @@
     "homeScore": 2,
     "awayScore": 1,
     "status": "played",
-    "date": null,
-    "venue": null,
-    "time": null
+    "date": "Miércoles 18 de noviembre de 2026",
+    "venue": "Estadio Israelita",
+    "time": "18:00"
   },
   {
     "id": "clausura-intermedia-f7-p2",
@@ -3384,12 +3384,12 @@
     "order": 2,
     "home": "Inter",
     "away": "Stadio Italiano",
-    "homeScore": null,
-    "awayScore": null,
-    "status": "scheduled",
-    "date": null,
-    "venue": null,
-    "time": null
+    "homeScore": 0,
+    "awayScore": 15,
+    "status": "played",
+    "date": "Miércoles 18 de noviembre de 2026",
+    "venue": "Stadio Italiano",
+    "time": "20:00"
   },
   {
     "id": "clausura-intermedia-f7-p3",
