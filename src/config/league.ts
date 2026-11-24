@@ -91,8 +91,6 @@ export const CUP_CLUBS_BY_CATEGORY: Partial<Record<CategoryId, readonly Club[]>>
     cupClub("cup-prince-of-wales", "Prince of Wales"),
     cupClub("cup-futuro-albo", "Futuro Albo", "/clubs/futuro-albo.jpeg"),
     cupClub("cup-ultimate", "Ultimate S.A.", "/clubs/ultimate.svg"),
-    cupClub("cup-espanol-mini", "Estadio Español", "/clubs/espanol.svg", ["Español"]),
-    cupClub("cup-italiano-mini", "Stadio Italiano", "/clubs/italiano.svg", ["Italiano"]),
   ],
 };
 
