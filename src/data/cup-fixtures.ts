@@ -34,6 +34,9 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
   "cup-2026-pre-peque-f8-p4": [7, 1],
   "cup-2026-pre-peque-f7-p2": [3, 6],
   "cup-2026-pre-peque-f5-p1": [0, 9],
+  "cup-2026-pre-peque-f3-p4": [5, 5],
+  "cup-2026-pre-peque-f9-p1": [2, 7],
+  "cup-2026-pre-peque-f7-p4": [0, 3],
   // PEQUE
   "cup-2026-peque-f1-p1": [2, 2],
   "cup-2026-peque-f1-p2": [4, 2],
@@ -65,13 +68,15 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
   "cup-2026-peque-f5-p1": [0, 3],
   "cup-2026-peque-f1-p5": [4, 0],
   "cup-2026-peque-f5-p4": [0, 3],
+  "cup-2026-peque-f7-p5": [3, 5],
+  "cup-2026-peque-f9-p2": [3, 3],
   // MINI
   "cup-2026-mini-f1-p3": [3, 2],
   "cup-2026-mini-f1-p4": [1, 2],
   "cup-2026-mini-f2-p2": [3, 3],
   "cup-2026-mini-f2-p3": [2, 0],
   "cup-2026-mini-f2-p4": [1, 0],
-  "cup-2026-mini-f3-p1": [1, 1],
+  "cup-2026-mini-f3-p1": [0, 3],
   "cup-2026-mini-f3-p4": [2, 0],
   "cup-2026-mini-f4-p1": [11, 3],
   "cup-2026-mini-f4-p2": [3, 1],
@@ -92,6 +97,7 @@ const CUP_RESULT_OVERRIDES: Readonly<Record<string, readonly [number, number]>> 
   "cup-2026-mini-f8-p3": [4, 1],
   "cup-2026-mini-f3-p3": [0, 3],
   "cup-2026-mini-f6-p1": [0, 3],
+  "cup-2026-mini-f5-p3": [4, 1],
   // INFANTIL
   "cup-2026-infantil-f1-p1": [1, 1],
   "cup-2026-infantil-f1-p2": [3, 0],
@@ -253,6 +259,44 @@ const CUP_MATCH_DETAILS: Readonly<Record<string, Partial<Pick<Match, "date" | "t
     time: "10:45",
     venue: "Country Club",
   },
+  "cup-2026-pre-peque-f3-p4": {
+    date: "Miércoles 18 de noviembre de 2026",
+    time: "17:30",
+    venue: "Barnechea",
+  },
+  "cup-2026-peque-f7-p5": {
+    date: "Viernes 20 de noviembre de 2026",
+    time: "17:00",
+    venue: "Country Club",
+  },
+  "cup-2026-pre-peque-f9-p1": {
+    date: "Viernes 20 de noviembre de 2026",
+    time: "18:00",
+    venue: "Country Club",
+  },
+  "cup-2026-mini-f5-p3": {
+    date: "Sábado 21 de noviembre de 2026",
+    time: "11:15",
+    venue: "Club Deportivo Manquehue",
+  },
+  "cup-2026-peque-f9-p2": {
+    date: "Sábado 21 de noviembre de 2026",
+    time: "10:00",
+    venue: "Estadio Español",
+  },
+  "cup-2026-mini-f3-p1": {
+    date: "Martes 24 de noviembre de 2026",
+    time: "18:00",
+    venue: "C D Alumni",
+  },
+  "cup-2026-mini-f9-p1": {
+    date: "Jueves 26 de noviembre de 2026",
+    time: "17:45",
+    venue: "C D Alumni",
+  },
+  "cup-2026-pre-peque-f7-p4": {
+    venue: "C D Alumni",
+  },
 };
 
 function cupRound(
@@ -318,4 +362,21 @@ export const CUP_FIXTURES: Match[] = [
   ...cupRound("infantil", 4, [["D Rojos","Barnechea"],["USS","Club Manquehue"]]),
   ...cupRound("infantil", 5, [["USS","D Rojos"],["Club Manquehue","Barnechea"]]),
   ...cupRound("infantil", 6, [["D Rojos","Club Manquehue"],["Barnechea","USS"]]),
+  {
+    id: "cup-2026-mini-adicional-italiano-espanol",
+    tournament: "clausura",
+    competition: "cup",
+    category: "mini",
+    round: 10,
+    roundLabel: "Partido adicional",
+    order: 1,
+    home: "Stadio Italiano",
+    away: "Estadio Español",
+    homeScore: 2,
+    awayScore: 2,
+    status: "played",
+    date: null,
+    time: null,
+    venue: null,
+  },
 ];
